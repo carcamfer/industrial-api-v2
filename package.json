@@ -1,0 +1,37 @@
+{
+  "name": "industrial-api-v2",
+  "version": "2.0.0",
+  "description": "Industrial event ingestion and query API with modular structure and Dockerized Postgres backend",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js",
+    "lint": "eslint .",
+    "db:migrate": "psql $DATABASE_URL -f db/init.sql",
+    "seed:events": "node scripts/seedEvents.js",
+    "seed:stream": "node scripts/simulateStream.js",
+    "apikey:create": "node scripts/createApiKey.js"
+  },
+  "dependencies": {
+    "ajv": "^8.18.0",
+    "ajv-formats": "^3.0.1",
+    "dayjs": "^1.11.13",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "morgan": "^1.10.0",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.18.0",
+    "pg-format": "^1.0.4",
+    "pug": "^3.0.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.4.0",
+    "nodemon": "^3.1.7"
+  }
+}

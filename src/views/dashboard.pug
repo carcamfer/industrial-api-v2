@@ -1,0 +1,77 @@
+extends layout
+
+block content
+  - const totals = summary.totals || { total: 0, last_24h: 0, last_hour: 0 };
+  section.cards
+    article.card
+      h2 Total eventos
+      p.metric #{totals.total}
+      p.subtext acumulado histórico
+    article.card
+      h2 Últimas 24h
+      p.metric #{totals.last_24h}
+      p.subtext eventos recientes
+    article.card
+      h2 Última hora
+      p.metric #{totals.last_hour}
+      p.subtext actividad inmediata
+
+  section.table-section
+    h2 Por severidad
+    table
+      thead
+        tr
+          th Severidad
+          th Conteo
+      tbody
+        if summary.severity && summary.severity.length
+          each row in summary.severity
+            tr
+              td= row.severity
+              td= row.count
+        else
+          tr
+            td(colspan="2") Sin datos
+
+  section.table-section
+    h2 Módulos con más eventos
+    table
+      thead
+        tr
+          th Módulo
+          th Conteo
+      tbody
+        if summary.modules && summary.modules.length
+          each row in summary.modules
+            tr
+              td= row.module_id
+              td= row.count
+        else
+          tr
+            td(colspan="2") Sin datos
+
+  section.table-section
+    h2 Eventos recientes
+    table
+      thead
+        tr
+          th Timestamp
+          th Módulo
+          th Activo
+          th Tipo
+          th Severidad
+          th Datos
+      tbody
+        if events && events.length
+          each event in events
+            tr
+              td= event.timestamp_fmt
+              td= event.module_id
+              td= event.asset_id
+              td= event.event_type
+              td= event.severity
+              td
+                code= JSON.stringify(event.data)
+        else
+          tr
+            td(colspan="6") Sin eventos registrados
