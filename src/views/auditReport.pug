@@ -1,0 +1,117 @@
+extends layout
+
+block content
+  style.
+    .audit-header { background: #1a1a2e; color: #fff; padding: 2rem; border-radius: 8px; margin-bottom: 2rem; }
+    .audit-header h2 { margin: 0 0 0.5rem; font-size: 1.6rem; }
+    .audit-meta { font-size: 0.85rem; opacity: 0.7; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+    .summary-card { padding: 1.2rem; border-radius: 8px; text-align: center; }
+    .summary-card h3 { margin: 0; font-size: 2.2rem; }
+    .summary-card p { margin: 0.3rem 0 0; font-size: 0.85rem; opacity: 0.8; }
+    .card-total       { background: #2d3748; color: #fff; }
+    .card-compliant   { background: #276749; color: #fff; }
+    .card-warning     { background: #744210; color: #fff; }
+    .card-noncompliant{ background: #742a2a; color: #fff; }
+    .section-title { font-size: 1.2rem; font-weight: bold; margin: 2rem 0 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+    .standard-block { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1.5rem; overflow: hidden; }
+    .standard-header { padding: 1rem 1.5rem; background: #f7fafc; display: flex; justify-content: space-between; align-items: center; }
+    .standard-name { font-weight: bold; font-size: 1rem; }
+    .badges { display: flex; gap: 0.5rem; }
+    .badge { padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+    .badge-ok  { background: #c6f6d5; color: #276749; }
+    .badge-warn{ background: #fefcbf; color: #744210; }
+    .badge-fail{ background: #fed7d7; color: #742a2a; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.7rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem; }
+    th { background: #f7fafc; font-weight: 600; }
+    .status-COMPLIANT    { color: #276749; font-weight: bold; }
+    .status-WARNING      { color: #b7791f; font-weight: bold; }
+    .status-NON_COMPLIANT{ color: #c53030; font-weight: bold; }
+    .critical-block { background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1rem; }
+    .critical-block h4 { margin: 0 0 0.5rem; color: #c53030; }
+    .rec-list { list-style: none; padding: 0; }
+    .rec-list li { padding: 0.7rem 1rem; border-left: 4px solid #4299e1; margin-bottom: 0.5rem; background: #ebf8ff; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+    .no-findings { color: #276749; padding: 1rem; background: #f0fff4; border-radius: 8px; }
+    @media print { body { font-size: 12px; } .summary-grid { grid-template-columns: repeat(2,1fr); } }
+
+  .audit-header
+    h2 📋 Reporte de Auditoría ISO
+    p.audit-meta
+      | ID: #{report.reportId} &nbsp;|&nbsp;
+      | Generado: #{new Date(report.generatedAt).toLocaleString('es-MX')}
+      if report.period.from
+        |  &nbsp;|&nbsp; Período: #{new Date(report.period.from).toLocaleDateString('es-MX')} – #{new Date(report.period.to).toLocaleDateString('es-MX')}
+
+  .summary-grid
+    .summary-card.card-total
+      h3= report.summary.total
+      p Total de eventos
+    .summary-card.card-compliant
+      h3= report.summary.compliant
+      p Conformes
+    .summary-card.card-warning
+      h3= report.summary.warnings
+      p Advertencias
+    .summary-card.card-noncompliant
+      h3= report.summary.nonCompliant
+      p No conformes
+
+  h3.section-title Cumplimiento por Norma ISO
+
+  each stdData, stdName in report.byStandard
+    .standard-block
+      .standard-header
+        span.standard-name= stdName
+        .badges
+          span.badge.badge-ok ✓ #{stdData.compliant}
+          span.badge.badge-warn ⚠ #{stdData.warnings}
+          span.badge.badge-fail ✗ #{stdData.nonCompliant}
+      table
+        thead
+          tr
+            th Cláusula
+            th Título
+            th Conformes
+            th Advertencias
+            th No Conformes
+        tbody
+          each clause in stdData.clauses
+            tr
+              td= clause.clause
+              td= clause.title
+              td.status-COMPLIANT= clause.compliant
+              td.status-WARNING= clause.warnings
+              td.status-NON_COMPLIANT= clause.nonCompliant
+
+  h3.section-title Hallazgos Críticos
+
+  if report.criticalFindings.length === 0
+    p.no-findings ✅ No se encontraron hallazgos críticos en el período analizado.
+  else
+    each finding in report.criticalFindings
+      .critical-block
+        h4 🚨 #{finding.module.toUpperCase()} — #{finding.asset}
+        p
+          strong Timestamp: 
+          | #{new Date(finding.timestamp).toLocaleString('es-MX')}
+        p
+          strong Normas afectadas: 
+          | #{finding.standards}
+        p
+          strong Recomendación: 
+          | #{finding.recommendation}
+
+  h3.section-title Recomendaciones
+
+  if report.recommendations.length === 0
+    p.no-findings ✅ Sin recomendaciones pendientes.
+  else
+    ul.rec-list
+      each rec in report.recommendations
+        li= rec
+
+  p(style="margin-top:2rem; text-align:right;")
+    a(href="/dashboard") ← Volver al Dashboard
+    |  &nbsp;|&nbsp; 
+    a(href="javascript:window.print()") 🖨 Imprimir / Exportar PDF

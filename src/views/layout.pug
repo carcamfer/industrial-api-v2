@@ -8,7 +8,10 @@ html(lang="es")
   body
     header
       h1 CTRLHACK 2.0 · Industrial Dashboard
-      p.status Indicator de eventos en vivo
+      p.status
+        a(href="/dashboard") Dashboard
+        |  &nbsp;|&nbsp; 
+        a(href="/audit-report") 📋 Reporte de Auditoría ISO
     main
       block content
     footer

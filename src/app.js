@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import eventsRouter from './routes/eventsRoutes.js';
 import dashboardRouter from './routes/dashboardRoutes.js';
+import auditRouter from './routes/auditRoutes.js';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(morgan(LOG_LEVEL));
 
 app.use('/api/v1/events', eventsRouter);
 app.use('/dashboard', dashboardRouter);
+app.use('/audit-report', auditRouter);
 
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
