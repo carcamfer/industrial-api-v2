@@ -37,7 +37,16 @@ block content
     .standard-block table td, .standard-block table th { color: #1a202c; }
     .critical-block p, .critical-block h4 { color: #1a202c; }
     .critical-block h4 { color: #c53030; }
-    @media print { body { font-size: 12px; } .summary-grid { grid-template-columns: repeat(2,1fr); } .scrollable { max-height: none; overflow: visible; } }
+    @media print {
+      body { font-size: 11px; }
+      .summary-grid { grid-template-columns: repeat(2,1fr); }
+      .scrollable { max-height: none !important; overflow: visible !important; border: none; }
+      .standard-block { page-break-inside: avoid; }
+      .critical-block { page-break-inside: avoid; }
+      .audit-header { background: #1a1a2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .summary-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
 
   .audit-header
     h2 📋 Reporte de Auditoría ISO
