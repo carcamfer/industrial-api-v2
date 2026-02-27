@@ -31,9 +31,13 @@ block content
     .critical-block { background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1rem; }
     .critical-block h4 { margin: 0 0 0.5rem; color: #c53030; }
     .rec-list { list-style: none; padding: 0; }
-    .rec-list li { padding: 0.7rem 1rem; border-left: 4px solid #4299e1; margin-bottom: 0.5rem; background: #ebf8ff; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
+    .rec-list li { padding: 0.7rem 1rem; border-left: 4px solid #4299e1; margin-bottom: 0.5rem; background: #ebf8ff; color: #1a202c; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
     .no-findings { color: #276749; padding: 1rem; background: #f0fff4; border-radius: 8px; }
-    @media print { body { font-size: 12px; } .summary-grid { grid-template-columns: repeat(2,1fr); } }
+    .scrollable { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem; background: #fff; color: #1a202c; }
+    .standard-block table td, .standard-block table th { color: #1a202c; }
+    .critical-block p, .critical-block h4 { color: #1a202c; }
+    .critical-block h4 { color: #c53030; }
+    @media print { body { font-size: 12px; } .summary-grid { grid-template-columns: repeat(2,1fr); } .scrollable { max-height: none; overflow: visible; } }
 
   .audit-header
     h2 📋 Reporte de Auditoría ISO
@@ -59,9 +63,10 @@ block content
 
   h3.section-title Cumplimiento por Norma ISO
 
-  each stdData, stdName in report.byStandard
-    .standard-block
-      .standard-header
+  .scrollable(style="max-height:500px")
+    each stdData, stdName in report.byStandard
+      .standard-block
+        .standard-header
         span.standard-name= stdName
         .badges
           span.badge.badge-ok ✓ #{stdData.compliant}
@@ -89,27 +94,29 @@ block content
   if report.criticalFindings.length === 0
     p.no-findings ✅ No se encontraron hallazgos críticos en el período analizado.
   else
-    each finding in report.criticalFindings
-      .critical-block
-        h4 🚨 #{finding.module.toUpperCase()} — #{finding.asset}
-        p
-          strong Timestamp: 
-          | #{new Date(finding.timestamp).toLocaleString('es-MX')}
-        p
-          strong Normas afectadas: 
-          | #{finding.standards}
-        p
-          strong Recomendación: 
-          | #{finding.recommendation}
+    .scrollable
+      each finding in report.criticalFindings
+        .critical-block
+          h4 🚨 #{finding.module.toUpperCase()} — #{finding.asset}
+          p
+            strong Timestamp: 
+            | #{new Date(finding.timestamp).toLocaleString('es-MX')}
+          p
+            strong Normas afectadas: 
+            | #{finding.standards}
+          p
+            strong Recomendación: 
+            | #{finding.recommendation}
 
   h3.section-title Recomendaciones
 
   if report.recommendations.length === 0
     p.no-findings ✅ Sin recomendaciones pendientes.
   else
-    ul.rec-list
-      each rec in report.recommendations
-        li= rec
+    .scrollable
+      ul.rec-list
+        each rec in report.recommendations
+          li= rec
 
   p(style="margin-top:2rem; text-align:right;")
     a(href="/dashboard") ← Volver al Dashboard
