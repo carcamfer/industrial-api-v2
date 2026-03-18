@@ -30,7 +30,25 @@ export function generateAuditReport (events) {
   };
 
   const summary = { total: events.length, compliant: 0, nonCompliant: 0, warnings: 0 };
+
+  // Pre-populate all 7 known ISO standards so they always appear in the report
+  const ALL_STANDARDS = [
+    { key: 'ISO 9001:2015',  clauses: [{ clause:'8.5', title:'Control de producción' }, { clause:'8.7', title:'Control de salidas no conformes' }, { clause:'9.1', title:'Seguimiento y evaluación' }] },
+    { key: 'ISO 27001:2022', clauses: [{ clause:'A.12', title:'Seguridad operacional' }] },
+    { key: 'ISO 55001:2014', clauses: [{ clause:'6.2', title:'Objetivos de gestión de activos' }, { clause:'8.1', title:'Planificación y control operacional' }, { clause:'9.1', title:'Monitoreo y evaluación' }] },
+    { key: 'ISO 45001:2018', clauses: [{ clause:'8.1', title:'Planificación y control operacional' }, { clause:'8.2', title:'Preparación ante emergencias' }, { clause:'9.1', title:'Seguimiento del desempeño SST' }] },
+    { key: 'ISO 14001:2015', clauses: [{ clause:'8.1', title:'Control operacional ambiental' }, { clause:'9.1', title:'Seguimiento ambiental' }, { clause:'10.2', title:'No conformidad ambiental' }] },
+    { key: 'ISO 50001:2018', clauses: [{ clause:'6.6', title:'Planificación energética' }, { clause:'9.1', title:'Seguimiento energético' }, { clause:'10.2', title:'No conformidad energética' }] },
+    { key: 'ISO 22301:2019', clauses: [{ clause:'8.4', title:'Procedimientos de continuidad' }] },
+  ];
   const byStandard = {};
+  for (const std of ALL_STANDARDS) {
+    byStandard[std.key] = {
+      compliant: 0, nonCompliant: 0, warnings: 0,
+      clauses: std.clauses.map(c => ({ clause: c.clause, title: c.title, compliant: 0, nonCompliant: 0, warnings: 0 })),
+    };
+  }
+
   const criticalFindings = [];
   const recommendationsSet = new Set();
 
@@ -67,7 +85,7 @@ export function generateAuditReport (events) {
     // By standard
     for (const iso of mapped.isoStandards) {
       if (!byStandard[iso.standard]) {
-        byStandard[iso.standard] = { compliant: 0, nonCompliant: 0, warnings: 0, clauses: {} };
+        byStandard[iso.standard] = { compliant: 0, nonCompliant: 0, warnings: 0, clauses: [] };
       }
 
       const std = byStandard[iso.standard];
@@ -76,20 +94,17 @@ export function generateAuditReport (events) {
       else if (iso.status === 'WARNING')  std.warnings++;
       else                                std.nonCompliant++;
 
-      const clauseKey = iso.clause;
-      if (!std.clauses[clauseKey]) {
-        std.clauses[clauseKey] = { clause: iso.clause, title: iso.title, compliant: 0, nonCompliant: 0, warnings: 0 };
+      // Find existing clause entry or add one
+      let clauseEntry = std.clauses.find(c => c.clause === iso.clause);
+      if (!clauseEntry) {
+        clauseEntry = { clause: iso.clause, title: iso.title, compliant: 0, nonCompliant: 0, warnings: 0 };
+        std.clauses.push(clauseEntry);
       }
 
-      if (iso.status === 'COMPLIANT')     std.clauses[clauseKey].compliant++;
-      else if (iso.status === 'WARNING')  std.clauses[clauseKey].warnings++;
-      else                                std.clauses[clauseKey].nonCompliant++;
+      if (iso.status === 'COMPLIANT')     clauseEntry.compliant++;
+      else if (iso.status === 'WARNING')  clauseEntry.warnings++;
+      else                                clauseEntry.nonCompliant++;
     }
-  }
-
-  // Convertir clauses de objeto a array
-  for (const std of Object.values(byStandard)) {
-    std.clauses = Object.values(std.clauses);
   }
 
   return {

@@ -1,17 +1,8 @@
-import { fetchSummaryStats, fetchRecentEvents } from '../services/dashboardService.js';
-
-export async function renderDashboard (req, res, next) {
-  try {
-    const [summary, recent] = await Promise.all([
-      fetchSummaryStats(),
-      fetchRecentEvents(25)
-    ]);
-
-    return res.render('dashboard', {
-      summary,
-      events: recent
-    });
-  } catch (error) {
-    return next(error);
-  }
+export function renderDashboard (req, res) {
+  const sinceRaw = req.query.since ? Number(req.query.since) : null;
+  return res.render('dashboard', {
+    summary: { severity: [], modules: [], totals: { total: 0, last_24h: 0, last_hour: 0 } },
+    events: [],
+    since: sinceRaw || null,
+  });
 }

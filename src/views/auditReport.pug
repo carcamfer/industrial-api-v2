@@ -1,133 +1,289 @@
 extends layout
 
 block content
-  style.
-    .audit-header { background: #1a1a2e; color: #fff; padding: 2rem; border-radius: 8px; margin-bottom: 2rem; }
-    .audit-header h2 { margin: 0 0 0.5rem; font-size: 1.6rem; }
-    .audit-meta { font-size: 0.85rem; opacity: 0.7; }
-    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
-    .summary-card { padding: 1.2rem; border-radius: 8px; text-align: center; }
-    .summary-card h3 { margin: 0; font-size: 2.2rem; }
-    .summary-card p { margin: 0.3rem 0 0; font-size: 0.85rem; opacity: 0.8; }
-    .card-total       { background: #2d3748; color: #fff; }
-    .card-compliant   { background: #276749; color: #fff; }
-    .card-warning     { background: #744210; color: #fff; }
-    .card-noncompliant{ background: #742a2a; color: #fff; }
-    .section-title { font-size: 1.2rem; font-weight: bold; margin: 2rem 0 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
-    .standard-block { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1.5rem; overflow: hidden; }
-    .standard-header { padding: 1rem 1.5rem; background: #f7fafc; display: flex; justify-content: space-between; align-items: center; }
-    .standard-name { font-weight: bold; font-size: 1rem; }
-    .badges { display: flex; gap: 0.5rem; }
-    .badge { padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
-    .badge-ok  { background: #c6f6d5; color: #276749; }
-    .badge-warn{ background: #fefcbf; color: #744210; }
-    .badge-fail{ background: #fed7d7; color: #742a2a; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 0.7rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem; }
-    th { background: #f7fafc; font-weight: 600; }
-    .status-COMPLIANT    { color: #276749; font-weight: bold; }
-    .status-WARNING      { color: #b7791f; font-weight: bold; }
-    .status-NON_COMPLIANT{ color: #c53030; font-weight: bold; }
-    .critical-block { background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1rem; }
-    .critical-block h4 { margin: 0 0 0.5rem; color: #c53030; }
-    .rec-list { list-style: none; padding: 0; }
-    .rec-list li { padding: 0.7rem 1rem; border-left: 4px solid #4299e1; margin-bottom: 0.5rem; background: #ebf8ff; color: #1a202c; border-radius: 0 4px 4px 0; font-size: 0.9rem; }
-    .no-findings { color: #276749; padding: 1rem; background: #f0fff4; border-radius: 8px; }
-    .scrollable { max-height: 350px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem; background: #fff; color: #1a202c; }
-    .standard-block table td, .standard-block table th { color: #1a202c; }
-    .critical-block p, .critical-block h4 { color: #1a202c; }
-    .critical-block h4 { color: #c53030; }
-    @media print {
-      body { font-size: 11px; }
-      .summary-grid { grid-template-columns: repeat(2,1fr); }
-      .scrollable { max-height: none !important; overflow: visible !important; border: none; }
-      .standard-block { page-break-inside: avoid; }
-      .critical-block { page-break-inside: avoid; }
-      .audit-header { background: #1a1a2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .summary-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    }
+  - pageTitle = 'Reporte Auditoría ISO'
+  - currentPage = 'audit'
 
-  .audit-header
-    h2 📋 Reporte de Auditoría ISO
-    p.audit-meta
-      | ID: #{report.reportId} &nbsp;|&nbsp;
-      | Generado: #{new Date(report.generatedAt).toLocaleString('es-MX')}
-      if report.period.from
-        |  &nbsp;|&nbsp; Período: #{new Date(report.period.from).toLocaleDateString('es-MX')} – #{new Date(report.period.to).toLocaleDateString('es-MX')}
+  .page-header
+    .page-header-inner
+      div
+        .page-breadcrumb
+          a(href="/") Inicio
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          a(href="/integracion-iso") Integración ISO
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          | Reporte Auditoría
+        h1.page-title Reporte de Auditoría ISO
+        p.page-subtitle Cumplimiento automático con ISO 9001 · ISO 27001 · ISO 45001 · ISO 55001 · ISO 14001 · ISO 50001 · ISO 22301
+      .page-actions
+        a.btn.btn-outline(href="/dashboard" + (since ? '?since=' + since : ''))
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            rect(x="3" y="3" width="7" height="7")
+            rect(x="14" y="3" width="7" height="7")
+            rect(x="14" y="14" width="7" height="7")
+            rect(x="3" y="14" width="7" height="7")
+          | Dashboard
+        button.btn.btn-outline(type="button" onclick="window.print()")
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            polyline(points="6,9 6,2 18,2 18,9")
+            path(d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2")
+            rect(x="6" y="14" width="12" height="8")
+          | Imprimir / PDF
 
-  .summary-grid
-    .summary-card.card-total
-      h3= report.summary.total
-      p Total de eventos
-    .summary-card.card-compliant
-      h3= report.summary.compliant
-      p Conformes
-    .summary-card.card-warning
-      h3= report.summary.warnings
-      p Advertencias
-    .summary-card.card-noncompliant
-      h3= report.summary.nonCompliant
-      p No conformes
+  main
+    .audit-header
+      h2
+        svg(width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:.5rem;vertical-align:middle")
+          path(d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z")
+          polyline(points="14,2 14,8 20,8")
+          line(x1="16" y1="13" x2="8" y2="13")
+          line(x1="16" y1="17" x2="8" y2="17")
+          polyline(points="10,9 9,9 8,9")
+        | Reporte de Auditoría ISO
+      p.audit-meta
+        | ID: #{report.reportId} &nbsp;|&nbsp;
+        | Generado: #{new Date(report.generatedAt).toLocaleString('es-MX')}
+        if report.period.from
+          |  &nbsp;|&nbsp; Período: #{new Date(report.period.from).toLocaleDateString('es-MX')} – #{new Date(report.period.to).toLocaleDateString('es-MX')}
+        span#audit-period
 
-  h3.section-title Cumplimiento por Norma ISO
+    .summary-grid
+      .summary-card.card-total
+        h3(id="stat-total")= report.summary.total
+        p Total de eventos
+      .summary-card.card-compliant
+        h3(id="stat-compliant")= report.summary.compliant
+        p Conformes
+      .summary-card.card-warning
+        h3(id="stat-warnings")= report.summary.warnings
+        p Advertencias
+      .summary-card.card-noncompliant
+        h3(id="stat-noncompliant")= report.summary.nonCompliant
+        p No conformes
 
-  .scrollable(style="max-height:500px")
-    each stdData, stdName in report.byStandard
-      .standard-block
-        .standard-header
-        span.standard-name= stdName
-        .badges
-          span.badge.badge-ok ✓ #{stdData.compliant}
-          span.badge.badge-warn ⚠ #{stdData.warnings}
-          span.badge.badge-fail ✗ #{stdData.nonCompliant}
-      table
-        thead
-          tr
-            th Cláusula
-            th Título
-            th Conformes
-            th Advertencias
-            th No Conformes
-        tbody
-          each clause in stdData.clauses
-            tr
-              td= clause.clause
-              td= clause.title
-              td.status-COMPLIANT= clause.compliant
-              td.status-WARNING= clause.warnings
-              td.status-NON_COMPLIANT= clause.nonCompliant
+    h3.section-title
+      svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+        path(d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z")
+      | Cumplimiento por Norma ISO
 
-  h3.section-title Hallazgos Críticos
+    #by-standard-wrap
+      .scrollable(style="max-height:500px")
+        each stdData, stdName in report.byStandard
+          .standard-block
+            .standard-header
+              span.standard-name= stdName
+              .badges
+                span.badge.badge-ok ✓ #{stdData.compliant}
+                span.badge.badge-warn ⚠ #{stdData.warnings}
+                span.badge.badge-fail ✗ #{stdData.nonCompliant}
+            table
+              thead
+                tr
+                  th Cláusula
+                  th Título
+                  th Conformes
+                  th Advertencias
+                  th No Conformes
+              tbody
+                each clause in stdData.clauses
+                  tr
+                    td= clause.clause
+                    td= clause.title
+                    td.status-COMPLIANT= clause.compliant
+                    td.status-WARNING= clause.warnings
+                    td.status-NON_COMPLIANT= clause.nonCompliant
 
-  if report.criticalFindings.length === 0
-    p.no-findings ✅ No se encontraron hallazgos críticos en el período analizado.
-  else
-    .scrollable
-      each finding in report.criticalFindings
-        .critical-block
-          h4 🚨 #{finding.module.toUpperCase()} — #{finding.asset}
-          p
-            strong Timestamp: 
-            | #{new Date(finding.timestamp).toLocaleString('es-MX')}
-          p
-            strong Normas afectadas: 
-            | #{finding.standards}
-          p
-            strong Recomendación: 
-            | #{finding.recommendation}
+    h3.section-title
+      svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+        circle(cx="12" cy="12" r="10")
+        line(x1="12" y1="8" x2="12" y2="12")
+        line(x1="12" y1="16" x2="12.01" y2="16")
+      | Hallazgos Críticos
 
-  h3.section-title Recomendaciones
+    #critical-findings-wrap
+      if report.criticalFindings.length === 0
+        p.no-findings ✅ No se encontraron hallazgos críticos en el período analizado.
+      else
+        .scrollable
+          each finding in report.criticalFindings
+            .critical-block
+              h4 🚨 #{finding.module.toUpperCase()} — #{finding.asset}
+              p
+                strong Timestamp:
+                | #{new Date(finding.timestamp).toLocaleString('es-MX')}
+              p
+                strong Normas afectadas:
+                | #{finding.standards}
+              p
+                strong Recomendación:
+                | #{finding.recommendation}
 
-  if report.recommendations.length === 0
-    p.no-findings ✅ Sin recomendaciones pendientes.
-  else
-    .scrollable
-      ul.rec-list
-        each rec in report.recommendations
-          li= rec
+    h3.section-title
+      svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+        line(x1="8" y1="6" x2="21" y2="6")
+        line(x1="8" y1="12" x2="21" y2="12")
+        line(x1="8" y1="18" x2="21" y2="18")
+        line(x1="3" y1="6" x2="3.01" y2="6")
+        line(x1="3" y1="12" x2="3.01" y2="12")
+        line(x1="3" y1="18" x2="3.01" y2="18")
+      | Recomendaciones
 
-  p(style="margin-top:2rem; text-align:right;")
-    a(href="/dashboard") ← Volver al Dashboard
-    |  &nbsp;|&nbsp; 
-    a(href="javascript:window.print()") 🖨 Imprimir / Exportar PDF
+    #recommendations-wrap
+      if report.recommendations.length === 0
+        p.no-findings ✅ Sin recomendaciones pendientes.
+      else
+        .scrollable
+          ul.rec-list
+            each rec in report.recommendations
+              li= rec
+
+  script.
+    (function() {
+      var events = JSON.parse(localStorage.getItem('iso_events') || '[]');
+      if (!events.length) return;
+
+      // ---- ISO Mapping ----
+      var ISO_MAPPINGS = {
+        quality:     [{standard:'ISO 9001:2015',clause:'8.5',title:'Control de producción y de la provisión del servicio'},{standard:'ISO 9001:2015',clause:'8.7',title:'Control de las salidas no conformes'},{standard:'ISO 9001:2015',clause:'9.1',title:'Seguimiento, medición, análisis y evaluación'}],
+        vision:      [{standard:'ISO 9001:2015',clause:'8.5',title:'Control de producción y de la provisión del servicio'},{standard:'ISO 9001:2015',clause:'8.7',title:'Control de las salidas no conformes'},{standard:'ISO 9001:2015',clause:'9.1',title:'Seguimiento, medición, análisis y evaluación'}],
+        maintenance: [{standard:'ISO 55001:2014',clause:'6.2',title:'Objetivos de gestión de activos y planificación'},{standard:'ISO 55001:2014',clause:'8.1',title:'Planificación y control operacional'},{standard:'ISO 55001:2014',clause:'9.1',title:'Monitoreo, medición, análisis y evaluación'}],
+        safety:      [{standard:'ISO 45001:2018',clause:'8.1',title:'Planificación y control operacional'},{standard:'ISO 45001:2018',clause:'8.2',title:'Preparación y respuesta ante emergencias'},{standard:'ISO 45001:2018',clause:'9.1',title:'Seguimiento, medición, análisis y evaluación del desempeño'}],
+        environment: [{standard:'ISO 14001:2015',clause:'8.1',title:'Planificación y control operacional'},{standard:'ISO 14001:2015',clause:'9.1',title:'Seguimiento, medición, análisis y evaluación'},{standard:'ISO 14001:2015',clause:'10.2',title:'No conformidad y acción correctiva'}],
+        energy:      [{standard:'ISO 50001:2018',clause:'6.6',title:'Planificación energética'},{standard:'ISO 50001:2018',clause:'9.1',title:'Seguimiento, medición, análisis y evaluación'},{standard:'ISO 50001:2018',clause:'10.2',title:'No conformidad y acción correctiva'}],
+      };
+      var BC = {standard:'ISO 22301:2019',clause:'8.4',title:'Procedimientos de continuidad de negocio'};
+      var IS = {standard:'ISO 27001:2022',clause:'A.12',title:'Seguridad operacional'};
+      var RECS = {
+        quality:     {NON_COMPLIANT:'Detener el lote afectado, iniciar revisión de no conformidades según ISO 9001:2015 §8.7 y notificar al responsable de calidad.',WARNING:'Revisar parámetros de calidad del proceso. Documentar la desviación y evaluar acción correctiva preventiva.'},
+        vision:      {NON_COMPLIANT:'Inspeccionar el sistema de visión artificial. Segregar productos sospechosos y abrir reporte de no conformidad (ISO 9001:2015 §8.7).',WARNING:'Verificar calibración del sistema de visión. Documentar la anomalía para análisis de tendencias.'},
+        maintenance: {NON_COMPLIANT:'Detener el activo afectado si hay riesgo de falla inminente. Ejecutar orden de trabajo correctivo urgente (ISO 55001:2014 §8.1).',WARNING:'Programar mantenimiento preventivo anticipado. Revisar el plan de gestión del activo (ISO 55001:2014 §6.2).'},
+        safety:      {NON_COMPLIANT:'ALERTA DE SEGURIDAD: Evacuar zona si es necesario. Activar protocolo de emergencia (ISO 45001:2018 §8.2).',WARNING:'Reforzar controles operacionales en la zona afectada. Revisar evaluación de riesgos (ISO 45001:2018 §8.1).'},
+        environment: {NON_COMPLIANT:'Activar plan de respuesta ambiental. Documentar el incidente y notificar a la autoridad ambiental si aplica (ISO 14001:2015 §10.2).',WARNING:'Monitorear tendencia de parámetros ambientales. Revisar controles operacionales (ISO 14001:2015 §8.1).'},
+        energy:      {NON_COMPLIANT:'Identificar y corregir la causa del consumo energético anómalo. Actualizar línea base energética (ISO 50001:2018 §10.2).',WARNING:'Revisar el plan de uso de energía. Analizar indicadores de desempeño energético (ISO 50001:2018 §9.1).'},
+      };
+      var ALL_STD = [
+        {key:'ISO 9001:2015',  clauses:[{clause:'8.5',title:'Control de producción'},{clause:'8.7',title:'Control de salidas no conformes'},{clause:'9.1',title:'Seguimiento y evaluación'}]},
+        {key:'ISO 27001:2022', clauses:[{clause:'A.12',title:'Seguridad operacional'}]},
+        {key:'ISO 55001:2014', clauses:[{clause:'6.2',title:'Objetivos de gestión de activos'},{clause:'8.1',title:'Planificación y control operacional'},{clause:'9.1',title:'Monitoreo y evaluación'}]},
+        {key:'ISO 45001:2018', clauses:[{clause:'8.1',title:'Planificación y control operacional'},{clause:'8.2',title:'Preparación ante emergencias'},{clause:'9.1',title:'Seguimiento del desempeño SST'}]},
+        {key:'ISO 14001:2015', clauses:[{clause:'8.1',title:'Control operacional ambiental'},{clause:'9.1',title:'Seguimiento ambiental'},{clause:'10.2',title:'No conformidad ambiental'}]},
+        {key:'ISO 50001:2018', clauses:[{clause:'6.6',title:'Planificación energética'},{clause:'9.1',title:'Seguimiento energético'},{clause:'10.2',title:'No conformidad energética'}]},
+        {key:'ISO 22301:2019', clauses:[{clause:'8.4',title:'Procedimientos de continuidad'}]},
+      ];
+
+      function clauseStatus(sev, etype) {
+        if((sev==='CRITICAL'||sev==='HIGH')&&(etype==='ALARM'||etype==='ERROR')) return 'NON_COMPLIANT';
+        if(sev==='MEDIUM'&&etype==='WARNING') return 'WARNING';
+        return 'COMPLIANT';
+      }
+      function overallStatus(arr) {
+        if(arr.indexOf('NON_COMPLIANT')>=0) return 'NON_COMPLIANT';
+        if(arr.indexOf('WARNING')>=0) return 'WARNING';
+        return 'COMPLIANT';
+      }
+      function mapEvent(ev) {
+        var base = (ISO_MAPPINGS[ev.module_id]||[]).map(function(c){ return Object.assign({},c,{status:clauseStatus(ev.severity,ev.event_type)}); });
+        if(ev.severity==='CRITICAL') base.push(Object.assign({},BC,{status:'NON_COMPLIANT'}));
+        if(ev.event_type==='ERROR')  base.push(Object.assign({},IS,{status:clauseStatus(ev.severity,ev.event_type)}));
+        var cs = overallStatus(base.map(function(s){ return s.status; }));
+        var rec = cs==='COMPLIANT'
+          ? 'El módulo "'+ev.module_id+'" opera dentro de los parámetros normativos. Continuar con el monitoreo regular.'
+          : ((RECS[ev.module_id]&&RECS[ev.module_id][cs])||('Revisar el módulo "'+ev.module_id+'" y tomar acción correctiva según '+ev.severity+'.'));
+        return {isoStandards:base, complianceStatus:cs, recommendation:rec};
+      }
+
+      // ---- Generate report ----
+      var ts = events.map(function(e){ return new Date(e.timestamp).getTime(); });
+      var period = {from: new Date(Math.min.apply(null,ts)).toISOString(), to: new Date(Math.max.apply(null,ts)).toISOString()};
+      var summary = {total:events.length,compliant:0,nonCompliant:0,warnings:0};
+      var byStd = {};
+      ALL_STD.forEach(function(s){
+        byStd[s.key] = {compliant:0,nonCompliant:0,warnings:0,
+          clauses:s.clauses.map(function(c){ return {clause:c.clause,title:c.title,compliant:0,nonCompliant:0,warnings:0}; })};
+      });
+      var criticals = [];
+      var recSet = [];
+      events.forEach(function(ev) {
+        var m = mapEvent(ev);
+        if(m.complianceStatus==='COMPLIANT')     summary.compliant++;
+        else if(m.complianceStatus==='WARNING')  summary.warnings++;
+        else                                     summary.nonCompliant++;
+        if(ev.severity==='CRITICAL'&&m.complianceStatus==='NON_COMPLIANT')
+          criticals.push({timestamp:ev.timestamp,module:ev.module_id,asset:ev.asset_id,
+            standards:m.isoStandards.map(function(s){ return s.standard+' §'+s.clause; }).join(', '),recommendation:m.recommendation});
+        if(m.recommendation&&recSet.indexOf(m.recommendation)<0) recSet.push(m.recommendation);
+        m.isoStandards.forEach(function(iso){
+          if(!byStd[iso.standard]) byStd[iso.standard]={compliant:0,nonCompliant:0,warnings:0,clauses:[]};
+          var s = byStd[iso.standard];
+          if(iso.status==='COMPLIANT')     s.compliant++;
+          else if(iso.status==='WARNING')  s.warnings++;
+          else                             s.nonCompliant++;
+          var ce = s.clauses.filter(function(c){ return c.clause===iso.clause; })[0];
+          if(!ce){ ce={clause:iso.clause,title:iso.title,compliant:0,nonCompliant:0,warnings:0}; s.clauses.push(ce); }
+          if(iso.status==='COMPLIANT')     ce.compliant++;
+          else if(iso.status==='WARNING')  ce.warnings++;
+          else                             ce.nonCompliant++;
+        });
+      });
+
+      // ---- Update DOM ----
+      function $(id){ return document.getElementById(id); }
+      $('stat-total').textContent       = summary.total;
+      $('stat-compliant').textContent   = summary.compliant;
+      $('stat-warnings').textContent    = summary.warnings;
+      $('stat-noncompliant').textContent= summary.nonCompliant;
+
+      var pEl = $('audit-period');
+      if(pEl) pEl.textContent = ' \u00a0|\u00a0 Período: '+new Date(period.from).toLocaleDateString('es-MX')+' – '+new Date(period.to).toLocaleDateString('es-MX');
+
+      // by-standard
+      var bsWrap = $('by-standard-wrap');
+      if(bsWrap) {
+        var h='<div class="scrollable" style="max-height:500px">';
+        Object.keys(byStd).forEach(function(name){
+          var d=byStd[name];
+          h+='<div class="standard-block"><div class="standard-header"><span class="standard-name">'+name+'</span>';
+          h+='<div class="badges"><span class="badge badge-ok">✓ '+d.compliant+'</span><span class="badge badge-warn">⚠ '+d.warnings+'</span><span class="badge badge-fail">✗ '+d.nonCompliant+'</span></div></div>';
+          h+='<table><thead><tr><th>Cláusula</th><th>Título</th><th>Conformes</th><th>Advertencias</th><th>No Conformes</th></tr></thead><tbody>';
+          d.clauses.forEach(function(c){
+            h+='<tr><td>'+c.clause+'</td><td>'+c.title+'</td><td class="status-COMPLIANT">'+c.compliant+'</td><td class="status-WARNING">'+c.warnings+'</td><td class="status-NON_COMPLIANT">'+c.nonCompliant+'</td></tr>';
+          });
+          h+='</tbody></table></div>';
+        });
+        h+='</div>';
+        bsWrap.innerHTML=h;
+      }
+
+      // critical findings
+      var cfWrap = $('critical-findings-wrap');
+      if(cfWrap) {
+        if(!criticals.length) {
+          cfWrap.innerHTML='<p class="no-findings">✅ No se encontraron hallazgos críticos en el período analizado.</p>';
+        } else {
+          var h2='<div class="scrollable">';
+          criticals.forEach(function(f){
+            h2+='<div class="critical-block"><h4>🚨 '+f.module.toUpperCase()+' — '+f.asset+'</h4>';
+            h2+='<p><strong>Timestamp:</strong> '+new Date(f.timestamp).toLocaleString('es-MX')+'</p>';
+            h2+='<p><strong>Normas afectadas:</strong> '+f.standards+'</p>';
+            h2+='<p><strong>Recomendación:</strong> '+f.recommendation+'</p></div>';
+          });
+          h2+='</div>';
+          cfWrap.innerHTML=h2;
+        }
+      }
+
+      // recommendations
+      var recWrap = $('recommendations-wrap');
+      if(recWrap) {
+        if(!recSet.length) {
+          recWrap.innerHTML='<p class="no-findings">✅ Sin recomendaciones pendientes.</p>';
+        } else {
+          var h3='<div class="scrollable"><ul class="rec-list">';
+          recSet.forEach(function(r){ h3+='<li>'+r+'</li>'; });
+          h3+='</ul></div>';
+          recWrap.innerHTML=h3;
+        }
+      }
+    })();

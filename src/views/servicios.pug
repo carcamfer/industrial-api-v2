@@ -1,0 +1,65 @@
+extends layout
+
+block content
+  - pageTitle = 'Servicios de Software'
+  - currentPage = 'servicios'
+
+  .page-header
+    .page-header-inner
+      div
+        .page-breadcrumb
+          a(href="/" data-es="Inicio" data-en="Home") Inicio
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          span(data-es="Servicios de Software" data-en="Software Services") Servicios de Software
+        h1.page-title(data-es="Servicios de Software" data-en="Software Services") Servicios de Software
+        p.page-subtitle(data-es="Arquitectura, módulos, ecosistema y capacitación ISO" data-en="Architecture, modules, ecosystem and ISO training") Arquitectura, módulos, ecosistema y capacitación ISO
+      .page-actions
+        a.btn.btn-outline(href="/servicios-software/presentacion" target="_blank")
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            path(d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6")
+            polyline(points="15,3 21,3 21,9")
+            line(x1="10" y1="14" x2="21" y2="3")
+          span(data-es="Abrir en pantalla completa" data-en="Open fullscreen") Abrir en pantalla completa
+
+  main.sv-main
+    .sv-frame-wrap
+      .pres-frame
+        iframe(
+          src="/servicios-software/presentacion"
+          title="Softwares — Presentación"
+          allowfullscreen
+          loading="lazy"
+        )
+
+  style.
+    .sv-main {
+      position: relative;
+      z-index: 10;
+      padding: 1.5rem 2rem 2rem;
+      background:
+        radial-gradient(ellipse 80% 55% at 50% 0%,   rgba(139,92,246,.22) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 45% at 15% 80%,  rgba(6,182,212,.12)  0%, transparent 60%),
+        radial-gradient(ellipse 45% 35% at 85% 55%,  rgba(249,115,22,.08) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(139,92,246,.08) 0%, transparent 100%);
+    }
+    .sv-frame-wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .sv-frame-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -60px;
+      background: radial-gradient(ellipse 90% 70% at 50% 35%, rgba(139,92,246,.18) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .sv-main .pres-frame {
+      border-color: rgba(139,92,246,.4);
+      box-shadow:
+        0 0 60px rgba(139,92,246,.22),
+        0 0 0 1px rgba(139,92,246,.18),
+        0 24px 80px rgba(0,0,0,.35);
+    }

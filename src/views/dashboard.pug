@@ -1,77 +1,186 @@
 extends layout
 
 block content
-  - const totals = summary.totals || { total: 0, last_24h: 0, last_hour: 0 };
-  section.cards
-    article.card
-      h2 Total eventos
-      p.metric #{totals.total}
-      p.subtext acumulado histórico
-    article.card
-      h2 Últimas 24h
-      p.metric #{totals.last_24h}
-      p.subtext eventos recientes
-    article.card
-      h2 Última hora
-      p.metric #{totals.last_hour}
-      p.subtext actividad inmediata
+  - pageTitle = 'Dashboard Industrial'
+  - currentPage = 'dashboard'
 
-  section.table-section
-    h2 Por severidad
-    table
-      thead
-        tr
-          th Severidad
-          th Conteo
-      tbody
-        if summary.severity && summary.severity.length
-          each row in summary.severity
-            tr
-              td= row.severity
-              td= row.count
-        else
-          tr
-            td(colspan="2") Sin datos
+  .page-header
+    .page-header-inner
+      div
+        .page-breadcrumb
+          a(href="/") Inicio
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          a(href="/integracion-iso") Integración ISO
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          | Dashboard
+        h1.page-title Dashboard Industrial
+        p.page-subtitle Monitoreo de eventos industriales en tiempo real
+      .page-actions
+        a.btn.btn-primary(href="/audit-report" + (since ? '?since=' + since : ''))
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            path(d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z")
+            polyline(points="14,2 14,8 20,8")
+          | Reporte ISO
+        a.btn.btn-primary(href="/integracion-iso")
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polygon(points="13,2 3,14 12,14 11,22 21,10 12,10 13,2")
+          | Simulador Auditoría ISO
 
-  section.table-section
-    h2 Módulos con más eventos
-    table
-      thead
-        tr
-          th Módulo
-          th Conteo
-      tbody
-        if summary.modules && summary.modules.length
-          each row in summary.modules
-            tr
-              td= row.module_id
-              td= row.count
-        else
-          tr
-            td(colspan="2") Sin datos
+  main
+    - const totals = summary.totals || { total: 0, last_24h: 0, last_hour: 0 };
 
-  section.table-section
-    h2 Eventos recientes
-    table
-      thead
-        tr
-          th Timestamp
-          th Módulo
-          th Activo
-          th Tipo
-          th Severidad
-          th Datos
-      tbody
-        if events && events.length
-          each event in events
+    section.cards
+      article.card
+        h2 Total eventos
+        p.metric(id="metric-total")= totals.total
+        p.subtext acumulado histórico
+      article.card
+        h2 Últimas 24h
+        p.metric(id="metric-24h")= totals.last_24h
+        p.subtext eventos recientes
+      article.card
+        h2 Última hora
+        p.metric(id="metric-hour")= totals.last_hour
+        p.subtext actividad inmediata
+
+    section.table-section
+      h2
+        svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          path(d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z")
+        | Por severidad
+      .table-wrap
+        table
+          thead
             tr
-              td= event.timestamp_fmt
-              td= event.module_id
-              td= event.asset_id
-              td= event.event_type
-              td= event.severity
-              td
-                code= JSON.stringify(event.data)
-        else
-          tr
-            td(colspan="6") Sin eventos registrados
+              th Severidad
+              th Conteo
+          tbody#tbody-severity
+            if summary.severity && summary.severity.length
+              each row in summary.severity
+                tr
+                  td
+                    span(class="badge badge-" + row.severity.toLowerCase())= row.severity
+                  td= row.count
+            else
+              tr
+                td(colspan="2" style="text-align:center;color:var(--text-3)") Sin datos
+
+    section.table-section
+      h2
+        svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          rect(x="3" y="3" width="7" height="7")
+          rect(x="14" y="3" width="7" height="7")
+          rect(x="14" y="14" width="7" height="7")
+          rect(x="3" y="14" width="7" height="7")
+        | Módulos con más eventos
+      .table-wrap
+        table
+          thead
+            tr
+              th Módulo
+              th Conteo
+          tbody#tbody-modules
+            if summary.modules && summary.modules.length
+              each row in summary.modules
+                tr
+                  td= row.module_id
+                  td= row.count
+            else
+              tr
+                td(colspan="2" style="text-align:center;color:var(--text-3)") Sin datos
+
+    section.table-section
+      h2
+        svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          circle(cx="12" cy="12" r="10")
+          polyline(points="12,6 12,12 16,14")
+        | Eventos recientes
+      .table-wrap
+        table
+          thead
+            tr
+              th Timestamp
+              th Módulo
+              th Activo
+              th Tipo
+              th Severidad
+              th Datos
+          tbody#tbody-events
+            if events && events.length
+              each event in events
+                tr
+                  td(style="font-size:.78rem;color:var(--text-3)")= event.timestamp_fmt
+                  td= event.module_id
+                  td= event.asset_id
+                  td= event.event_type
+                  td
+                    span(class="badge badge-" + event.severity.toLowerCase())= event.severity
+                  td
+                    code= JSON.stringify(event.data)
+            else
+              tr
+                td(colspan="6" style="text-align:center;color:var(--text-3)") Sin eventos registrados
+
+  script.
+    (function() {
+      var events = JSON.parse(localStorage.getItem('iso_events') || '[]');
+      if (!events.length) return;
+
+      var now = Date.now();
+      var h24 = now - 86400000;
+      var h1  = now - 3600000;
+
+      // Metric cards
+      var el = document.getElementById('metric-total'); if(el) el.textContent = events.length;
+      var el24 = document.getElementById('metric-24h');
+      if(el24) el24.textContent = events.filter(function(e){ return new Date(e.timestamp).getTime()>=h24; }).length;
+      var elH = document.getElementById('metric-hour');
+      if(elH) elH.textContent = events.filter(function(e){ return new Date(e.timestamp).getTime()>=h1; }).length;
+
+      // By severity
+      var sevMap = {};
+      events.forEach(function(e){ sevMap[e.severity] = (sevMap[e.severity]||0)+1; });
+      var tbody1 = document.getElementById('tbody-severity');
+      if(tbody1) {
+        tbody1.innerHTML = '';
+        ['CRITICAL','HIGH','MEDIUM','LOW'].forEach(function(s){
+          if(!sevMap[s]) return;
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td><span class="badge badge-'+s.toLowerCase()+'">'+s+'</span></td><td>'+sevMap[s]+'</td>';
+          tbody1.appendChild(tr);
+        });
+      }
+
+      // By module
+      var modMap = {};
+      events.forEach(function(e){ modMap[e.module_id] = (modMap[e.module_id]||0)+1; });
+      var modArr = Object.keys(modMap).map(function(k){ return {id:k,n:modMap[k]}; }).sort(function(a,b){ return b.n-a.n; });
+      var tbody2 = document.getElementById('tbody-modules');
+      if(tbody2) {
+        tbody2.innerHTML = '';
+        modArr.slice(0,10).forEach(function(m){
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>'+m.id+'</td><td>'+m.n+'</td>';
+          tbody2.appendChild(tr);
+        });
+      }
+
+      // Recent events
+      var tbody3 = document.getElementById('tbody-events');
+      if(tbody3) {
+        tbody3.innerHTML = '';
+        events.slice(0,25).forEach(function(e){
+          var d = new Date(e.timestamp);
+          var fmt = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+
+            ' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td style="font-size:.78rem;color:var(--text-3)">'+fmt+'</td>'+
+            '<td>'+e.module_id+'</td><td>'+e.asset_id+'</td><td>'+e.event_type+'</td>'+
+            '<td><span class="badge badge-'+e.severity.toLowerCase()+'">'+e.severity+'</span></td>'+
+            '<td><code>'+JSON.stringify(e.data)+'</code></td>';
+          tbody3.appendChild(tr);
+        });
+      }
+    })();

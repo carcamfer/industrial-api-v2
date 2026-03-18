@@ -1,0 +1,631 @@
+extends layout
+
+block content
+  - pageTitle = 'Inicio'
+  - currentPage = 'home'
+
+  main
+
+    //- ── HERO ──────────────────────────────────────────────────────
+    section.ep-hero
+      .ep-hero-inner
+        .ep-hero-badge
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="currentColor")
+            circle(cx="12" cy="12" r="10")
+          | 2026 · CTRLHACK 2.0
+
+        h1.ep-hero-title Expo Programador
+
+        .ep-hero-meta
+          span.ep-hero-meta-item
+            svg(width="14" height="14" viewBox="0 0 448 512" fill="currentColor")
+              path(d="M12 192h424c6.6 0 12 5.4 12 12v260c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V204c0-6.6 5.4-12 12-12zm436-44v-36c0-26.5-21.5-48-48-48h-48V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H160V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H48C21.5 64 0 85.5 0 112v36c0 6.6 5.4 12 12 12h424c6.6 0 12-5.4 12-12z")
+            span(data-es="22 al 24 de Mayo, 2026" data-en="May 22–24, 2026") 22 al 24 de Mayo, 2026
+          span.ep-hero-meta-sep /
+          span.ep-hero-meta-item
+            svg(width="14" height="14" viewBox="0 0 384 512" fill="currentColor")
+              path(d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z")
+            | Ciudad Juárez, Chihuahua
+
+        .ep-hero-cta
+          a.btn.btn-primary.btn-lg(href="https://www.eventbrite.com/e/ctrlhack-20-tickets-1980653539053" target="_blank")
+            svg(width="16" height="16" viewBox="0 0 576 512" fill="currentColor")
+              path(d="M576 240v32c0 8.8-7.2 16-16 16h-16c0 44.2-35.8 80-80 80s-80-35.8-80-80H192c0 44.2-35.8 80-80 80s-80-35.8-80-80H16c-8.8 0-16-7.2-16-16V240c0-8.8 7.2-16 16-16h16V112c0-26.5 21.5-48 48-48h352c26.5 0 48 21.5 48 48v112h16c8.8 0 16 7.2 16 16z")
+            span(data-es="Boletos" data-en="Tickets") Boletos
+          a.btn.btn-outline.btn-lg(href="#hackaton")
+            svg(width="16" height="16" viewBox="0 0 640 512" fill="currentColor")
+              path(d="M255.03 261.65c6.25 6.25 16.38 6.25 22.63 0l11.31-11.31c6.25-6.25 6.25-16.38 0-22.63L253.25 192l35.72-35.72c6.25-6.25 6.25-16.38 0-22.63l-11.31-11.31c-6.25-6.25-16.38-6.25-22.63 0l-58.34 58.34c-6.25 6.25-6.25 16.38 0 22.63l58.34 58.34zm96.01-11.3l11.31 11.31c6.25 6.25 16.38 6.25 22.63 0l58.34-58.34c6.25-6.25 6.25-16.38 0-22.63l-58.34-58.34c-6.25-6.25-16.38-6.25-22.63 0l-11.31 11.31c-6.25 6.25-6.25 16.38 0 22.63L386.75 192l-35.71 35.72c-6.25 6.25-6.25 16.37 0 22.63zM624 416H381.54c-.74 19.81-14.71 32-32.74 32H288c-18.69 0-33.02-17.47-32.77-32H16c-8.8 0-16 7.2-16 16v16c0 35.2 28.8 64 64 64h512c35.2 0 64-28.8 64-64v-16c0-8.8-7.2-16-16-16zM576 48c0-26.4-21.6-48-48-48H112C85.6 0 64 21.6 64 48v336h512V48zm-64 272H128V64h384v256z")
+            span(data-es="CTRL+HACK 2.0 BASES" data-en="CTRL+HACK 2.0 RULES") CTRL+HACK 2.0 BASES
+
+        //- Countdown
+        .ep-countdown-wrap
+          p.ep-countdown-label(data-es="FALTAN" data-en="TIME LEFT") FALTAN
+          #ep-countdown.ep-countdown
+            .ep-countdown-item
+              span#cd-days.ep-countdown-num --
+              span.ep-countdown-unit(data-es="Días" data-en="Days") Días
+            .ep-countdown-sep :
+            .ep-countdown-item
+              span#cd-hours.ep-countdown-num --
+              span.ep-countdown-unit(data-es="Horas" data-en="Hours") Horas
+            .ep-countdown-sep :
+            .ep-countdown-item
+              span#cd-mins.ep-countdown-num --
+              span.ep-countdown-unit(data-es="Minutos" data-en="Minutes") Minutos
+            .ep-countdown-sep :
+            .ep-countdown-item
+              span#cd-secs.ep-countdown-num --
+              span.ep-countdown-unit(data-es="Segundos" data-en="Seconds") Segundos
+          p.ep-countdown-venue
+            svg(width="14" height="14" viewBox="0 0 384 512" fill="currentColor" style="margin-right:.4rem;vertical-align:middle")
+              path(d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0z")
+            | La Rodadora Espacio Interactivo, Cd. Juárez
+
+    //- ── TICKER ─────────────────────────────────────────────────────
+    .ep-ticker-wrap
+      .ep-ticker
+        span(data-es="Conectando talento e industria" data-en="Connecting talent and industry") Conectando talento e industria
+        span.sep /
+        span(data-es="Ideas que transforman" data-en="Ideas that transform") Ideas que transforman
+        span.sep /
+        span(data-es="Tecnología con impacto" data-en="Technology with impact") Tecnología con impacto
+        span.sep /
+        span(data-es="Impulsa tu visión" data-en="Drive your vision") Impulsa tu visión
+        span.sep /
+        span(data-es="Pensar en grande, programar mejor" data-en="Think big, code better") Pensar en grande, programar mejor
+        span.sep /
+        span(data-es="Ecosistemas que inspiran" data-en="Inspiring ecosystems") Ecosistemas que inspiran
+        span.sep /
+        span Hackatón CTRL+HACK 2.0
+        span.sep /
+        span(data-es="Soluciones para el futuro" data-en="Solutions for the future") Soluciones para el futuro
+        span.sep /
+        //- duplicate for infinite loop
+        span(data-es="Conectando talento e industria" data-en="Connecting talent and industry") Conectando talento e industria
+        span.sep /
+        span(data-es="Ideas que transforman" data-en="Ideas that transform") Ideas que transforman
+        span.sep /
+        span(data-es="Tecnología con impacto" data-en="Technology with impact") Tecnología con impacto
+        span.sep /
+        span(data-es="Impulsa tu visión" data-en="Drive your vision") Impulsa tu visión
+        span.sep /
+        span(data-es="Pensar en grande, programar mejor" data-en="Think big, code better") Pensar en grande, programar mejor
+        span.sep /
+        span(data-es="Mentes brillantes" data-en="Brilliant minds") Mentes brillantes
+        span.sep /
+
+    //- ── ASÍ SE VIVIÓ 2025 (SOBRE EL EVENTO) ───────────────────────
+    section.ep-section#sobre
+      .ep-section-inner
+        .ep-section-head
+          p.ep-section-badge(data-es="POR QUÉ ASISTIR" data-en="WHY ATTEND") POR QUÉ ASISTIR
+          h2.ep-section-title(data-es="Así se vivió Expo Programador 2025" data-en="How Expo Programador 2025 Was") Así se vivió Expo Programador 2025
+          p.ep-section-subdesc(data-es="Un encuentro para crear y conectar" data-en="A gathering to create and connect") Un encuentro para crear y conectar
+        .ep-about-layout
+          .ep-about-text
+            p.ep-about-desc
+              span(data-es="Expo Programador 2025 fue un espacio abierto donde talento, industria y tecnología se unieron para impulsar la innovación, el desarrollo de soluciones y el crecimiento del ecosistema local." data-en="Expo Programador 2025 was an open space where talent, industry and technology came together to drive innovation, develop solutions and grow the local tech ecosystem.") Expo Programador 2025 fue un espacio abierto donde talento, industria y tecnología se unieron para impulsar la innovación, el desarrollo de soluciones y el crecimiento del ecosistema local.
+            ul.ep-check-list
+              li
+                svg(width="16" height="16" viewBox="0 0 512 512" fill="currentColor")
+                  path(d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z")
+                span(data-es="Networking, conferencias y colaboración" data-en="Networking, talks and collaboration") Networking, conferencias y colaboración
+              li
+                svg(width="16" height="16" viewBox="0 0 512 512" fill="currentColor")
+                  path(d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z")
+                span(data-es="Hackatón CTRL+HACK" data-en="CTRL+HACK Hackathon") Hackatón CTRL+HACK
+              li
+                svg(width="16" height="16" viewBox="0 0 512 512" fill="currentColor")
+                  path(d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z")
+                span(data-es="Tendencias en tecnología aplicada a la industria" data-en="Industry-applied technology trends") Tendencias en tecnología aplicada a la industria
+          .ep-about-img
+            img(src="/public/img/c1.webp" alt="Expo Programador 2025" loading="lazy")
+
+        //- Galería 2025
+        .ep-gallery-tabs
+          button.ep-tab.active(data-tab="ponencias" data-es="Ponencias" data-en="Talks") Ponencias
+          button.ep-tab(data-tab="presidium") Presidium
+          button.ep-tab(data-tab="hackaton") Hackaton CTRL+HACK
+
+        //- Carousel Ponencias
+        .ep-carousel-section(id="tab-ponencias")
+          .ep-carousel-wrap
+            .ep-carousel-track#carousel-ponencias
+              .ep-carousel-item
+                img(src="/public/img/ev1.jpg" alt="Ponencias 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/ev2.jpg" alt="Ponencias 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/ev3.jpg" alt="Ponencias 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/ev4.jpg" alt="Ponencias 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/ev5.jpg" alt="Ponencias 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/ev6.jpg" alt="Ponencias 2025" loading="lazy")
+            button.ep-carousel-btn.ep-carousel-btn-prev(onclick="carouselPrev('ponencias')") &#8249;
+            button.ep-carousel-btn.ep-carousel-btn-next(onclick="carouselNext('ponencias')") &#8250;
+
+        //- Carousel Presidium
+        .ep-carousel-section.hidden(id="tab-presidium")
+          .ep-carousel-wrap
+            .ep-carousel-track#carousel-presidium
+              .ep-carousel-item
+                img(src="/public/img/pon1.jpg" alt="Presidium 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/pon2.jpg" alt="Presidium 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/pon3.png" alt="Presidium 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/pon4.png" alt="Presidium 2025" loading="lazy")
+            button.ep-carousel-btn.ep-carousel-btn-prev(onclick="carouselPrev('presidium')") &#8249;
+            button.ep-carousel-btn.ep-carousel-btn-next(onclick="carouselNext('presidium')") &#8250;
+
+        //- Carousel Hackaton CTRL+HACK
+        .ep-carousel-section.hidden(id="tab-hackaton")
+          .ep-carousel-wrap
+            .ep-carousel-track#carousel-hackaton
+              .ep-carousel-item
+                img(src="/public/img/pres1.jpg" alt="Hackaton CTRL+HACK 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/pres2.jpg" alt="Hackaton CTRL+HACK 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/pres3.jpg" alt="Hackaton CTRL+HACK 2025" loading="lazy")
+              .ep-carousel-item
+                img(src="/public/img/pres4.png" alt="Hackaton CTRL+HACK 2025" loading="lazy")
+            button.ep-carousel-btn.ep-carousel-btn-prev(onclick="carouselPrev('hackaton')") &#8249;
+            button.ep-carousel-btn.ep-carousel-btn-next(onclick="carouselNext('hackaton')") &#8250;
+
+    //- ── SERVICIOS DE SOFTWARE (cards del Express) ──────────────────
+    section.ep-section.ep-section-alt#plataforma
+      .ep-section-inner
+        .ep-section-head
+          p.ep-section-badge(data-es="SERVICIOS DE SOFTWARE" data-en="SOFTWARE SERVICES") SERVICIOS DE SOFTWARE
+          h2.ep-section-title(data-es="Sistema industrial en tiempo real" data-en="Real-time Industrial System") Sistema industrial en tiempo real
+          p.ep-section-subdesc(data-es="Monitorea, audita y controla desde una sola plataforma. Todas las herramientas del ecosistema CTRLHACK en tu pantalla." data-en="Monitor, audit and control from a single platform. All CTRLHACK ecosystem tools on your screen.") Monitorea, audita y controla desde una sola plataforma. Todas las herramientas del ecosistema CTRLHACK en tu pantalla.
+        .ep-features-grid
+          a.ep-feat(href="/integracion-iso")
+            .ep-feat-icon.ep-feat-icon-green
+              svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2")
+                path(d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z")
+                polyline(points="14,2 14,8 20,8")
+                line(x1="9" y1="13" x2="15" y2="13")
+            .ep-feat-title(data-es="Simulador Auditoría ISO" data-en="ISO Audit Simulator") Simulador Auditoría ISO
+            p.ep-feat-desc(data-es="Simulación industrial, auditoría ISO y dashboard de métricas en tiempo real." data-en="Industrial simulation, ISO audit and real-time metrics dashboard.") Simulación industrial, auditoría ISO y dashboard de métricas en tiempo real.
+            span.ep-feat-link
+              span(data-es="Ver reporte" data-en="View report") Ver reporte
+              svg(width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                line(x1="5" y1="12" x2="19" y2="12")
+                polyline(points="12,5 19,12 12,19")
+          a.ep-feat(href="/servicios-software")
+            .ep-feat-icon.ep-feat-icon-orange
+              svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5722" stroke-width="2")
+                polyline(points="16,18 22,12 16,6")
+                polyline(points="8,6 2,12 8,18")
+            .ep-feat-title(data-es="Softwares" data-en="Software") Softwares
+            p.ep-feat-desc(data-es="28+ módulos, arquitectura modular, ecosistema conectado." data-en="28+ modules, modular architecture, connected ecosystem.") 28+ módulos, arquitectura modular, ecosistema conectado.
+            span.ep-feat-link
+              span(data-es="Ver softwares" data-en="View software") Ver softwares
+              svg(width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                line(x1="5" y1="12" x2="19" y2="12")
+                polyline(points="12,5 19,12 12,19")
+
+    //- ── HACKATON CTRL+HACK 2.0 ─────────────────────────────────────
+    section.ep-section#hackaton
+      .ep-section-inner
+        .ep-section-head
+          p.ep-section-badge HACKATON
+          h2.ep-section-title CTRL + HACK 2.0
+          p.ep-section-subdesc(data-es="Conecta con el ecosistema tecnológico y descubre cómo ser parte de un evento que transforma ideas en soluciones." data-en="Connect with the tech ecosystem and discover how to be part of an event that transforms ideas into solutions.") Conecta con el ecosistema tecnológico y descubre cómo ser parte de un evento que transforma ideas en soluciones.
+
+        .ep-hack-layout
+          .ep-hack-img-col
+            img.ep-hack-bases-img(src="/public/img/hack-bases.jpg" alt="Bases del concurso CTRL+HACK 2.0" loading="lazy")
+          .ep-hack-cta-col
+            a.btn.btn-primary(href="https://1drv.ms/b/c/5f57c3e18a2a9e37/IQBpx0aXGTRLTp0L4XpCgRmsAQiPNf8vS9mhFSbZZd1nksM" target="_blank")
+              svg(width="16" height="16" viewBox="0 0 384 512" fill="currentColor")
+                path(d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z")
+              span(data-es="Consultar Bases" data-en="View Rules") Consultar Bases
+          .ep-hack-prizes-col
+            p.ep-hack-col-label(data-es="Premios" data-en="Prizes") Premios
+            .ep-prizes
+              .ep-prize.ep-prize-1
+                .ep-prize-place 1°
+                .ep-prize-amount $15,000
+                .ep-prize-label(data-es="MXN — Primer lugar" data-en="MXN — 1st place") MXN — Primer lugar
+              .ep-prize.ep-prize-2
+                .ep-prize-place 2°
+                .ep-prize-amount $10,000
+                .ep-prize-label(data-es="MXN — Segundo lugar" data-en="MXN — 2nd place") MXN — Segundo lugar
+              .ep-prize.ep-prize-3
+                .ep-prize-place 3°
+                .ep-prize-amount $5,000
+                .ep-prize-label(data-es="MXN — Tercer lugar" data-en="MXN — 3rd place") MXN — Tercer lugar
+
+    //- ── LOGOS / PATROCINADORES ─────────────────────────────────────
+    section.ep-logos-section
+      .ep-logos-inner
+        p.ep-logos-label(data-es="Empresas e instituciones participantes" data-en="Participating companies and institutions") Empresas e instituciones participantes
+        .ep-logos-grid
+          .ep-logo-item: img(src="/public/img/logo-itcj.png"       alt="ITCJ"            loading="lazy")
+          .ep-logo-item: img(src="/public/img/logo-escudo.png"     alt="Escudo amarillo" loading="lazy")
+          .ep-logo-item: img(src="/public/img/logo-historias.png"  alt="Historias"       loading="lazy")
+          .ep-logo-item: img(src="/public/img/logo-wp1.png"        alt="Patrocinador"    loading="lazy")
+          .ep-logo-item: img(src="/public/img/logo-wp2.png"        alt="Patrocinador"    loading="lazy")
+          .ep-logo-item: img(src="/public/img/logo-canacintra.png" alt="CANACINTRA"      loading="lazy")
+          .ep-logo-item: img(src="/public/img/logo-223231.png"     alt="Patrocinador"    loading="lazy")
+          .ep-logo-item: img(src="/public/img/logo-binmatter.png"  alt="Binmatter"       loading="lazy")
+          .ep-logo-item: img(src="/public/img/logo-centro.png"     alt="Centro entrenamiento" loading="lazy")
+
+    //- ── TICKETS ────────────────────────────────────────────────────
+    section.ep-section.ep-section-alt#tickets
+      .ep-section-inner
+        .ep-section-head
+          p.ep-section-badge(data-es="OPCIONES DE ACCESO" data-en="ACCESS OPTIONS") OPCIONES DE ACCESO
+          h2.ep-section-title(data-es="Elige tu boleto" data-en="Choose your ticket") Elige tu boleto
+          p.ep-section-subdesc(data-es="Selecciona el acceso que mejor se adapte a tu perfil y forma parte del evento que conecta talento, industria y tecnología." data-en="Select the access that best fits your profile and be part of the event that connects talent, industry and technology.") Selecciona el acceso que mejor se adapte a tu perfil y forma parte del evento que conecta talento, industria y tecnología.
+        .ep-tickets-grid
+          .ep-ticket
+            h3.ep-ticket-name CTRL HACK Individual
+            .ep-ticket-price
+              span.ep-ticket-amount $330
+              span.ep-ticket-currency MXN
+            h4.ep-ticket-inc(data-es="Incluye:" data-en="Includes:") Incluye:
+            ul.ep-ticket-list
+              li(data-es="Kit de bienvenida y certificación" data-en="Welcome kit and certification") Kit de bienvenida y certificación
+              li(data-es="Networking con empresas y mentores" data-en="Networking with companies and mentors") Networking con empresas y mentores
+              li(data-es="Materiales digitales y grabaciones" data-en="Digital materials and recordings") Materiales digitales y grabaciones
+            a.btn.btn-outline(href="https://www.eventbrite.com/e/ctrlhack-20-tickets-1980653539053" target="_blank" data-es="Comprar Boleto" data-en="Buy Ticket") Comprar Boleto
+          .ep-ticket.ep-ticket-featured
+            .ep-ticket-badge(data-es="RECOMENDADO" data-en="RECOMMENDED") RECOMENDADO
+            h3.ep-ticket-name Ctrl Hack Equipo
+            .ep-ticket-price
+              span.ep-ticket-amount $990
+              span.ep-ticket-currency MXN
+            h4.ep-ticket-inc(data-es="Incluye:" data-en="Includes:") Incluye:
+            ul.ep-ticket-list
+              li(data-es="Participación completa — equipo de 3" data-en="Full participation — team of 3") Participación completa — equipo de 3
+              li(data-es="Networking con empresas y mentores" data-en="Networking with companies and mentors") Networking con empresas y mentores
+              li(data-es="Kit de bienvenida y certificación" data-en="Welcome kit and certification") Kit de bienvenida y certificación
+            a.btn.btn-primary(href="https://www.eventbrite.com/e/ctrlhack-20-tickets-1980653539053" target="_blank" data-es="Comprar Boleto" data-en="Buy Ticket") Comprar Boleto
+
+    //- ── NEWSLETTER ─────────────────────────────────────────────────
+    section.ep-section#newsletter
+      .ep-section-inner.ep-nl-wrap
+        p.ep-section-badge(data-es="MANTENTE INFORMADO" data-en="STAY INFORMED") MANTENTE INFORMADO
+        h2.ep-section-title(data-es="Sé parte del futuro productivo" data-en="Be part of the productive future") Sé parte del futuro productivo
+        p.ep-section-desc(data-es="Déjanos tu correo y recibe noticias, convocatorias y oportunidades exclusivas para formar parte de Expo Programador 2026." data-en="Leave your email and receive news, calls and exclusive opportunities to be part of Expo Programador 2026.") Déjanos tu correo y recibe noticias, convocatorias y oportunidades exclusivas para formar parte de Expo Programador 2026.
+        form.ep-nl-form(id="ep-nl-form" onsubmit="return epNlSubmit(event)")
+          label.sr-only(for="ep-nl-email" data-es="Correo electrónico" data-en="Email address") Correo electrónico
+          input.ep-nl-input(type="email" id="ep-nl-email" placeholder="tucorreo@ejemplo.com" required)
+          button.btn.btn-primary(type="submit" data-es="Suscribirse" data-en="Subscribe") Suscribirse
+        p.ep-nl-legal
+          | Puedes darte de baja en cualquier momento. Consulta nuestro
+          | #[a(href="#") Aviso de Privacidad] y #[a(href="#") Términos].
+        #ep-nl-msg.ep-nl-msg(style="display:none")
+        p.ep-nl-contact
+          | Contacto:
+          |
+          a(href="mailto:info@expoprogramador.com") info@expoprogramador.com
+
+  //- ── STYLES ─────────────────────────────────────────────────────────
+  style.
+    /* ── Reduced motion ──────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .ep-hero {
+      position: relative; z-index: 10; text-align: center;
+      padding: 5rem 2rem 4rem;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139,92,246,.35) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 20% 80%, rgba(6,182,212,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 80% 70%, rgba(249,115,22,.12) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(139,92,246,.12) 0%, transparent 100%);
+      border-bottom: 1px solid rgba(139,92,246,.3);
+    }
+    .ep-hero::before {
+      content: '';
+      position: absolute; inset: 0; z-index: -1;
+      background: radial-gradient(ellipse 600px 400px at 50% -100px, rgba(139,92,246,.3), transparent);
+    }
+    .ep-hero-inner { max-width: 860px; margin: 0 auto; }
+    .ep-hero-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .4rem 1rem;
+      background: linear-gradient(135deg, rgba(139,92,246,.35), rgba(6,182,212,.2));
+      border: 1px solid rgba(139,92,246,.6);
+      border-radius: 20px; font-size: .75rem; font-weight: 700;
+      color: #C4B5FD; text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 0 20px rgba(139,92,246,.3);
+    }
+    .ep-hero-title {
+      font-size: clamp(2.5rem, 7vw, 5rem); font-weight: 900; letter-spacing: -2px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #C4B5FD 35%, #60A5FA 65%, #22D3EE 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1.15; padding-bottom: 0.15em; margin: 0 0 2.5rem;
+      filter: drop-shadow(0 0 40px rgba(139,92,246,.4));
+    }
+    .ep-hero-meta {
+      display: flex; align-items: center; justify-content: center;
+      gap: .75rem; flex-wrap: wrap; margin-bottom: 2rem;
+    }
+    .ep-hero-meta-item { display: flex; align-items: center; gap: .4rem; font-size: .9rem; color: var(--text-2); font-weight: 500; }
+    .ep-hero-meta-sep  { color: var(--text-3); }
+    .ep-hero-cta       { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+
+    /* Countdown */
+    .ep-countdown-wrap { text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .ep-countdown-label { font-size: .7rem; font-weight: 700; letter-spacing: 2px; color: #A78BFA; text-transform: uppercase; margin-bottom: .75rem; }
+    .ep-countdown {
+      display: inline-flex; align-items: center; gap: .35rem;
+      background: linear-gradient(135deg, rgba(12,22,48,.9), rgba(8,15,34,.95));
+      border: 1px solid rgba(139,92,246,.4);
+      border-radius: var(--radius-lg); padding: .6rem 1rem; margin-bottom: .75rem;
+      box-shadow: 0 0 40px rgba(139,92,246,.2), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .ep-countdown-item { display: flex; flex-direction: column; align-items: center; min-width: 44px; }
+    .ep-countdown-num {
+      font-size: 1.6rem; font-weight: 900; letter-spacing: -1px; line-height: 1;
+      background: linear-gradient(135deg, #FFFFFF, #C4B5FD, #60A5FA);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .ep-countdown-unit { font-size: .65rem; color: #6B84A8; text-transform: uppercase; letter-spacing: .5px; margin-top: .2rem; }
+    .ep-countdown-sep  { font-size: 2rem; font-weight: 700; color: #A78BFA; margin-bottom: .8rem; }
+    .ep-countdown-venue { font-size: .82rem; color: var(--text-3); }
+
+    /* Ticker */
+    .ep-ticker-wrap {
+      overflow: hidden;
+      background: linear-gradient(90deg, rgba(139,92,246,.12), rgba(6,182,212,.08), rgba(139,92,246,.12));
+      border-top: 1px solid rgba(139,92,246,.3); border-bottom: 1px solid rgba(139,92,246,.3);
+      padding: .75rem 0; position: relative; z-index: 10;
+    }
+    .ep-ticker {
+      display: inline-flex; gap: 1.5rem; white-space: nowrap;
+      font-size: .82rem; font-weight: 600; color: #B8CCE8; letter-spacing: .3px;
+      animation: ep-ticker 30s linear infinite;
+    }
+    .ep-ticker .sep { color: #A78BFA; }
+    @keyframes ep-ticker { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+
+    /* Sections */
+    .ep-section     { position: relative; z-index: 10; padding: 5rem 0; }
+    .ep-section-alt {
+      background: linear-gradient(135deg, rgba(8,15,34,.85), rgba(12,22,48,.9));
+      border-top: 1px solid rgba(139,92,246,.15);
+      border-bottom: 1px solid rgba(139,92,246,.15);
+    }
+    .ep-section-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .ep-section-head  { text-align: center; margin-bottom: 3rem; }
+    .ep-section-badge {
+      display: inline-block; font-size: .7rem; font-weight: 800;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: #22D3EE; margin-bottom: .6rem;
+      text-shadow: 0 0 16px rgba(6,182,212,.6);
+    }
+    .ep-section-title {
+      font-size: clamp(1.5rem, 3.5vw, 2.25rem); font-weight: 800; letter-spacing: -.5px; margin: 0 0 .75rem;
+      background: linear-gradient(135deg, #FFFFFF, #C4B5FD, #60A5FA);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .ep-section-subdesc { font-size: .95rem; color: var(--text-2); max-width: 600px; margin: 0 auto; line-height: 1.7; }
+    .ep-section-desc    { font-size: .95rem; color: var(--text-2); line-height: 1.7; margin: 0 0 1.5rem; }
+
+    /* About */
+    .ep-about-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; margin-bottom: 2.5rem; }
+    .ep-about-desc   { font-size: .92rem; color: var(--text-2); line-height: 1.7; margin: 0 0 1.25rem; }
+    .ep-check-list   { list-style: none; display: flex; flex-direction: column; gap: .7rem; }
+    .ep-check-list li { display: flex; align-items: flex-start; gap: .6rem; font-size: .9rem; color: var(--text-2); }
+    .ep-check-list li svg { flex-shrink: 0; margin-top: 3px; fill: var(--green); }
+    .ep-about-img { display: flex; justify-content: center; }
+    .ep-about-img img { width: auto; max-width: 220px; height: auto; border-radius: var(--radius-lg); border: 1px solid var(--border-dim); box-shadow: 0 16px 40px rgba(0,0,0,.4); }
+
+    /* Gallery tabs */
+    .ep-gallery-tabs { display: flex; gap: .5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .ep-tab {
+      padding: .45rem 1.1rem; border-radius: var(--radius); font-size: .82rem; font-weight: 600;
+      color: var(--text-2); background: var(--card); border: 1px solid var(--border-dim);
+      cursor: pointer; transition: all .2s;
+    }
+    .ep-tab:hover { color: var(--text); border-color: var(--border); }
+    .ep-tab.active { color: var(--primary-light); border-color: var(--border); background: var(--primary-dim); }
+    .ep-carousel-section { position: relative; }
+    .ep-carousel-section.hidden { display: none; }
+
+    /* Platform features */
+    .ep-features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+    .ep-feat {
+      background: linear-gradient(135deg, rgba(12,22,48,.95), rgba(8,15,34,.9));
+      border: 1px solid rgba(139,92,246,.25);
+      border-radius: var(--radius-lg); padding: 1.75rem;
+      transition: all .3s; text-decoration: none !important; color: inherit; display: block; cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    .ep-feat::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #8B5CF6, #06B6D4, transparent);
+      opacity: 0; transition: opacity .3s;
+    }
+    .ep-feat:hover::before { opacity: 1; }
+    .ep-feat:hover { border-color: rgba(139,92,246,.6); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(139,92,246,.3), 0 0 0 1px rgba(139,92,246,.2); }
+    .ep-feat-icon   { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+    .ep-feat-icon-purple { background: linear-gradient(135deg, rgba(139,92,246,.35), rgba(109,40,217,.2)); border: 1px solid rgba(139,92,246,.4); }
+    .ep-feat-icon-blue   { background: linear-gradient(135deg, rgba(59,130,246,.3), rgba(37,99,235,.15)); border: 1px solid rgba(59,130,246,.35); }
+    .ep-feat-icon-green  { background: linear-gradient(135deg, rgba(16,185,129,.28), rgba(5,150,105,.15)); border: 1px solid rgba(16,185,129,.35); }
+    .ep-feat-icon-orange { background: linear-gradient(135deg, rgba(249,115,22,.28), rgba(234,88,12,.15)); border: 1px solid rgba(249,115,22,.35); }
+    .ep-feat-title { font-size: 1rem; font-weight: 700; color: var(--text); margin: 0 0 .4rem; }
+    .ep-feat-desc  { font-size: .85rem; color: var(--text-2); line-height: 1.6; margin: 0; }
+    .ep-feat-link  { display: inline-flex; align-items: center; gap: .3rem; margin-top: 1rem; font-size: .8rem; color: var(--primary-light); font-weight: 600; }
+
+    /* Hackaton */
+    .ep-hack-layout { display: grid; grid-template-columns: auto auto 1fr; gap: 2.5rem; align-items: center; max-width: 860px; margin: 0 auto; justify-content: center; }
+    .ep-hack-col-label { font-size: .7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--primary-light); margin-bottom: .9rem; }
+    .ep-hack-img-col { display: flex; flex-direction: column; }
+    .ep-hack-cta-col { display: flex; align-items: center; justify-content: center; }
+    .ep-hack-prizes-col { display: flex; flex-direction: column; align-items: center; }
+    .ep-hack-bases-img { width: 100%; max-width: 260px; border-radius: var(--radius-lg); border: 1px solid var(--border-dim); display: block; }
+    @media (max-width: 640px) { .ep-hack-layout { grid-template-columns: 1fr; } }
+    .ep-prizes { display: flex; flex-direction: column; gap: 1rem; align-items: center; width: 100%; }
+    .ep-prize {
+      display: flex; align-items: center; gap: 1rem;
+      background: linear-gradient(135deg, rgba(12,22,48,.95), rgba(8,15,34,.9));
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; transition: all .25s;
+    }
+    .ep-prize-1 {
+      border-color: rgba(245,158,11,.5);
+      box-shadow: 0 0 24px rgba(245,158,11,.2), inset 0 0 40px rgba(245,158,11,.04);
+      background: linear-gradient(135deg, rgba(245,158,11,.1), rgba(12,22,48,.95));
+    }
+    .ep-prize-2 { border-color: rgba(148,163,184,.35); }
+    .ep-prize-3 { border-color: rgba(180,120,60,.35); }
+    .ep-prize-place { font-size: 1.5rem; font-weight: 900; color: var(--primary-light); min-width: 2.5rem; }
+    .ep-prize-1 .ep-prize-place { color: #FCD34D; text-shadow: 0 0 16px rgba(252,211,77,.5); }
+    .ep-prize-amount { font-size: 1.6rem; font-weight: 800; color: var(--text); flex: 1; }
+    .ep-prize-label  { font-size: .8rem; color: var(--text-3); }
+    .ep-hack-screen img { width: 100%; border-radius: var(--radius-lg); border: 1px solid var(--border-dim); margin-bottom: .75rem; }
+    .ep-hack-caption { font-size: .82rem; color: var(--text-3); line-height: 1.6; }
+
+    /* Logos */
+    .ep-logos-section {
+      position: relative; z-index: 10;
+      background: linear-gradient(135deg, rgba(4,9,26,.9), rgba(8,15,34,.85));
+      padding: 3rem 2rem;
+      border-top: 1px solid rgba(139,92,246,.2); border-bottom: 1px solid rgba(139,92,246,.2);
+    }
+    .ep-logos-inner { max-width: 1200px; margin: 0 auto; text-align: center; }
+    .ep-logos-label { font-size: .72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-3); margin-bottom: 2rem; }
+    .ep-logos-grid  { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2rem; }
+    .ep-logo-item { height: 52px; display: flex; align-items: center; opacity: .85; transition: opacity .25s, filter .25s, transform .25s; filter: none; cursor: pointer; }
+    .ep-logo-item:hover { opacity: 1; filter: drop-shadow(0 0 8px rgba(139,92,246,.5)); transform: scale(1.06); }
+    .ep-logo-item img { height: 100%; width: auto; max-width: 140px; object-fit: contain; }
+
+    /* Tickets */
+    .ep-tickets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; max-width: 620px; margin: 0 auto; }
+    .ep-ticket {
+      background: linear-gradient(135deg, rgba(12,22,48,.95), rgba(8,15,34,.9));
+      border: 1px solid rgba(139,92,246,.25);
+      border-radius: var(--radius-lg); padding: 1.25rem; text-align: center;
+      position: relative; transition: all .3s; cursor: default;
+    }
+    .ep-ticket:hover { border-color: rgba(139,92,246,.55); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(139,92,246,.3); }
+    .ep-ticket-featured {
+      border-color: rgba(139,92,246,.6);
+      background: linear-gradient(135deg, rgba(139,92,246,.18), rgba(8,15,34,.95), rgba(59,130,246,.08));
+      box-shadow: 0 0 48px rgba(139,92,246,.35), 0 0 0 1px rgba(139,92,246,.3);
+    }
+    .ep-ticket-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, #8B5CF6, #6D28D9); color: #fff; font-size: .65rem; font-weight: 800;
+      letter-spacing: 1.5px; padding: .25rem .9rem; border-radius: 20px; text-transform: uppercase; white-space: nowrap;
+      box-shadow: 0 0 16px rgba(139,92,246,.5);
+    }
+    .ep-ticket-name   { font-size: .95rem; font-weight: 800; color: var(--text); margin: 0 0 .75rem; }
+    .ep-ticket-price  { display: flex; align-items: baseline; justify-content: center; gap: .3rem; margin-bottom: 1.25rem; }
+    .ep-ticket-amount { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; background: linear-gradient(135deg, #FFFFFF, #C4B5FD, #60A5FA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .ep-ticket-currency { font-size: .9rem; color: var(--text-3); font-weight: 600; }
+    .ep-ticket-inc { font-size: .78rem; text-transform: uppercase; letter-spacing: .5px; color: var(--text-3); margin: 0 0 .75rem; }
+    .ep-ticket-list { list-style: none; margin-bottom: 1.75rem; display: flex; flex-direction: column; gap: .5rem; text-align: left; }
+    .ep-ticket-list li { font-size: .85rem; color: var(--text-2); padding-left: 1.1rem; position: relative; }
+    .ep-ticket-list li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-weight: 700; }
+
+    /* Newsletter */
+    .ep-nl-wrap  { max-width: 600px; margin: 0 auto; text-align: center; }
+    .ep-nl-form  { display: flex; gap: .75rem; margin: 1.5rem 0 .75rem; flex-wrap: wrap; justify-content: center; }
+    .ep-nl-input {
+      flex: 1; min-width: 240px; padding: .7rem 1rem;
+      background: var(--card); border: 1px solid var(--border-dim);
+      border-radius: var(--radius); color: var(--text); font-size: .9rem; outline: none; transition: border-color .2s;
+    }
+    .ep-nl-input:focus { border-color: var(--primary); }
+    .ep-nl-legal { font-size: .75rem; color: var(--text-3); }
+    .ep-nl-contact { margin-top: 1.25rem; font-size: .82rem; color: var(--text-3); }
+    .ep-nl-contact a { color: var(--primary-light); text-decoration: none; font-weight: 600; }
+    .ep-nl-contact a:hover { text-decoration: underline; }
+    .ep-nl-legal a { color: var(--primary-light); text-decoration: none; }
+    .ep-nl-legal a:hover { text-decoration: underline; }
+    .ep-nl-msg { margin-top: .75rem; font-size: .85rem; padding: .6rem 1rem; border-radius: var(--radius); }
+    .ep-nl-msg.ok  { background: rgba(16,185,129,.12); color: var(--green-light); border: 1px solid rgba(16,185,129,.3); }
+    .ep-nl-msg.err { background: rgba(239,68,68,.1); color: var(--red-light); border: 1px solid rgba(239,68,68,.3); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .ep-hero { padding: 3rem 1.25rem 2.5rem; }
+      .ep-about-layout { grid-template-columns: 1fr; gap: 2rem; }
+      .ep-about-img { order: -1; }
+      .ep-section-inner { padding: 0 1.25rem; }
+      .ep-section { padding: 3.5rem 0; }
+      .ep-countdown { padding: .75rem 1rem; gap: .25rem; }
+      .ep-countdown-num { font-size: 1.8rem; }
+      .ep-carousel-item { flex: 0 0 calc(50% - .3rem); }
+    }
+    @media (max-width: 480px) {
+      .ep-carousel-item { flex: 0 0 calc(100% - .3rem); }
+    }
+
+  script.
+    // ── Countdown to May 22, 2026 ──────────────────────────────────
+    (function(){
+      var target = new Date('2026-05-22T08:00:00-06:00').getTime();
+      function tick(){
+        var diff = Math.max(0, target - Date.now());
+        var d = Math.floor(diff/86400000);
+        var h = Math.floor((diff%86400000)/3600000);
+        var m = Math.floor((diff%3600000)/60000);
+        var s = Math.floor((diff%60000)/1000);
+        document.getElementById('cd-days').textContent  = String(d).padStart(2,'0');
+        document.getElementById('cd-hours').textContent = String(h).padStart(2,'0');
+        document.getElementById('cd-mins').textContent  = String(m).padStart(2,'0');
+        document.getElementById('cd-secs').textContent  = String(s).padStart(2,'0');
+      }
+      tick(); setInterval(tick, 1000);
+    })();
+
+    // ── Gallery tabs ───────────────────────────────────────────────
+    document.querySelectorAll('.ep-tab').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var tab = this.dataset.tab;
+        document.querySelectorAll('.ep-tab').forEach(function(b){ b.classList.remove('active'); });
+        this.classList.add('active');
+        ['ponencias','presidium','hackaton'].forEach(function(t){
+          var el = document.getElementById('tab-' + t);
+          if(el) el.classList.toggle('hidden', t !== tab);
+        });
+      });
+    });
+
+    // ── Carousel ────────────────────────────────────────────────────
+    var carouselPos = {};
+    function carouselItems(id) {
+      return document.querySelectorAll('#carousel-' + id + ' .ep-carousel-item');
+    }
+    function carouselMove(id, dir) {
+      var items = carouselItems(id);
+      var total = items.length;
+      if (!carouselPos[id]) carouselPos[id] = 0;
+      var visible = 3;
+      var max = Math.max(0, total - visible);
+      carouselPos[id] = Math.min(max, Math.max(0, carouselPos[id] + dir));
+      var itemW = items[0] ? items[0].offsetWidth + 9.6 : 0;
+      document.getElementById('carousel-' + id).style.transform = 'translateX(-' + (carouselPos[id] * itemW) + 'px)';
+    }
+    function carouselPrev(id) { carouselMove(id, -1); }
+    function carouselNext(id) { carouselMove(id, 1); }
+
+    // ── Newsletter form ────────────────────────────────────────────
+    function epNlSubmit(e){
+      e.preventDefault();
+      var msg = document.getElementById('ep-nl-msg');
+      msg.className = 'ep-nl-msg ok';
+      msg.textContent = _epLang === 'en'
+        ? 'Thank you! We will keep you updated on all Expo Programador 2026 news.'
+        : '¡Gracias! Te avisaremos con todas las novedades de Expo Programador 2026.';
+      msg.style.display = 'block';
+      document.getElementById('ep-nl-email').value = '';
+      return false;
+    }

@@ -1,0 +1,262 @@
+extends layout
+
+block content
+  - pageTitle = 'Simulador Auditoría ISO'
+  - currentPage = 'iso-landing'
+
+  .page-header
+    .page-header-inner
+      div
+        .page-breadcrumb
+          a(href="/" data-es="Inicio" data-en="Home") Inicio
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          span(data-es="Simulador Auditoría ISO" data-en="ISO Audit Simulator") Simulador Auditoría ISO
+        h1.page-title(data-es="Simulador Auditoría ISO" data-en="ISO Audit Simulator") Simulador Auditoría ISO
+        p.page-subtitle(data-es="Monitoreo industrial, simulación de eventos y auditoría de cumplimiento multinorma en tiempo real" data-en="Industrial monitoring, event simulation and real-time multi-standard compliance audit") Monitoreo industrial, simulación de eventos y auditoría de cumplimiento multinorma en tiempo real
+      .page-actions
+        a.btn.btn-primary(href="/dashboard" id="link-dashboard")
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            rect(x="3" y="3" width="7" height="7")
+            rect(x="14" y="3" width="7" height="7")
+            rect(x="14" y="14" width="7" height="7")
+            rect(x="3" y="14" width="7" height="7")
+          | Dashboard
+        a.btn.btn-primary(href="/audit-report" id="link-audit-report")
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            path(d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z")
+            polyline(points="14,2 14,8 20,8")
+            line(x1="9" y1="13" x2="15" y2="13")
+          span(data-es="Reporte ISO" data-en="ISO Report") Reporte ISO
+
+  main
+    //- Simulation Control Panel
+    .sim-panel
+      .sim-panel-header
+        .sim-panel-title
+          svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary-light)" stroke-width="2")
+            polygon(points="13,2 3,14 12,14 11,22 21,10 12,10 13,2")
+          span(data-es="Control de Simulaciones" data-en="Simulation Control") Control de Simulaciones
+        .sim-status
+          .sim-dot#sim-dot
+          span#sim-status-text(data-es="Listo" data-en="Ready") Listo
+      .sim-controls
+        button.btn.btn-primary#btn-sim-once(type="button")
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polygon(points="13,2 3,14 12,14 11,22 21,10 12,10 13,2")
+          span(data-es="Generar Evento" data-en="Generate Event") Generar Evento
+        button.btn.btn-ghost#btn-clear-log(type="button")
+          svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            polyline(points="3,6 5,6 21,6")
+            path(d="M19,6v14a2,2,0,01-2,2H7a2,2,0,01-2-2V6m3,0V4a2,2,0,012-2h4a2,2,0,012,2v2")
+          span(data-es="Limpiar log" data-en="Clear log") Limpiar log
+      .sim-log#sim-log
+        .log-entry
+          span.log-time --:--:--
+          span.text-muted(data-es='Sistema listo. Presiona "Generar Evento" para iniciar.' data-en='System ready. Press "Generate Event" to start.') Sistema listo. Presiona "Generar Evento" para iniciar.
+
+    //- Quick nav cards
+    .cards
+      .card
+        h2(data-es="Módulos Activos" data-en="Active Modules") Módulos Activos
+        p.metric 6
+        p.subtext vision · maintenance · quality · energy · safety · environment
+
+      .card
+        h2(data-es="Normas Monitoreadas" data-en="Monitored Standards") Normas Monitoreadas
+        p.metric 7
+        p.subtext ISO 9001 · 27001 · 55001 · 50001 · 22301 · 45001 · 14001
+
+    //- Standards info
+    h3.section-title
+      svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+        path(d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z")
+      span(data-es="Normas ISO Integradas" data-en="Integrated ISO Standards") Normas ISO Integradas
+
+    .features-grid(style="margin-top:0")
+      .feature-card
+        .feature-icon.feature-icon-green
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green-light)" stroke-width="2")
+            path(d="M9 11l3 3L22 4")
+            path(d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11")
+        .feature-title(data-es="ISO 9001 — Gestión de Calidad" data-en="ISO 9001 — Quality Management") ISO 9001 — Gestión de Calidad
+        p.feature-desc(style="font-size:.82rem" data-es="Monitoreo de cláusulas de calidad: control de procesos, gestión de no conformidades, acciones correctivas y mejora continua." data-en="Quality clause monitoring: process control, non-conformity management, corrective actions and continuous improvement.") Monitoreo de cláusulas de calidad: control de procesos, gestión de no conformidades, acciones correctivas y mejora continua.
+
+      .feature-card
+        .feature-icon.feature-icon-purple
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary-light)" stroke-width="2")
+            rect(x="3" y="11" width="18" height="11" rx="2" ry="2")
+            path(d="M7 11V7a5 5 0 0110 0v4")
+        .feature-title(data-es="ISO 27001 — Seguridad de la Información" data-en="ISO 27001 — Information Security") ISO 27001 — Seguridad de la Información
+        p.feature-desc(style="font-size:.82rem" data-es="Cumplimiento de controles de seguridad: gestión de accesos, respuesta a incidentes, continuidad del negocio y evaluación de riesgos." data-en="Security control compliance: access management, incident response, business continuity and risk assessment.") Cumplimiento de controles de seguridad: gestión de accesos, respuesta a incidentes, continuidad del negocio y evaluación de riesgos.
+
+      .feature-card
+        .feature-icon(style="background:rgba(245,158,11,.12)")
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FCD34D" stroke-width="2")
+            path(d="M12 2L2 7l10 5 10-5-10-5z")
+            path(d="M2 17l10 5 10-5")
+            path(d="M2 12l10 5 10-5")
+        .feature-title(data-es="ISO 55001 — Gestión de Activos" data-en="ISO 55001 — Asset Management") ISO 55001 — Gestión de Activos
+        p.feature-desc(style="font-size:.82rem" data-es="Ciclo de vida de activos industriales: adquisición, operación, mantenimiento y disposición con trazabilidad completa." data-en="Industrial asset lifecycle: acquisition, operation, maintenance and disposal with full traceability.") Ciclo de vida de activos industriales: adquisición, operación, mantenimiento y disposición con trazabilidad completa.
+
+      .feature-card
+        .feature-icon(style="background:rgba(34,211,238,.1)")
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2")
+            path(d="M13 2L3 14h9l-1 8 10-12h-9l1-8z")
+        .feature-title(data-es="ISO 50001 — Gestión de Energía" data-en="ISO 50001 — Energy Management") ISO 50001 — Gestión de Energía
+        p.feature-desc(style="font-size:.82rem" data-es="Monitoreo de consumo energético, KPIs de eficiencia, líneas base y planes de ahorro alineados a auditorías energéticas." data-en="Energy consumption monitoring, efficiency KPIs, baselines and savings plans aligned to energy audits.") Monitoreo de consumo energético, KPIs de eficiencia, líneas base y planes de ahorro alineados a auditorías energéticas.
+
+      .feature-card
+        .feature-icon(style="background:rgba(37,99,235,.15)")
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2")
+            path(d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z")
+        .feature-title(data-es="ISO 22301 — Continuidad del Negocio" data-en="ISO 22301 — Business Continuity") ISO 22301 — Continuidad del Negocio
+        p.feature-desc(style="font-size:.82rem" data-es="Gestión de incidentes críticos, planes de continuidad, simulacros y recuperación ante interrupciones operativas." data-en="Critical incident management, continuity plans, drills and recovery from operational disruptions.") Gestión de incidentes críticos, planes de continuidad, simulacros y recuperación ante interrupciones operativas.
+
+      .feature-card
+        .feature-icon(style="background:rgba(248,113,113,.12)")
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2")
+            path(d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z")
+            path(d="M9 12l2 2 4-4")
+        .feature-title(data-es="ISO 45001 — Seguridad y Salud en el Trabajo" data-en="ISO 45001 — Occupational Health & Safety") ISO 45001 — Seguridad y Salud en el Trabajo
+        p.feature-desc(style="font-size:.82rem" data-es="Identificación de peligros, evaluación de riesgos laborales, incidentes y mejora continua del entorno de trabajo seguro." data-en="Hazard identification, occupational risk assessment, incidents and continuous improvement of a safe work environment.") Identificación de peligros, evaluación de riesgos laborales, incidentes y mejora continua del entorno de trabajo seguro.
+
+      .feature-card
+        .feature-icon(style="background:rgba(16,185,129,.1)")
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2")
+            circle(cx="12" cy="12" r="10")
+            path(d="M12 8v4l3 3")
+        .feature-title(data-es="ISO 14001 — Gestión Ambiental" data-en="ISO 14001 — Environmental Management") ISO 14001 — Gestión Ambiental
+        p.feature-desc(style="font-size:.82rem" data-es="Monitoreo de aspectos ambientales, residuos, emisiones y cumplimiento regulatorio con reportes automáticos de desempeño." data-en="Environmental aspects monitoring, waste, emissions and regulatory compliance with automatic performance reports.") Monitoreo de aspectos ambientales, residuos, emisiones y cumplimiento regulatorio con reportes automáticos de desempeño.
+
+  script.
+    (function() {
+      var STORAGE_KEY = 'iso_session_start';
+      var EVENTS_KEY  = 'iso_events';
+
+      var log          = document.getElementById('sim-log');
+      var btnOnce      = document.getElementById('btn-sim-once');
+      var btnClear     = document.getElementById('btn-clear-log');
+      var linkDashboard = document.getElementById('link-dashboard');
+      var linkAudit    = document.getElementById('link-audit-report');
+
+      // ---- Event generation (client-side) ----
+      var MODULES = ['vision','maintenance','quality','energy','safety','environment'];
+      var ASSETS = {
+        vision:      ['robot-01','robot-02','conveyor-01'],
+        maintenance: ['robot-01','robot-02','press-01','conveyor-01','hvac-01'],
+        quality:     ['press-01','conveyor-01','robot-01'],
+        energy:      ['hvac-01','press-01','robot-01','robot-02'],
+        safety:      ['robot-01','robot-02','press-01','conveyor-01'],
+        environment: ['sensor-env-01','hvac-01'],
+      };
+      function rand(a,b){ return Math.random()*(b-a)+a; }
+      function randInt(a,b){ return Math.floor(rand(a,b+1)); }
+      function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+      function generateEvent() {
+        var mod = pick(MODULES);
+        var asset = pick(ASSETS[mod]);
+        var severity, data;
+        switch(mod) {
+          case 'vision': {
+            var t = parseFloat(rand(20,120).toFixed(1));
+            var dr = parseFloat(rand(0,15).toFixed(2));
+            severity = t>110?'CRITICAL':t>90?'HIGH':t>70?'MEDIUM':'LOW';
+            data = {value:t,defect_rate:dr,unit:'celsius'}; break;
+          }
+          case 'quality': {
+            var sc = parseFloat(rand(0,100).toFixed(1));
+            var rc = randInt(0,30);
+            severity = sc<40||rc>20?'CRITICAL':sc<60||rc>10?'HIGH':sc<75||rc>5?'MEDIUM':'LOW';
+            data = {value:sc,reject_count:rc,batch_id:'BATCH-'+Date.now()}; break;
+          }
+          case 'maintenance': {
+            var vib = parseFloat(rand(0,10).toFixed(2));
+            var hrs = randInt(0,5000);
+            var oil = parseFloat(rand(0,100).toFixed(1));
+            severity = vib>8.5||hrs>4500||oil<15?'CRITICAL':vib>6.5||hrs>3500||oil<30?'HIGH':vib>4.0||hrs>2000||oil<50?'MEDIUM':'LOW';
+            data = {value:vib,hours_since_maintenance:hrs,oil_pressure:oil}; break;
+          }
+          case 'energy': {
+            var kwh = parseFloat(rand(0,500).toFixed(2));
+            var pf  = parseFloat(rand(0.5,1.0).toFixed(3));
+            var peak = Math.random()>0.7;
+            severity = kwh>450||pf<0.6?'CRITICAL':kwh>380||(peak&&kwh>300)?'HIGH':kwh>280||pf<0.75?'MEDIUM':'LOW';
+            data = {value:kwh,power_factor:pf,peak_demand:peak}; break;
+          }
+          case 'safety': {
+            var risk = parseFloat(rand(0,100).toFixed(1));
+            severity = risk>85?'CRITICAL':risk>65?'HIGH':risk>40?'MEDIUM':'LOW';
+            data = {value:risk,incident_type:pick(['slip_fall','equipment_contact','chemical_exposure','fire_risk']),zone:pick(['Zone-A','Zone-B','Zone-C','Assembly-Floor'])}; break;
+          }
+          case 'environment': {
+            var co2  = parseFloat(rand(300,2000).toFixed(1));
+            var etmp = parseFloat(rand(15,40).toFixed(1));
+            var hum  = parseFloat(rand(20,90).toFixed(1));
+            severity = co2>1800||etmp>37||hum>85?'CRITICAL':co2>1400||etmp>33||hum>75?'HIGH':co2>1000||etmp>28||hum>65?'MEDIUM':'LOW';
+            data = {value:co2,temperature:etmp,humidity:hum,unit:'ppm_CO2'}; break;
+          }
+          default: severity='LOW'; data={value:Math.random()*100};
+        }
+        var etype = (severity==='CRITICAL'||severity==='HIGH')?'ALARM':severity==='MEDIUM'?'WARNING':'INFO';
+        return {
+          event_id:   'sim-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
+          timestamp:  new Date().toISOString(),
+          module_id:  mod,
+          asset_id:   asset,
+          plant_id:   'PLT-01',
+          event_type: etype,
+          severity:   severity,
+          data:       data,
+        };
+      }
+
+      // ---- Session / link management ----
+      function updateLinks(ts) {
+        if (linkDashboard) linkDashboard.href = '/dashboard?since=' + ts;
+        if (linkAudit)     linkAudit.href     = '/audit-report?since=' + ts;
+      }
+      function startSession() {
+        var ts = Date.now();
+        localStorage.setItem(STORAGE_KEY, ts);
+        localStorage.setItem(EVENTS_KEY, '[]');
+        updateLinks(ts);
+        return ts;
+      }
+      function ensureSession() {
+        var ex = localStorage.getItem(STORAGE_KEY);
+        if (ex) return ex;
+        return startSession();
+      }
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) updateLinks(saved);
+
+      // ---- Log UI ----
+      function addLogEntry(ev) {
+        var entry = document.createElement('div');
+        entry.className = 'log-entry';
+        var t = new Date().toLocaleTimeString('es-MX');
+        var sev = ev.severity || 'LOW';
+        entry.innerHTML =
+          '<span class="log-time">' + t + '</span>' +
+          '<span class="log-module">' + (ev.module_id || '?') + '</span>' +
+          '<span class="log-severity-' + sev + '">' + sev + '</span>' +
+          '&nbsp;&nbsp;<span class="log-asset">' + (ev.asset_id||'') + ' · ' + (ev.event_type||'') + '</span>';
+        log.insertBefore(entry, log.firstChild);
+        if (log.children.length > 50) log.removeChild(log.lastChild);
+      }
+
+      // ---- Generate & store ----
+      function sendOne() {
+        var ev = generateEvent();
+        var events = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
+        events.unshift(ev);
+        if (events.length > 200) events.length = 200;
+        localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+        addLogEntry(ev);
+      }
+
+      btnOnce.addEventListener('click', function() { ensureSession(); sendOne(); });
+      btnClear.addEventListener('click', function() { log.innerHTML = ''; startSession(); });
+    })();

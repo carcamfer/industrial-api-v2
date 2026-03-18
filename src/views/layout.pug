@@ -3,16 +3,96 @@ html(lang="es")
   head
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, initial-scale=1")
-    title CTRLHACK 2.0 - Industrial Dashboard
+    title= pageTitle ? pageTitle + ' — Expo Programador' : 'Expo Programador · Plataforma Industrial'
+    link(rel="preconnect" href="https://fonts.googleapis.com")
+    link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap")
     link(rel="stylesheet" href="/public/styles.css")
   body
-    header
-      h1 CTRLHACK 2.0 · Industrial Dashboard
-      p.status
-        a(href="/dashboard") Dashboard
-        |  &nbsp;|&nbsp; 
-        a(href="/audit-report") 📋 Reporte de Auditoría ISO
-    main
+    nav#site-nav
+      .nav-inner
+        a.nav-logo(href="/")
+          .nav-logo-icon EP
+          .nav-logo-text
+            span.nav-logo-title Expo Programador
+            span.nav-logo-sub(data-es="Plataforma Industrial" data-en="Industrial Platform") Plataforma Industrial
+        button.nav-hamburger(aria-label="Menú" aria-expanded="false")
+          span
+          span
+          span
+        ul.nav-links
+          li
+            a.nav-link(href="/" class=currentPage === 'home' ? 'active' : '')
+              svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                path(d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z")
+                polyline(points="9,22 9,12 15,12 15,22")
+              span(data-es="Inicio" data-en="Home") Inicio
+          li
+            a.nav-link(href="/integracion-iso" class=currentPage === 'iso-landing' ? 'active' : '')
+              svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                path(d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z")
+                polyline(points="14,2 14,8 20,8")
+                line(x1="9" y1="13" x2="15" y2="13")
+              span(data-es="Simulador Auditoría ISO" data-en="ISO Audit Simulator") Simulador Auditoría ISO
+          li
+            a.nav-link(href="/servicios-software" class=currentPage === 'servicios' ? 'active' : '')
+              svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                polyline(points="16,18 22,12 16,6")
+                polyline(points="8,6 2,12 8,18")
+              span(data-es="Softwares" data-en="Software") Softwares
+        .lang-switcher(aria-label="Cambiar idioma / Switch language")
+          button.lang-opt(data-lang="es" title="Español" onclick="epSetLang('es')") ES
+          button.lang-opt(data-lang="en" title="English" onclick="epSetLang('en')") EN
+
+    .page-wrapper
       block content
+
     footer
-      p Hecho con ⚙️ + 🦾
+      p Expo Programador · CTRLHACK 2.0
+        |  —
+        a(href="/")
+          span(data-es="Inicio" data-en="Home") Inicio
+        |  ·
+        a(href="/integracion-iso")
+          span(data-es="Integración ISO" data-en="ISO Integration") Integración ISO
+        |  ·
+        a(href="/servicios-software")
+          span(data-es="Servicios de Software" data-en="Software Services") Servicios de Software
+
+    script(src="/public/easter-eggs.js" defer)
+    script.
+      // ── Language switcher ─────────────────────────────────────────
+      var _epLang = localStorage.getItem('ep-lang') || 'es';
+
+      function epSetLang(l) {
+        _epLang = l;
+        localStorage.setItem('ep-lang', l);
+        document.documentElement.lang = l;
+        document.querySelectorAll('[data-es][data-en]').forEach(function(el){
+          el.textContent = el.getAttribute('data-' + l);
+        });
+        document.querySelectorAll('.lang-opt').forEach(function(btn){
+          btn.classList.toggle('active', btn.getAttribute('data-lang') === l);
+        });
+      }
+
+      epSetLang(_epLang);
+    script.
+      (function(){
+        var btn = document.querySelector('.nav-hamburger');
+        var menu = document.querySelector('.nav-links');
+        if(!btn || !menu) return;
+        btn.addEventListener('click', function(){
+          var open = menu.classList.toggle('open');
+          btn.classList.toggle('open', open);
+          btn.setAttribute('aria-expanded', open);
+        });
+        // Cierra el menú al hacer click en un link
+        menu.querySelectorAll('a').forEach(function(a){
+          a.addEventListener('click', function(){
+            menu.classList.remove('open');
+            btn.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      })();

@@ -1,21 +1,26 @@
 import dayjs from 'dayjs';
 import pool from '../db/index.js';
 
-export async function fetchSummaryStats () {
+export async function fetchSummaryStats (since = null) {
+  const where = since ? 'WHERE timestamp >= $1' : '';
+  const p = since ? [since] : [];
+
   const [countsBySeverity, countsByModule, totals] = await Promise.all([
     pool.query(`
       SELECT COALESCE(severity, 'UNKNOWN') AS severity, COUNT(*)
       FROM industrial_events
+      ${where}
       GROUP BY severity
       ORDER BY COUNT(*) DESC
-    `),
+    `, p),
     pool.query(`
       SELECT module_id, COUNT(*)
       FROM industrial_events
+      ${where}
       GROUP BY module_id
       ORDER BY COUNT(*) DESC
       LIMIT 10
-    `),
+    `, p),
     pool.query(`
       SELECT
         COUNT(*) AS total,
@@ -26,7 +31,8 @@ export async function fetchSummaryStats () {
           WHERE timestamp >= NOW() - INTERVAL '1 HOUR'
         ) AS last_hour
       FROM industrial_events
-    `)
+      ${where}
+    `, p)
   ]);
 
   return {
@@ -36,13 +42,17 @@ export async function fetchSummaryStats () {
   };
 }
 
-export async function fetchRecentEvents (limit = 20) {
+export async function fetchRecentEvents (limit = 20, since = null) {
+  const whereClause = since ? 'WHERE timestamp >= $1' : '';
+  const params = since ? [since, limit] : [limit];
+  const limitParam = since ? '$2' : '$1';
   const { rows } = await pool.query(
     `SELECT *
      FROM industrial_events
+     ${whereClause}
      ORDER BY timestamp DESC
-     LIMIT $1`,
-    [limit]
+     LIMIT ${limitParam}`,
+    params
   );
 
   return rows.map((row) => ({
