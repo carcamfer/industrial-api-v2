@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plataforma Industrial Modular</title>
+<style>
+:root{--bg:#030B1A;--bl:#2563EB;--bll:#60A5FA;--pu:#7C3AED;--pul:#A78BFA;
+      --gr:#10B981;--grl:#34D399;--or:#F59E0B;--re:#F87171;--cy:#22D3EE;
+      --ga:#94A3B8;--te:#E2E8F0;--ca:#0F1F3D}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;overflow-x:hidden;background:var(--bg);
+  font-family:'IBM Plex Sans','Inter','Segoe UI',system-ui,sans-serif;color:var(--te)}
+#bgc{position:fixed;inset:0;z-index:0;pointer-events:none}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(37,99,235,.05) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(37,99,235,.05) 1px,transparent 1px);
+  background-size:60px 60px}
+.scan{position:fixed;left:0;right:0;height:2px;z-index:50;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(96,165,250,.2),transparent);
+  animation:scan 8s linear infinite}
+@keyframes scan{from{top:0}to{top:100%}}
+
+.scene{position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:7vh 4vw 5vh;
+  min-height:auto;z-index:1;border-bottom:1px solid rgba(37,99,235,.12)}
+
+
+.ttl{font-size:clamp(26px,4.5vw,70px);font-weight:900;text-align:center;
+  background:linear-gradient(135deg,var(--bll),var(--pul),var(--grl));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:up .8s both}
+.stl{font-size:clamp(20px,3vw,46px);font-weight:800;text-align:center;
+  background:linear-gradient(135deg,var(--bll),var(--pul));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:dn .7s both;margin-bottom:.5vh}
+.sub{font-size:clamp(11px,1.2vw,18px);color:#64748B;text-align:center;
+  animation:fi .7s .3s both;margin-bottom:2vh}
+
+.logos{display:flex;align-items:center;gap:3vw;margin-bottom:2vh;animation:dn .8s both}
+.logos img{height:clamp(50px,6vh,86px);filter:drop-shadow(0 0 16px rgba(124,58,237,.5))}
+.lsep{width:2px;height:clamp(38px,5vh,68px);background:linear-gradient(to bottom,transparent,var(--pu),transparent)}
+
+.stats{display:flex;gap:1.5vw;margin-top:2vh;animation:up .8s .5s both;flex-wrap:wrap;justify-content:center}
+.stat{padding:1.2vh 2.5vw;border-radius:12px;background:rgba(15,31,61,.9);border:1px solid;text-align:center}
+.sv{font-size:clamp(18px,2.5vw,36px);font-weight:800}
+.sl{font-size:clamp(9px,.9vw,13px);color:#64748B;margin-top:.3vh}
+
+#s3{justify-content:flex-start;padding-top:1vh}
+.mod-scroll{width:100%;overflow-y:auto;flex:1;padding:0 1vw 1vh;
+  scrollbar-width:thin;scrollbar-color:rgba(96,165,250,.3) transparent}
+.cat-block{margin-bottom:2.5vh}
+.cat-hdr{display:flex;align-items:center;gap:.8vw;font-size:clamp(10px,1vw,14px);
+  font-weight:700;padding:.5vh 1vw;border-left:3px solid;border-radius:0 6px 6px 0;
+  background:rgba(15,31,61,.7);margin-bottom:.7vh}
+.cat-cnt{margin-left:auto;font-size:clamp(8px,.7vw,11px);font-weight:600;padding:.2vh .8vw;border-radius:20px}
+.cat-cards{display:flex;flex-wrap:wrap;gap:.5vw}
+.mod-card{background:rgba(15,31,61,.85);border:1px solid rgba(255,255,255,.06);
+  border-left:3px solid var(--ac,#3B82F6);border-radius:10px;padding:.6vh .9vw;
+  display:flex;align-items:center;gap:.6vw;flex:1;
+  min-width:clamp(130px,11vw,190px);max-width:210px;transition:transform .2s;cursor:default}
+.mod-card:hover{transform:translateY(-2px)}
+.mod-icon{font-size:clamp(13px,1.3vw,20px);flex-shrink:0}
+.mod-name{font-size:clamp(8px,.75vw,12px);color:#CBD5E1;line-height:1.3;flex:1}
+.mod-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:blink 1.8s ease infinite}
+
+.eco{position:relative;width:90vw;height:54vh}
+.eco svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.eline{stroke-dasharray:8 5;animation:dash 2s linear infinite;fill:none;stroke-width:1.5;opacity:.5}
+@keyframes dash{from{stroke-dashoffset:26}to{stroke-dashoffset:0}}
+.enode{position:absolute;border-radius:10px;background:rgba(10,20,40,.95);
+  border:2px solid;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;font-size:clamp(7px,.65vw,10px);font-weight:600;
+  text-align:center;padding:.6vh .8vw;cursor:default;z-index:5;transition:transform .25s;
+  width:clamp(80px,9vw,130px);line-height:1.3}
+.enode:hover{transform:scale(1.06)}
+.eicon{font-size:clamp(14px,1.6vw,24px);margin-bottom:.2vh}
+.core{position:absolute;border-radius:50%;
+  background:radial-gradient(circle,#1D4ED8,#1E3A8A);border:3px solid var(--bll);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  font-weight:700;color:#BFDBFE;text-align:center;
+  animation:pglow 2s ease infinite;z-index:10}
+@keyframes pglow{0%,100%{box-shadow:0 0 28px rgba(37,99,235,.5)}50%{box-shadow:0 0 55px rgba(37,99,235,.9)}}
+
+.iso-wrap{display:flex;gap:4vw;align-items:center;max-width:90vw}
+.iso-doc{width:clamp(200px,20vw,320px);flex-shrink:0;background:rgba(15,31,61,.95);
+  border:1px solid rgba(59,130,246,.4);border-radius:14px;overflow:hidden;
+  animation:fl 3.5s ease infinite}
+@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.dhdr{background:rgba(37,99,235,.8);padding:1.2vh 1.5vw;font-size:clamp(10px,.85vw,13px);font-weight:700;color:#BFDBFE}
+.drow{display:flex;justify-content:space-between;padding:.65vh 1.5vw;
+  border-bottom:1px solid rgba(255,255,255,.05);font-size:clamp(9px,.75vw,12px)}
+.drow .dl{color:#64748B}.drow .dv{color:var(--te);font-weight:600}
+.dbadge{margin:1vh 1.5vw;padding:.7vh;border-radius:8px;background:rgba(52,211,153,.12);
+  color:var(--grl);font-size:clamp(8px,.75vw,12px);font-weight:700;text-align:center;
+  border:1px solid rgba(52,211,153,.3)}
+.iso-pts{flex:1}
+.iso-pts h2{font-size:clamp(20px,2.8vw,42px);font-weight:800;
+  background:linear-gradient(135deg,var(--bll),var(--pul));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1.5vh}
+.ipt{display:flex;align-items:center;gap:1vw;margin-bottom:1.2vh;
+  font-size:clamp(10px,1vw,17px);color:#CBD5E1}
+.ipt span{font-size:clamp(14px,1.5vw,24px)}
+
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:2vw;max-width:88vw;margin-top:2vh}
+.dcol{background:rgba(15,31,61,.9);border-radius:14px;padding:2.5vh 2.5vw;border:1px solid;animation:up .7s both}
+.dcol h3{font-size:clamp(12px,1.2vw,20px);font-weight:700;margin-bottom:1.5vh}
+.ditem{display:flex;align-items:center;gap:.8vw;margin-bottom:.9vh;font-size:clamp(10px,.95vw,16px);color:#CBD5E1}
+
+.final{font-size:clamp(28px,5vw,72px);font-weight:900;text-align:center;
+  background:linear-gradient(135deg,var(--bll),var(--pul),var(--grl));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:up .9s both}
+.ctas{display:flex;gap:1.5vw;margin-top:2.5vh;animation:up .8s .5s both;flex-wrap:wrap;justify-content:center}
+.cta{padding:1.2vh 2.5vw;border-radius:12px;font-size:clamp(12px,1.2vw,18px);font-weight:700;cursor:pointer;border:none}
+
+.narbar{position:fixed;bottom:0;left:0;right:0;
+  background:rgba(3,11,26,.95);border-top:1px solid rgba(59,130,246,.2);
+  padding:1.2vh 5vw;z-index:100;backdrop-filter:blur(10px)}
+.nspk{font-size:clamp(8px,.65vw,10px);color:var(--bll);font-weight:700;
+  text-transform:uppercase;letter-spacing:2px;margin-bottom:.3vh}
+.ntxt{font-size:clamp(11px,1vw,17px);color:var(--te);font-style:italic;line-height:1.4;min-height:1.4em}
+
+.prog{position:fixed;bottom:clamp(58px,8vh,88px);left:0;right:0;height:2px;
+  background:rgba(59,130,246,.1);z-index:100}
+.progf{height:100%;background:linear-gradient(90deg,var(--bll),var(--pul));transition:width .5s}
+.ctrls{position:fixed;bottom:calc(clamp(58px,8vh,88px) + 8px);right:2vw;
+  z-index:200;display:flex;gap:.6vw;align-items:center}
+.cbtn{width:clamp(34px,2.8vw,44px);height:clamp(34px,2.8vw,44px);border-radius:50%;
+  border:1px solid rgba(96,165,250,.4);background:rgba(15,31,61,.95);
+  color:var(--bll);font-size:clamp(12px,1.1vw,16px);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s}
+.cbtn:hover{background:rgba(59,130,246,.25);box-shadow:0 0 10px rgba(59,130,246,.3)}
+.cbtn.on{background:rgba(59,130,246,.3);box-shadow:0 0 10px var(--bll)}
+.dots{position:fixed;right:1vw;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:.7vh;z-index:100}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(59,130,246,.25);
+  border:1px solid rgba(96,165,250,.4);cursor:pointer;transition:all .25s}
+.dot.on{background:var(--bll);box-shadow:0 0 6px var(--bll);width:10px;height:10px}
+.slbl{position:fixed;top:2vh;left:50%;transform:translateX(-50%);
+  font-size:clamp(8px,.65vw,10px);color:rgba(96,165,250,.4);
+  text-transform:uppercase;letter-spacing:3px;z-index:100}
+
+.fab{position:absolute;bottom:0;left:0;right:0;height:18vh;opacity:.14;pointer-events:none}
+
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dn{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* Carrusel */
+.carousel-track{position:relative;width:100%;height:clamp(160px,18vh,240px)}
+.carousel-slide{position:absolute;inset:0;opacity:0;transition:opacity .5s ease;pointer-events:none}
+.carousel-active{opacity:1;pointer-events:all}
+.carousel-card{display:flex;gap:1.5vw;align-items:center;height:100%;padding:0 4vw}
+.carousel-img{height:100%;width:auto;max-width:45%;object-fit:cover;border-radius:12px;
+  border:2px solid rgba(124,58,237,.4);box-shadow:0 0 20px rgba(124,58,237,.2);flex-shrink:0}
+.carousel-comment{flex:1;display:flex;flex-direction:column;justify-content:center;gap:.8vh}
+.carousel-comment-title{font-size:clamp(13px,1.3vw,20px);font-weight:700;color:#A78BFA}
+.carousel-comment-text{font-size:clamp(10px,.95vw,15px);color:#94A3B8;font-style:italic;line-height:1.5}
+.carousel-nav{position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(15,31,61,.9);border:1px solid rgba(167,139,250,.4);
+  color:#A78BFA;font-size:clamp(20px,2vw,32px);cursor:pointer;border-radius:50%;
+  width:clamp(32px,2.8vw,44px);height:clamp(32px,2.8vw,44px);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;z-index:10;line-height:1}
+.carousel-prev{left:.5vw}.carousel-next{right:.5vw}
+.carousel-nav:hover{background:rgba(124,58,237,.3);box-shadow:0 0 10px rgba(124,58,237,.4)}
+.carousel-dots{display:flex;justify-content:center;gap:.5vw;margin-top:.8vh}
+.cdot{width:7px;height:7px;border-radius:50%;background:rgba(167,139,250,.3);
+  border:1px solid rgba(167,139,250,.4);cursor:pointer;transition:all .25s}
+.cdot-active{background:#A78BFA;box-shadow:0 0 6px #A78BFA;width:9px;height:9px}
+
+
+/* ISO table */
+.iso-table{width:100%;border-collapse:collapse;font-size:clamp(7px,.68vw,11px)}
+.iso-table thead tr{background:rgba(255,255,255,.04)}
+.iso-table th{padding:.5vh .7vw;text-align:left;color:#64748B;font-weight:600;
+  font-size:clamp(7px,.65vw,10px);text-transform:uppercase;letter-spacing:.05em;
+  border-bottom:1px solid rgba(255,255,255,.08)}
+.iso-table td{padding:.55vh .7vw;border-bottom:1px solid rgba(255,255,255,.05);
+  vertical-align:middle;color:#CBD5E1;line-height:1.35}
+.iso-table tr:last-child td{border-bottom:none}
+.iso-table tr:hover td{background:rgba(255,255,255,.02)}
+.iso-sec{font-weight:700;border-left:3px solid;padding-left:.6vw;white-space:nowrap;font-size:clamp(7px,.65vw,10px)}
+.iso-tag{display:inline-block;padding:.15vh .4vw;border-radius:5px;
+  font-size:clamp(6px,.6vw,9px);font-weight:600;margin:.1vh .1vw;white-space:nowrap}
+
+
+.iso-tag{display:inline-flex;align-items:center;gap:.3vw;
+  background:rgba(255,255,255,.06);border:1px solid var(--tc,#60A5FA);
+  color:var(--tc,#60A5FA);border-radius:20px;
+  padding:.2vh .5vw;font-size:clamp(7px,.65vw,10px);font-weight:600;
+  margin:.15vh .2vw;white-space:nowrap}
+
+.narbar,.prog,.ctrls,.dots,.slbl{display:none!important}
+#vtxt{display:none!important}
+/* Scrollable page narration block */
+.scene-nar{
+  background:rgba(37,99,235,.06);
+  border-left:3px solid rgba(96,165,250,.4);
+  color:#94A3B8;
+  font-size:clamp(12px,1vw,15px);
+  padding:1.2rem 1.75rem;
+  border-radius:0 10px 10px 0;
+  margin-top:2.5rem;
+  max-width:min(820px,90vw);
+  line-height:1.65;
+  font-style:italic;
+}
+/* Module cards — click to open chatbot */
+.mod-card{position:relative;cursor:pointer!important}
+.mod-card:hover{transform:translateY(-2px);border-color:rgba(118,77,240,.5)!important;background:rgba(15,31,80,.95)!important}
+
+/* ── Chat panel ────────────────────────────────────── */
+#chat-backdrop{
+  display:none;position:fixed;inset:0;
+  background:rgba(3,11,26,.6);backdrop-filter:blur(4px);
+  z-index:1000
+}
+#chat-panel{
+  display:none;position:fixed;top:0;right:0;
+  width:min(420px,100vw);height:100dvh;
+  background:rgba(8,16,40,.97);
+  border-left:1px solid rgba(118,77,240,.35);
+  box-shadow:-12px 0 48px rgba(0,0,0,.6);
+  z-index:1001;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+#chat-panel.open{transform:translateX(0)}
+#chat-backdrop.open{display:block}
+#chat-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.9rem 1.1rem;
+  border-bottom:1px solid rgba(118,77,240,.25);
+  background:rgba(118,77,240,.08);
+  flex-shrink:0
+}
+#chat-module-name{
+  font-size:.85rem;font-weight:700;color:#C4B5FD;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 2.5rem)
+}
+#chat-close{
+  background:none;border:none;color:#94A3B8;font-size:1.1rem;
+  cursor:pointer;padding:.25rem .4rem;border-radius:6px;flex-shrink:0
+}
+#chat-close:hover{color:#E2E8F0;background:rgba(255,255,255,.07)}
+#chat-messages{
+  flex:1;overflow-y:auto;padding:.9rem 1rem;
+  display:flex;flex-direction:column;gap:.65rem;
+  scrollbar-width:thin;scrollbar-color:rgba(118,77,240,.3) transparent
+}
+.cm-bubble{
+  max-width:88%;padding:.6rem .85rem;border-radius:14px;
+  font-size:.82rem;line-height:1.55;color:#E2E8F0;word-break:break-word
+}
+.cm-bubble.user{
+  align-self:flex-end;
+  background:linear-gradient(135deg,#5B21B6,#764DF0);
+  border-bottom-right-radius:4px
+}
+.cm-bubble.assistant{
+  align-self:flex-start;
+  background:rgba(30,41,80,.9);
+  border:1px solid rgba(118,77,240,.2);
+  border-bottom-left-radius:4px
+}
+.cm-bubble.thinking{color:#64748B;font-style:italic}
+#chat-quick-actions{
+  display:flex;flex-wrap:wrap;gap:.4rem;
+  padding:.65rem 1rem;border-top:1px solid rgba(118,77,240,.15);flex-shrink:0
+}
+.qa-btn{
+  background:rgba(118,77,240,.12);border:1px solid rgba(118,77,240,.3);
+  color:#C4B5FD;font-size:.75rem;padding:.35rem .65rem;border-radius:20px;
+  cursor:pointer;transition:background .2s,border-color .2s;white-space:nowrap
+}
+.qa-btn:hover{background:rgba(118,77,240,.25);border-color:rgba(118,77,240,.6)}
+#contact-form{
+  padding:.9rem 1rem;border-top:1px solid rgba(118,77,240,.15);flex-shrink:0;
+  display:flex;flex-direction:column;gap:.55rem
+}
+.cf-title{font-size:.8rem;color:#A78BFA;font-weight:600;margin-bottom:.1rem}
+.cf-input{
+  background:rgba(15,25,60,.8);border:1px solid rgba(118,77,240,.3);
+  color:#E2E8F0;padding:.45rem .7rem;border-radius:8px;font-size:.8rem;width:100%;
+  outline:none;box-sizing:border-box
+}
+.cf-input:focus{border-color:rgba(118,77,240,.7)}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.cf-submit{
+  background:linear-gradient(135deg,#5B21B6,#764DF0);
+  border:none;color:#fff;padding:.55rem;border-radius:8px;
+  font-size:.82rem;font-weight:600;cursor:pointer;margin-top:.2rem
+}
+.cf-submit:hover{opacity:.9}
+.cf-cancel{
+  background:none;border:none;color:#64748B;font-size:.75rem;
+  cursor:pointer;text-align:center;padding:.2rem
+}
+.cf-cancel:hover{color:#94A3B8}
+#chat-input-row{
+  display:flex;gap:.5rem;padding:.75rem 1rem;
+  border-top:1px solid rgba(118,77,240,.15);flex-shrink:0
+}
+#chat-input{
+  flex:1;background:rgba(15,25,60,.8);border:1px solid rgba(118,77,240,.3);
+  color:#E2E8F0;padding:.5rem .8rem;border-radius:10px;font-size:.82rem;outline:none
+}
+#chat-input:focus{border-color:rgba(118,77,240,.7)}
+#chat-send{
+  background:linear-gradient(135deg,#5B21B6,#764DF0);
+  border:none;color:#fff;padding:.5rem .8rem;border-radius:10px;
+  font-size:1rem;cursor:pointer;flex-shrink:0
+}
+#chat-send:hover{opacity:.9}
+#chat-send:disabled{opacity:.45;cursor:not-allowed}
+/* Back link */
+.back-bar{
+  position:sticky;top:0;z-index:500;
+  background:rgba(4,14,30,.95);
+  border-bottom:1px solid rgba(118,77,240,.3);
+  padding:.75rem 2rem;
+  display:flex;align-items:center;gap:1rem;
+  backdrop-filter:blur(16px);
+}
+.back-bar a{color:#9B75F4;text-decoration:none;font-size:.85rem;font-weight:600;display:inline-flex;align-items:center;gap:.4rem}
+.back-bar a:hover{color:#E2E8F0}
+.back-bar-title{font-size:.85rem;color:#94A3B8;margin-left:.5rem}
+</style>
+</head>
+<body>
+<div class="back-bar">
+  <a href="/">&#8592; Volver al inicio</a>
+  <span class="back-bar-title">Softwares</span>
+</div>
+<canvas id="bgc"></canvas>
+<div class="grid"></div>
+<div class="scan"></div>
+
+
+<!-- ESCENA 3 -->
+<div class="scene" id="s3">
+  <div style="text-align:center;padding-bottom:.8vh;animation:dn .7s both;flex-shrink:0">
+    <h2 class="stl" style="margin-bottom:.3vh">28+ Módulos Especializados</h2>
+    <p class="sub" style="margin-bottom:0">Una plataforma completa — aquí algunos de los más destacados</p>
+  </div>
+  <div class="mod-scroll">
+<div class="cat-block"><div class="cat-hdr" style="color:#34D399;border-color:#34D399">🏢 ERP & Gestión Empresarial<span class="cat-cnt" style="background:#34D39922;color:#34D399">8</span></div><div class="cat-cards"><div class="mod-card" style="--ac:#34D399"><span class="mod-icon">📊</span><span class="mod-name">Producción Real vs Planeada</span><span class="mod-dot" style="background:#34D399"></span></div><div class="mod-card" style="--ac:#34D399"><span class="mod-icon">📦</span><span class="mod-name">Inventario Inteligente</span><span class="mod-dot" style="background:#34D399"></span></div><div class="mod-card" style="--ac:#34D399"><span class="mod-icon">🛒</span><span class="mod-name">Compras y Proveedores</span><span class="mod-dot" style="background:#34D399"></span></div><div class="mod-card" style="--ac:#34D399"><span class="mod-icon">🗑️</span><span class="mod-name">Gestión de Scrap y Calidad</span><span class="mod-dot" style="background:#34D399"></span></div><div class="mod-card" style="--ac:#34D399"><span class="mod-icon">📈</span><span class="mod-name">Analítica Empresarial</span><span class="mod-dot" style="background:#34D399"></span></div><div class="mod-card" style="--ac:#34D399"><span class="mod-icon">🤝</span><span class="mod-name">CRM Industrial</span><span class="mod-dot" style="background:#34D399"></span></div><div class="mod-card" style="--ac:#34D399"><span class="mod-icon">🗂️</span><span class="mod-name">Gestión de Proyectos y Costos</span><span class="mod-dot" style="background:#34D399"></span></div><div class="mod-card" style="--ac:#34D399"><span class="mod-icon">💰</span><span class="mod-name">Control de Gastos Operativos</span><span class="mod-dot" style="background:#34D399"></span></div></div></div>
+<div class="cat-block"><div class="cat-hdr" style="color:#F87171;border-color:#F87171">🛡️ Ciberseguridad OT<span class="cat-cnt" style="background:#F8717122;color:#F87171">5</span></div><div class="cat-cards"><div class="mod-card" style="--ac:#F87171"><span class="mod-icon">🔀</span><span class="mod-name">Segmentación de Red OT</span><span class="mod-dot" style="background:#F87171"></span></div><div class="mod-card" style="--ac:#F87171"><span class="mod-icon">🛡️</span><span class="mod-name">Edge Vision Seguridad Industrial</span><span class="mod-dot" style="background:#F87171"></span></div><div class="mod-card" style="--ac:#F87171"><span class="mod-icon">🔌</span><span class="mod-name">Gateway Industrial OT-IT Seguro</span><span class="mod-dot" style="background:#F87171"></span></div><div class="mod-card" style="--ac:#F87171"><span class="mod-icon">🔍</span><span class="mod-name">Detección de Anomalías OT con AI</span><span class="mod-dot" style="background:#F87171"></span></div><div class="mod-card" style="--ac:#F87171"><span class="mod-icon">⚔️</span><span class="mod-name">Simulador de Ataques + Defensa</span><span class="mod-dot" style="background:#F87171"></span></div></div></div>
+<div class="cat-block"><div class="cat-hdr" style="color:#A78BFA;border-color:#A78BFA">👁️ Visión Artificial<span class="cat-cnt" style="background:#A78BFA22;color:#A78BFA">3</span></div><div class="cat-cards"><div class="mod-card" style="--ac:#A78BFA"><span class="mod-icon">👁️</span><span class="mod-name">Visión Artificial Industrial</span><span class="mod-dot" style="background:#A78BFA"></span></div><div class="mod-card" style="--ac:#A78BFA"><span class="mod-icon">🔢</span><span class="mod-name">Conteo Automático en Banda</span><span class="mod-dot" style="background:#A78BFA"></span></div><div class="mod-card" style="--ac:#A78BFA"><span class="mod-icon">🦺</span><span class="mod-name">Detección de Riesgos Ergonómicos</span><span class="mod-dot" style="background:#A78BFA"></span></div></div></div>
+<div class="cat-block"><div class="cat-hdr" style="color:#FBBF24;border-color:#FBBF24">🤖 AI & Machine Learning<span class="cat-cnt" style="background:#FBBF2422;color:#FBBF24">6</span></div><div class="cat-cards"><div class="mod-card" style="--ac:#FBBF24"><span class="mod-icon">⚙️</span><span class="mod-name">Simulación de Cuellos de Botella</span><span class="mod-dot" style="background:#FBBF24"></span></div><div class="mod-card" style="--ac:#FBBF24"><span class="mod-icon">📳</span><span class="mod-name">Detección de Fallas Mecánicas</span><span class="mod-dot" style="background:#FBBF24"></span></div><div class="mod-card" style="--ac:#FBBF24"><span class="mod-icon">🎯</span><span class="mod-name">Detección de Desviaciones con AI</span><span class="mod-dot" style="background:#FBBF24"></span></div><div class="mod-card" style="--ac:#FBBF24"><span class="mod-icon">🤖</span><span class="mod-name">Predicción de Demanda con ML</span><span class="mod-dot" style="background:#FBBF24"></span></div><div class="mod-card" style="--ac:#FBBF24"><span class="mod-icon">🧠</span><span class="mod-name">Planificación Automática con AI</span><span class="mod-dot" style="background:#FBBF24"></span></div><div class="mod-card" style="--ac:#FBBF24"><span class="mod-icon">🔄</span><span class="mod-name">Optimización de Secuenciación</span><span class="mod-dot" style="background:#FBBF24"></span></div></div></div>
+<div class="cat-block"><div class="cat-hdr" style="color:#22D3EE;border-color:#22D3EE">⚙️ Infraestructura & Edge<span class="cat-cnt" style="background:#22D3EE22;color:#22D3EE">6</span></div><div class="cat-cards"><div class="mod-card" style="--ac:#22D3EE"><span class="mod-icon">🌐</span><span class="mod-name">Red Industrial Resiliente OT</span><span class="mod-dot" style="background:#22D3EE"></span></div><div class="mod-card" style="--ac:#22D3EE"><span class="mod-icon">⚡</span><span class="mod-name">Monitorización de Energía con AI</span><span class="mod-dot" style="background:#22D3EE"></span></div><div class="mod-card" style="--ac:#22D3EE"><span class="mod-icon">🪞</span><span class="mod-name">Digital Twin Operativo</span><span class="mod-dot" style="background:#22D3EE"></span></div><div class="mod-card" style="--ac:#22D3EE"><span class="mod-icon">⏱️</span><span class="mod-name">Identificación de Tiempos Muertos</span><span class="mod-dot" style="background:#22D3EE"></span></div><div class="mod-card" style="--ac:#22D3EE"><span class="mod-icon">🖧</span><span class="mod-name">Orquestación de Nodos Edge</span><span class="mod-dot" style="background:#22D3EE"></span></div><div class="mod-card" style="--ac:#22D3EE"><span class="mod-icon">📡</span><span class="mod-name">Digitalización de Señales Analógicas</span><span class="mod-dot" style="background:#22D3EE"></span></div></div></div>
+  </div>
+</div>
+
+<!-- ESCENA 4 -->
+<div class="scene" id="s4">
+  <h2 class="stl">Un Ecosistema Vivo y Conectado</h2>
+  <p class="sub">Los módulos se comunican entre sí para toma de decisiones inteligente</p>
+  <div style="display:flex;gap:2.5vw;width:96vw;flex-shrink:0;align-items:flex-start">
+<div id="ecobox" style="position:relative;width:96vw;height:62vh;flex-shrink:0">
+    <svg id="ecosvg" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible"></svg>
+
+    <!-- Nodos con id para calcular posición -->
+    <div class="enode" id="en-gateway"  style="left:2%;top:10%;border-color:#60A5FA;color:#93C5FD"><div class="eicon">🔌</div>Gateway OT-IT</div>
+    <div class="enode" id="en-vision"   style="left:2%;top:36%;border-color:#A78BFA;color:#C4B5FD"><div class="eicon">👁️</div>Visión Artificial</div>
+    <div class="enode" id="en-fallas"   style="left:2%;top:62%;border-color:#F59E0B;color:#FCD34D"><div class="eicon">📳</div>Fallas Mecánicas</div>
+    <div class="enode" id="en-energia"  style="left:2%;top:82%;border-color:#22D3EE;color:#67E8F9"><div class="eicon">⚡</div>Energía con AI</div>
+
+    <div class="enode" id="en-digitwin" style="left:23%;top:5%;border-color:#FBBF24;color:#FDE68A"><div class="eicon">🪞</div>Digital Twin</div>
+    <div class="enode" id="en-conteo"   style="left:23%;top:78%;border-color:#A78BFA;color:#C4B5FD"><div class="eicon">🔢</div>Conteo en Banda</div>
+
+    <!-- NÚCLEO CENTRAL -->
+    <div id="en-nucleo" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:min(115px,11vw);height:min(115px,11vw);border-radius:50%;
+      background:radial-gradient(circle,#1D4ED8,#1E3A8A);border:3px solid #60A5FA;
+      display:flex;align-items:center;justify-content:center;flex-direction:column;
+      font-weight:700;color:#BFDBFE;text-align:center;font-size:clamp(8px,.8vw,11px);
+      box-shadow:0 0 30px rgba(37,99,235,.6),0 0 60px rgba(37,99,235,.3);
+      animation:pglow 2s ease infinite;z-index:10;padding:6px">🧠<br>NÚCLEO<br>CENTRAL</div>
+
+    <div class="enode" id="en-scrap"    style="right:23%;top:5%;border-color:#F87171;color:#FCA5A5"><div class="eicon">🗑️</div>Scrap & Calidad</div>
+    <div class="enode" id="en-erp"      style="right:23%;top:78%;border-color:#34D399;color:#6EE7B7"><div class="eicon">🏢</div>SAP / ERP</div>
+
+    <div class="enode" id="en-analitica" style="right:2%;top:10%;border-color:#22D3EE;color:#67E8F9"><div class="eicon">📈</div>Analítica & KPIs</div>
+    <div class="enode" id="en-inventario" style="right:2%;top:36%;border-color:#34D399;color:#6EE7B7"><div class="eicon">📦</div>Inventario Inteligente</div>
+    <div class="enode" id="en-produccion" style="right:2%;top:62%;border-color:#F87171;color:#FCA5A5"><div class="eicon">📊</div>Prod. Real vs Plan</div>
+    <div class="enode" id="en-crm"       style="right:2%;top:82%;border-color:#FBBF24;color:#FDE68A"><div class="eicon">🤝</div>CRM Industrial</div>
+
+    <!-- Punto de datos animado -->
+    <div id="fdot" style="position:absolute;width:13px;height:13px;border-radius:50%;
+      background:#A78BFA;box-shadow:0 0 10px #A78BFA;display:none;z-index:20;
+      transition:left .7s ease,top .7s ease,background .3s;pointer-events:none"></div>
+  </div>
+  </div>
+</div>
+</div>
+
+
+
+<!-- UI -->
+<div class="narbar">
+  <div class="nspk">🎙️ Narración</div>
+  <div class="ntxt" id="ntxt">Presiona ▶ para iniciar la presentación</div>
+</div>
+<div class="prog"><div class="progf" id="pf" style="width:14.28%"></div></div>
+<div class="ctrls">
+  <button class="cbtn" onclick="prev()">◀</button>
+  <button class="cbtn" id="playbtn" onclick="toggleAuto()">▶</button>
+  <button class="cbtn" onclick="next()">▶▶</button>
+</div>
+<div class="dots" id="dots"></div>
+
+<script>
+
+// Ecosystem connections
+(function() {
+  function center(el) {
+    var box = el.getBoundingClientRect();
+    var pb = document.getElementById('ecobox').getBoundingClientRect();
+    return { x: box.left - pb.left + box.width/2, y: box.top - pb.top + box.height/2 };
+  }
+  function drawLines() {
+    var svg = document.getElementById('ecosvg');
+    if (!svg) return;
+    svg.innerHTML = '';
+    var nucleus = document.getElementById('en-nucleo');
+    if (!nucleus) return;
+    var nc = center(nucleus);
+    var nodes = ['en-gateway','en-vision','en-fallas','en-energia','en-digitwin','en-conteo',
+                 'en-scrap','en-erp','en-analitica','en-inventario','en-produccion','en-crm'];
+    var colors = ['#60A5FA','#A78BFA','#F59E0B','#22D3EE','#FBBF24','#A78BFA',
+                  '#F87171','#34D399','#22D3EE','#34D399','#F87171','#FBBF24'];
+    // Cross-module connections (drawn first so nucleus lines appear on top)
+    var crossPairs = [
+      ['en-gateway',   'en-digitwin',   '#60A5FA'],
+      ['en-vision',    'en-conteo',     '#A78BFA'],
+      ['en-vision',    'en-scrap',      '#A78BFA'],
+      ['en-analitica', 'en-erp',        '#22D3EE'],
+      ['en-produccion','en-scrap',      '#F87171'],
+      ['en-inventario','en-erp',        '#34D399'],
+      ['en-fallas',    'en-produccion', '#F59E0B'],
+      ['en-energia',   'en-analitica',  '#22D3EE'],
+    ];
+    crossPairs.forEach(function(pair) {
+      var el1 = document.getElementById(pair[0]);
+      var el2 = document.getElementById(pair[1]);
+      if (!el1 || !el2) return;
+      var c1 = center(el1), c2 = center(el2);
+      var ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('x1', c1.x); ln.setAttribute('y1', c1.y);
+      ln.setAttribute('x2', c2.x); ln.setAttribute('y2', c2.y);
+      ln.setAttribute('stroke', pair[2]);
+      ln.setAttribute('class','eline');
+      ln.setAttribute('style','opacity:0.25');
+      svg.appendChild(ln);
+    });
+    nodes.forEach(function(id, i) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var ec = center(el);
+      var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', ec.x); line.setAttribute('y1', ec.y);
+      line.setAttribute('x2', nc.x); line.setAttribute('y2', nc.y);
+      line.setAttribute('stroke', colors[i]);
+      line.setAttribute('class','eline');
+      svg.appendChild(line);
+    });
+  }
+  // Animate dot along connections
+  var nodeIds = ['en-gateway','en-vision','en-fallas','en-energia','en-digitwin','en-conteo',
+                 'en-scrap','en-erp','en-analitica','en-inventario','en-produccion','en-crm'];
+  var dotColors = ['#60A5FA','#A78BFA','#F59E0B','#22D3EE','#FBBF24','#A78BFA',
+                   '#F87171','#34D399','#22D3EE','#34D399','#F87171','#FBBF24'];
+  var dotIdx = 0;
+  var dotPhase = 0; // 0 = going to nucleus, 1 = going back to node
+  function moveDot() {
+    var fdot = document.getElementById('fdot');
+    var ecobox = document.getElementById('ecobox');
+    if (!fdot || !ecobox) return;
+    fdot.style.display = 'block';
+    var nodeEl = document.getElementById(nodeIds[dotIdx]);
+    var nucleus = document.getElementById('en-nucleo');
+    if (!nodeEl || !nucleus) return;
+    var nc = center(nucleus);
+    var ec = center(nodeEl);
+    var target = dotPhase === 0 ? nc : ec;
+    fdot.style.background = dotColors[dotIdx];
+    fdot.style.boxShadow = '0 0 10px ' + dotColors[dotIdx];
+    fdot.style.left = (target.x - 6.5) + 'px';
+    fdot.style.top = (target.y - 6.5) + 'px';
+    if (dotPhase === 0) { dotPhase = 1; }
+    else { dotPhase = 0; dotIdx = (dotIdx + 1) % nodeIds.length; }
+  }
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      drawLines();
+      moveDot();
+      setInterval(moveDot, 900);
+    }, 300);
+  });
+  window.addEventListener('resize', drawLines);
+})();
+
+// ── Chatbot por módulo ────────────────────────────────────────────────────────
+</script>
+
+<!-- Chat panel -->
+<div id="chat-backdrop"></div>
+<div id="chat-panel">
+  <div id="chat-header">
+    <span id="chat-module-name"></span>
+    <button id="chat-close">✕</button>
+  </div>
+  <div id="chat-messages"></div>
+  <div id="chat-quick-actions">
+    <button class="qa-btn" data-q="¿Cómo se implementa este módulo?">¿Cómo se implementa?</button>
+    <button class="qa-btn" data-q="¿Cuál es el tiempo de implementación?">Tiempo estimado</button>
+    <button class="qa-btn" data-q="¿Con qué sistemas se integra?">Integraciones</button>
+    <button class="qa-btn show-contact" data-type="llamada">📅 Agendar llamada</button>
+    <button class="qa-btn show-contact" data-type="correo">✉️ Enviar correo</button>
+  </div>
+  <div id="contact-form" style="display:none"></div>
+  <div id="chat-input-row">
+    <input id="chat-input" placeholder="Escribe tu pregunta...">
+    <button id="chat-send">➤</button>
+  </div>
+</div>
+
+<script>
+// ── Chatbot por módulo ────────────────────────────────────────────────────────
+(function() {
+  var panel     = document.getElementById('chat-panel');
+  var backdrop  = document.getElementById('chat-backdrop');
+  var modTitle  = document.getElementById('chat-module-name');
+  var msgBox    = document.getElementById('chat-messages');
+  var inputEl   = document.getElementById('chat-input');
+  var sendBtn   = document.getElementById('chat-send');
+  var qaBtns    = document.querySelectorAll('.qa-btn');
+  var contactForm = document.getElementById('contact-form');
+  var inputRow  = document.getElementById('chat-input-row');
+  var qaRow     = document.getElementById('chat-quick-actions');
+
+  var activeModule = '';
+  var history = [];   // [{role, content}]
+  var contactType = 'llamada';
+
+  // Open panel
+  document.querySelectorAll('.mod-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var nameEl = card.querySelector('.mod-name');
+      if (!nameEl) return;
+      activeModule = nameEl.textContent.trim();
+      openPanel(activeModule);
+    });
+  });
+
+  function openPanel(name) {
+    modTitle.textContent = name;
+    msgBox.innerHTML = '';
+    history = [];
+    contactForm.style.display = 'none';
+    inputRow.style.display = 'flex';
+    qaRow.style.display = 'flex';
+    panel.style.display = 'flex';
+    backdrop.classList.add('open');
+    // small delay so display:flex applies before transition
+    requestAnimationFrame(function() { panel.classList.add('open'); });
+    addBubble('assistant', '¡Hola! Soy el asistente de <strong>' + name + '</strong>. ¿En qué te puedo ayudar?');
+  }
+
+  function closePanel() {
+    panel.classList.remove('open');
+    backdrop.classList.remove('open');
+    setTimeout(function() { panel.style.display = 'none'; }, 310);
+  }
+
+  document.getElementById('chat-close').addEventListener('click', closePanel);
+  backdrop.addEventListener('click', closePanel);
+
+  // Quick actions
+  qaBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (btn.classList.contains('show-contact')) {
+        contactType = btn.dataset.type;
+        showContactForm(contactType);
+      } else {
+        sendMessage(btn.dataset.q);
+      }
+    });
+  });
+
+  // Send on button / Enter
+  sendBtn.addEventListener('click', function() { sendMessage(inputEl.value); });
+  inputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(inputEl.value); }
+  });
+
+  function sendMessage(text) {
+    text = (text || '').trim();
+    if (!text) return;
+    inputEl.value = '';
+    addBubble('user', escHtml(text));
+    history.push({ role: 'user', content: text });
+    var thinking = addBubble('assistant', '...', 'thinking');
+    sendBtn.disabled = true;
+
+    fetch('/api/v1/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ module: activeModule, messages: history })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      thinking.remove();
+      var reply = data.reply || 'Lo siento, no pude procesar esa consulta.';
+      history.push({ role: 'assistant', content: reply });
+      addBubble('assistant', escHtml(reply).replace(/\n/g, '<br>'));
+      sendBtn.disabled = false;
+    })
+    .catch(function() {
+      thinking.remove();
+      addBubble('assistant', 'Error de conexión. Por favor intenta de nuevo.');
+      sendBtn.disabled = false;
+    });
+  }
+
+  function addBubble(role, html, extra) {
+    var div = document.createElement('div');
+    div.className = 'cm-bubble ' + role + (extra ? ' ' + extra : '');
+    div.innerHTML = html;
+    msgBox.appendChild(div);
+    msgBox.scrollTop = msgBox.scrollHeight;
+    return div;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── Contact form ────────────────────────────────────────────────────────────
+  function showContactForm(type) {
+    contactForm.innerHTML = '';
+    var title = document.createElement('p');
+    title.className = 'cf-title';
+    title.textContent = type === 'llamada' ? '📅 Agendar llamada' : '✉️ Enviar correo';
+    contactForm.appendChild(title);
+
+    var fields = [
+      { name:'name',          placeholder:'Nombre completo',   type:'text' },
+      { name:'company',       placeholder:'Empresa',           type:'text' },
+      { name:'email',         placeholder:'Correo electrónico',type:'email' },
+      { name:'phone',         placeholder:'Teléfono',          type:'tel' },
+      { name:'preferredTime', placeholder:'Horario preferido (ej. Lunes 10am)', type:'text' }
+    ];
+
+    fields.forEach(function(f) {
+      var inp = document.createElement('input');
+      inp.className = 'cf-input';
+      inp.name = f.name;
+      inp.placeholder = f.placeholder;
+      inp.type = f.type;
+      contactForm.appendChild(inp);
+    });
+
+    var submitBtn = document.createElement('button');
+    submitBtn.className = 'cf-submit';
+    submitBtn.textContent = type === 'llamada' ? 'Solicitar llamada' : 'Enviar correo';
+    submitBtn.addEventListener('click', function() { submitContact(type); });
+    contactForm.appendChild(submitBtn);
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cf-cancel';
+    cancelBtn.textContent = 'Cancelar';
+    cancelBtn.addEventListener('click', function() {
+      contactForm.style.display = 'none';
+      inputRow.style.display = 'flex';
+    });
+    contactForm.appendChild(cancelBtn);
+
+    contactForm.style.display = 'flex';
+    inputRow.style.display = 'none';
+  }
+
+  function submitContact(type) {
+    var inputs = contactForm.querySelectorAll('.cf-input');
+    var data = { module: activeModule, type: type };
+    var valid = true;
+    inputs.forEach(function(inp) {
+      data[inp.name] = inp.value.trim();
+      if (!inp.value.trim()) valid = false;
+    });
+    if (!valid) { alert('Por favor completa todos los campos.'); return; }
+
+    fetch('/api/v1/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      contactForm.style.display = 'none';
+      inputRow.style.display = 'flex';
+      if (res.ok) {
+        addBubble('assistant', type === 'llamada'
+          ? '✅ ¡Listo! Recibimos tu solicitud. Te contactaremos pronto para confirmar la llamada.'
+          : '✅ ¡Correo enviado! Nos pondremos en contacto contigo a la brevedad.');
+      } else {
+        addBubble('assistant', 'Hubo un error al enviar. Por favor intenta de nuevo.');
+      }
+    })
+    .catch(function() {
+      contactForm.style.display = 'none';
+      inputRow.style.display = 'flex';
+      addBubble('assistant', 'Error de conexión al enviar el formulario.');
+    });
+  }
+})();
+</script>
+</body>
+</html>
