@@ -1,0 +1,158 @@
+[
+  {
+    "id": "erp-gestion-empresarial",
+    "name": "ERP & Business Management Agent",
+    "nameEs": "Agente ERP & Gestión Empresarial",
+    "type": "Cloud",
+    "category": "erp",
+    "categoryLabel": "ERP & Gestión",
+    "icon": "🧩",
+    "descriptionEs": "Automatiza la gestión de inventario, compras, producción, finanzas y ventas con IA en la nube. Sincroniza datos desde ERPs locales en el edge.",
+    "descriptionEn": "Automates inventory, purchasing, production, finance and sales management with cloud AI. Syncs data from local edge ERPs.",
+    "fullDescriptionEs": "El Agente ERP & Gestión Empresarial centraliza todas las operaciones de negocio usando inteligencia artificial en la nube. Predice la demanda, optimiza niveles de stock, genera órdenes de compra automáticas, evalúa proveedores y detecta desviaciones presupuestarias en tiempo real. Para empresas con ERP instalado localmente (SAP, Odoo, etc.), las tools Edge sincronizan los datos al cloud y envían órdenes de regreso al sistema local, garantizando operación continua incluso con conectividad intermitente.",
+    "fullDescriptionEn": "The ERP & Business Management Agent centralizes all business operations using cloud AI. It predicts demand, optimizes stock levels, generates automatic purchase orders, evaluates suppliers, and detects budget deviations in real time. For companies with locally installed ERP systems (SAP, Odoo, etc.), Edge tools sync data to the cloud and push orders back to the local system, ensuring continuous operation even with intermittent connectivity.",
+    "toolIds": [
+      "get_inventory_status", "predict_demand", "optimize_stock_levels",
+      "recommend_purchase_orders", "generate_purchase_order", "evaluate_suppliers",
+      "analyze_lead_times", "compare_planned_vs_actual", "detect_production_deviation",
+      "predict_production_delays", "optimize_production_schedule", "track_project_progress",
+      "estimate_project_costs", "detect_budget_overrun", "categorize_expenses",
+      "optimize_operational_costs", "generate_kpis", "forecast_revenue",
+      "detect_business_anomalies", "score_leads", "predict_sales", "automate_followups",
+      "sync_erp_data_local", "push_orders_to_erp"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "erp-edge-sync-module-v1.0.tar.gz",
+    "tags": ["erp", "inventario", "compras", "finanzas", "ventas", "kpis"]
+  },
+  {
+    "id": "ciberseguridad-industrial",
+    "name": "Industrial Cybersecurity Agent",
+    "nameEs": "Agente de Ciberseguridad Industrial",
+    "type": "Hybrid",
+    "category": "cybersecurity",
+    "categoryLabel": "Ciberseguridad",
+    "icon": "🔐",
+    "descriptionEs": "Protege redes OT/IT con detección de anomalías en el edge y análisis de riesgo en la nube. Bloquea amenazas en tiempo real sin depender de conectividad.",
+    "descriptionEn": "Protects OT/IT networks with edge anomaly detection and cloud risk analysis. Blocks threats in real time without connectivity dependency.",
+    "fullDescriptionEs": "El Agente de Ciberseguridad Industrial opera en modo híbrido para proteger infraestructuras críticas. Las tools Edge actúan en milisegundos: detectan anomalías de red, bloquean IPs maliciosas, segmentan la red OT y aíslan dispositivos comprometidos — todo sin necesidad de conexión a la nube. Las tools Cloud analizan patrones de ataque a mayor escala, simulan escenarios de amenaza y generan estrategias de seguridad actualizadas que se despliegan de vuelta al edge.",
+    "fullDescriptionEn": "The Industrial Cybersecurity Agent operates in hybrid mode to protect critical infrastructure. Edge tools act in milliseconds: detect network anomalies, block malicious IPs, segment the OT network, and isolate compromised devices — all without cloud connectivity. Cloud tools analyze attack patterns at scale, simulate threat scenarios, and generate updated security strategies that are deployed back to the edge.",
+    "toolIds": [
+      "analyze_network_risk", "detect_anomaly_patterns", "simulate_attack_scenarios",
+      "generate_security_strategy", "detect_network_anomalies_local", "block_ip",
+      "segment_network", "apply_segmentation", "monitor_ot_network",
+      "isolate_device", "inspect_gateway_traffic"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "cybersec-edge-agent-v1.0.tar.gz",
+    "tags": ["ciberseguridad", "ot", "it", "red", "anomalías", "firewall"]
+  },
+  {
+    "id": "vision-artificial-industrial",
+    "name": "Industrial Vision Agent",
+    "nameEs": "Agente de Visión Artificial Industrial",
+    "type": "Hybrid",
+    "category": "vision",
+    "categoryLabel": "Visión Artificial",
+    "icon": "👁️",
+    "descriptionEs": "Inspección de calidad, conteo en línea y seguridad laboral con visión por computadora. Procesamiento pesado en el edge, entrenamiento de modelos en la nube.",
+    "descriptionEn": "Quality inspection, line counting and workplace safety with computer vision. Heavy processing at edge, model training in the cloud.",
+    "fullDescriptionEs": "El Agente de Visión Artificial Industrial combina el poder de cómputo local del edge con la inteligencia de la nube. Las tools Edge ejecutan inferencia en tiempo real: inspeccionan calidad de producto, cuentan ítems en la línea, detectan violaciones de seguridad y monitorean posturas de trabajadores — con latencias de 10-50ms usando modelos CNN embebidos. Las tools Cloud reentrenan los modelos con nuevos defectos, mejoran la detección y analizan patrones visuales históricos para mantenimiento predictivo.",
+    "fullDescriptionEn": "The Industrial Vision Agent combines local edge compute power with cloud intelligence. Edge tools run real-time inference: inspect product quality, count items on lines, detect safety violations and monitor worker postures — with 10-50ms latency using embedded CNN models. Cloud tools retrain models with new defects, improve detection, and analyze historical visual patterns for predictive maintenance.",
+    "toolIds": [
+      "inspect_product_quality", "count_items_on_conveyor", "detect_safety_violations",
+      "monitor_worker_posture", "capture_video_stream",
+      "train_vision_model", "improve_detection_model", "analyze_visual_patterns"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "vision-edge-agent-v1.0.tar.gz",
+    "tags": ["visión", "calidad", "seguridad", "inspección", "cámara", "cnn"]
+  },
+  {
+    "id": "ai-ml-industrial",
+    "name": "Industrial AI & ML Agent",
+    "nameEs": "Agente AI & Machine Learning Industrial",
+    "type": "Hybrid",
+    "category": "ai-ml",
+    "categoryLabel": "AI & ML",
+    "icon": "🤖",
+    "descriptionEs": "Predicción de fallas, optimización de secuencias y detección de desviaciones con modelos ML. Entrenamiento en cloud, inferencia en edge.",
+    "descriptionEn": "Failure prediction, sequence optimization and deviation detection with ML models. Training in cloud, inference at edge.",
+    "fullDescriptionEs": "El Agente AI & ML Industrial implementa el ciclo completo de machine learning para manufactura. La recolección de datos ocurre en el edge (vibración, señales de proceso) con mínima latencia. Los modelos se entrenan y optimizan en la nube con capacidad computacional masiva — predicción de fallas, detección de desviaciones, identificación de cuellos de botella y generación de modelos de gemelo digital. Los modelos entrenados se despliegan de vuelta al edge para inferencia local en `run_local_inference`.",
+    "fullDescriptionEn": "The Industrial AI & ML Agent implements the full machine learning cycle for manufacturing. Data collection happens at the edge (vibration, process signals) with minimal latency. Models are trained and optimized in the cloud with massive compute — failure prediction, deviation detection, bottleneck identification, and digital twin model generation. Trained models are deployed back to the edge for local inference in `run_local_inference`.",
+    "toolIds": [
+      "predict_demand_industrial", "optimize_production_sequence", "detect_process_deviation",
+      "predict_machine_failure", "analyze_vibration_patterns", "optimize_energy_usage",
+      "identify_bottlenecks", "generate_digital_twin_model",
+      "collect_vibration_data", "collect_process_signals",
+      "run_local_inference", "detect_real_time_anomalies"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "aiml-edge-inference-v1.0.tar.gz",
+    "tags": ["ml", "predicción", "vibración", "anomalías", "lstm", "inferencia"]
+  },
+  {
+    "id": "infraestructura-edge",
+    "name": "Infrastructure & Edge Agent",
+    "nameEs": "Agente de Infraestructura & Edge",
+    "type": "Hybrid",
+    "category": "infrastructure",
+    "categoryLabel": "Infraestructura & Edge",
+    "icon": "🏗️",
+    "descriptionEs": "Orquesta nodos edge, digitaliza señales analógicas, gestiona dispositivos y controla acciones locales. El diferenciador clave para industria 4.0.",
+    "descriptionEn": "Orchestrates edge nodes, digitizes analog signals, manages devices and controls local actions. The key differentiator for industry 4.0.",
+    "fullDescriptionEs": "El Agente de Infraestructura & Edge es el corazón operativo de cualquier planta industria 4.0. Gestiona toda la capa de dispositivos: orquesta múltiples nodos edge, digitaliza señales analógicas de sensores legacy, monitorea consumo energético en tiempo real y ejecuta acciones de control locales en PLCs y actuadores. En la nube, gestiona el registro de dispositivos, despliega configuraciones y actualizaciones de agentes, y monitorea la salud de toda la flota edge.",
+    "fullDescriptionEn": "The Infrastructure & Edge Agent is the operational heart of any Industry 4.0 plant. It manages the entire device layer: orchestrates multiple edge nodes, digitizes analog signals from legacy sensors, monitors energy consumption in real time, and executes local control actions on PLCs and actuators. In the cloud, it manages the device registry, deploys configurations and agent updates, and monitors the health of the entire edge fleet.",
+    "toolIds": [
+      "orchestrate_edge_nodes", "manage_edge_devices", "collect_sensor_data",
+      "digitize_analog_signals", "monitor_energy_consumption", "execute_local_control_action",
+      "deploy_edge_configuration", "update_edge_agents",
+      "monitor_edge_health", "manage_device_registry"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "infra-edge-orchestrator-v1.0.tar.gz",
+    "tags": ["edge", "iot", "plc", "sensores", "orquestación", "dispositivos"]
+  },
+  {
+    "id": "produccion-avanzada",
+    "name": "Advanced Production Agent",
+    "nameEs": "Agente de Producción Avanzada",
+    "type": "Hybrid",
+    "category": "production",
+    "categoryLabel": "Producción",
+    "icon": "🏭",
+    "descriptionEs": "Optimiza flujos productivos, detecta tiempos muertos y ajusta parámetros en tiempo real. Cloud analiza y planifica, Edge ejecuta y recolecta.",
+    "descriptionEn": "Optimizes production flows, detects idle times and adjusts parameters in real time. Cloud analyzes and plans, Edge executes and collects.",
+    "fullDescriptionEs": "El Agente de Producción Avanzada cierra el ciclo entre la planificación y la ejecución en planta. Las tools Edge recolectan datos de producción, rastrean el estado de máquinas, detectan tiempos muertos en tiempo real y ejecutan ajustes de producción directamente en los equipos. Las tools Cloud simulan cuellos de botella, optimizan el flujo productivo, planifican automáticamente la producción e identifican patrones de tiempo muerto para mejora continua.",
+    "fullDescriptionEn": "The Advanced Production Agent closes the loop between planning and shop floor execution. Edge tools collect production data, track machine states, detect idle time in real time and execute production adjustments directly on equipment. Cloud tools simulate bottlenecks, optimize production flow, automatically plan production, and identify idle time patterns for continuous improvement.",
+    "toolIds": [
+      "simulate_bottlenecks", "optimize_production_flow",
+      "plan_production_automatically", "identify_idle_time_patterns",
+      "collect_production_data", "track_machine_state",
+      "detect_idle_time", "execute_production_adjustment"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "production-edge-module-v1.0.tar.gz",
+    "tags": ["producción", "oee", "bottleneck", "planificación", "lean"]
+  },
+  {
+    "id": "digital-twin",
+    "name": "Digital Twin Agent",
+    "nameEs": "Agente de Digital Twin",
+    "type": "Cloud",
+    "category": "digital-twin",
+    "categoryLabel": "Digital Twin",
+    "icon": "🧠",
+    "descriptionEs": "Genera gemelos digitales de activos y sistemas, simula operaciones y optimiza el rendimiento global con datos en tiempo real del edge.",
+    "descriptionEn": "Generates digital twins of assets and systems, simulates operations and optimizes global performance with real-time edge data.",
+    "fullDescriptionEs": "El Agente de Digital Twin crea réplicas virtuales exactas de máquinas, líneas de producción y plantas enteras. La tool Edge `feed_real_time_data_to_twin` alimenta continuamente el gemelo con datos reales del piso de planta. En la nube, `generate_digital_twin` construye el modelo, `simulate_operations` corre escenarios what-if sin interrumpir la producción real, y `optimize_system_performance` aplica las mejoras encontradas como recomendaciones de configuración.",
+    "fullDescriptionEn": "The Digital Twin Agent creates exact virtual replicas of machines, production lines, and entire plants. The Edge tool `feed_real_time_data_to_twin` continuously feeds the twin with real shop floor data. In the cloud, `generate_digital_twin` builds the model, `simulate_operations` runs what-if scenarios without interrupting real production, and `optimize_system_performance` applies findings as configuration recommendations.",
+    "toolIds": [
+      "generate_digital_twin", "simulate_operations", "optimize_system_performance",
+      "feed_real_time_data_to_twin"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "digital-twin-edge-feeder-v1.0.tar.gz",
+    "tags": ["digital-twin", "simulación", "gemelo", "optimización", "what-if"]
+  }
+]

@@ -1,0 +1,212 @@
+extends layout
+
+block content
+  .page-header
+    .page-header-inner
+      div
+        .page-breadcrumb
+          a(href="/") Inicio
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          a(href="/agentes")
+            span(data-es="Agentes" data-en="Agents") Agentes
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          span(data-es="Tools" data-en="Tools") Tools
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          code= tool.id
+        h1.page-title
+          span.tool-title-friendly
+            span(data-es=tool.nameEs data-en=tool.name)= tool.nameEs
+        .page-subtitle
+          span.badge(class='badge-' + tool.type.toLowerCase())= tool.type
+          | &nbsp;·&nbsp;
+          span.text-muted= tool.category
+          | &nbsp;·&nbsp;
+          code.tool-id-inline= tool.id
+      .page-actions
+        a.btn.btn-outline(href="javascript:history.back()")
+          span(data-es="← Volver" data-en="← Back") ← Volver
+
+  main
+
+    section.agent-section
+      h2.section-title
+        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          circle(cx="12" cy="12" r="10")
+          line(x1="12" y1="8" x2="12" y2="12")
+          line(x1="12" y1="16" x2="12.01" y2="16")
+        span(data-es="Descripción" data-en="Description") Descripción
+      .card
+        p
+          span(data-es=tool.descriptionEs data-en=tool.descriptionEn)= tool.descriptionEs
+
+    - const inputProps  = (tool.inputSchema  && tool.inputSchema.properties)  ? Object.entries(tool.inputSchema.properties)  : []
+    - const outputProps = (tool.outputSchema && tool.outputSchema.properties) ? Object.entries(tool.outputSchema.properties) : []
+    - const inputRequired = (tool.inputSchema && tool.inputSchema.required) ? tool.inputSchema.required : []
+
+    section.agent-section
+      h2.section-title
+        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          polyline(points="16,18 22,12 16,6")
+          polyline(points="8,6 2,12 8,18")
+        span(data-es="Parámetros de la Tool" data-en="Tool Parameters") Parámetros de la Tool
+      .schema-split
+        .schema-half
+          .schema-table-header
+            svg(width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+              line(x1="12" y1="5" x2="12" y2="19")
+              polyline(points="19,12 12,19 5,12")
+            span(data-es="Entrada — lo que recibe" data-en="Input — what it receives") Entrada — lo que recibe
+          if inputProps.length > 0
+            table.schema-params-table
+              thead
+                tr
+                  th(data-es="Parámetro" data-en="Parameter") Parámetro
+                  th(data-es="Tipo" data-en="Type") Tipo
+                  th(data-es="Req." data-en="Req.") Req.
+                  th(data-es="Default" data-en="Default") Default
+              tbody
+                each pair in inputProps
+                  - var propName = pair[0]; var prop = pair[1]
+                  tr
+                    td
+                      code.param-name= propName
+                    td
+                      span(class='type-pill type-' + (prop.type || 'any'))= prop.type || 'any'
+                    td.req-cell
+                      if inputRequired.includes(propName)
+                        span.req-yes(data-es="✓ Sí" data-en="✓ Yes") ✓ Sí
+                      else
+                        span.req-no —
+                    td.default-cell
+                      if prop.default !== undefined
+                        code.default-val= String(prop.default)
+                      else
+                        span.req-no —
+          else
+            p.schema-empty(data-es="Sin parámetros de entrada" data-en="No input parameters") Sin parámetros de entrada
+
+        .schema-half
+          .schema-table-header
+            svg(width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+              line(x1="12" y1="19" x2="12" y2="5")
+              polyline(points="5,12 12,5 19,12")
+            span(data-es="Salida — lo que devuelve" data-en="Output — what it returns") Salida — lo que devuelve
+          if outputProps.length > 0
+            table.schema-params-table
+              thead
+                tr
+                  th(data-es="Campo" data-en="Field") Campo
+                  th(data-es="Tipo" data-en="Type") Tipo
+                  th(data-es="Formato" data-en="Format") Formato
+              tbody
+                each pair in outputProps
+                  - var propName = pair[0]; var prop = pair[1]
+                  tr
+                    td
+                      code.param-name= propName
+                    td
+                      span(class='type-pill type-' + (prop.type || 'any'))= prop.type || 'any'
+                    td.default-cell
+                      if prop.format
+                        span.format-tag= prop.format
+                      else if prop.items
+                        span.format-tag items→
+                          code= prop.items.type || 'obj'
+                      else
+                        span.req-no —
+          else
+            p.schema-empty(data-es="Sin campos de salida" data-en="No output fields") Sin campos de salida
+
+    - const rulesFrom = commRules.filter(function(r){ return r.targetToolId === tool.id; })
+    - const rulesTo   = commRules.filter(function(r){ return r.sourceToolId === tool.id; })
+
+    if commRules.length > 0
+      section.agent-section
+        h2.section-title
+          svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            circle(cx="18" cy="5" r="3")
+            circle(cx="6" cy="12" r="3")
+            circle(cx="18" cy="19" r="3")
+            line(x1="8.59" y1="13.51" x2="15.42" y2="17.49")
+            line(x1="15.41" y1="6.51" x2="8.59" y2="10.49")
+          span(data-es="Conexiones con otras Tools" data-en="Connections with other Tools") Conexiones con otras Tools
+        .conn-grid
+          if rulesFrom.length > 0
+            .conn-column
+              .conn-column-label.conn-label-from
+                svg(width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                  line(x1="19" y1="12" x2="5" y2="12")
+                  polyline(points="12,5 5,12 12,19")
+                span(data-es="Recibe de" data-en="Receives from") Recibe de
+              each rule in rulesFrom
+                .conn-card.conn-card-from
+                  .conn-card-top
+                    a.conn-tool-link(href='/agentes/tools/' + rule.sourceToolId)
+                      code= rule.sourceToolId
+                  .conn-card-meta
+                    span.badge.badge-event= rule.event
+                    span.proto-badge(class='proto-' + rule.protocol.toLowerCase().replace('/','-'))= rule.protocol
+                  if rule.description
+                    p.conn-desc= rule.description
+          if rulesTo.length > 0
+            .conn-column
+              .conn-column-label.conn-label-to
+                svg(width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                  line(x1="5" y1="12" x2="19" y2="12")
+                  polyline(points="12,5 19,12 12,19")
+                span(data-es="Envía a" data-en="Sends to") Envía a
+              each rule in rulesTo
+                .conn-card.conn-card-to
+                  .conn-card-top
+                    a.conn-tool-link(href='/agentes/tools/' + rule.targetToolId)
+                      code= rule.targetToolId
+                  .conn-card-meta
+                    span.badge.badge-event= rule.event
+                    span.proto-badge(class='proto-' + rule.protocol.toLowerCase().replace('/','-'))= rule.protocol
+                  if rule.description
+                    p.conn-desc= rule.description
+
+    section.agent-section#tool-demo-section
+      h2.section-title
+        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          polygon(points="5,3 19,12 5,21 5,3")
+        span(data-es="Demo en vivo" data-en="Live Demo") Demo en vivo
+      .tool-demo-panel
+        .tool-demo-header
+          .tool-demo-status
+            span.demo-dot#tool-demo-dot
+            span#tool-demo-status-text(data-es="Listo" data-en="Ready") Listo
+          .tool-demo-controls
+            button.btn.btn-primary#btn-run-tool-demo
+              svg(width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                polygon(points="5,3 19,12 5,21 5,3")
+              span#btn-run-tool-demo-text(data-es="Ejecutar Demo" data-en="Run Demo") Ejecutar Demo
+            button.btn.btn-ghost#btn-reset-tool-demo(style="display:none")
+              span(data-es="Reiniciar" data-en="Reset") Reiniciar
+        .tool-demo-body#tool-demo-body
+          .tool-demo-idle#tool-demo-idle
+            svg(width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.25")
+              polygon(points="5,3 19,12 5,21 5,3")
+            p(data-es="Presiona Ejecutar Demo para ver cómo actúa esta tool en tiempo real" data-en="Press Run Demo to see how this tool acts in real time") Presiona Ejecutar Demo para ver cómo actúa esta tool en tiempo real
+
+    if usedByAgents.length > 0
+      section.agent-section
+        h2.section-title
+          svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            path(d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2")
+            circle(cx="9" cy="7" r="4")
+          span(data-es="Agentes que usan esta tool" data-en="Agents using this tool") Agentes que usan esta tool
+        .tool-agents-list
+          each agent in usedByAgents
+            a.tool-agent-chip(href='/agentes/agents/' + agent.id)
+              span= agent.icon
+              | &nbsp;
+              span(data-es=agent.nameEs data-en=agent.name)= agent.nameEs
+              span.badge.badge-sm(class='badge-' + agent.type.toLowerCase())= agent.type
+
+  script.
+    window.TOOL_ID = !{JSON.stringify(tool.id)};
+  script(src="/public/agents-tool.js" defer)

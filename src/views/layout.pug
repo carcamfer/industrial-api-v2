@@ -35,11 +35,17 @@ html(lang="es")
                 line(x1="9" y1="13" x2="15" y2="13")
               span(data-es="Simulador Auditoría ISO" data-en="ISO Audit Simulator") Simulador Auditoría ISO
           li
+            a.nav-link(href="/agentes" class=currentPage === 'agentes' ? 'active' : '')
+              svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                circle(cx="12" cy="12" r="3")
+                path(d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14")
+              span(data-es="Agentes" data-en="Agents") Agentes
+          li
             a.nav-link(href="/servicios-software" class=currentPage === 'servicios' ? 'active' : '')
               svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
                 polyline(points="16,18 22,12 16,6")
                 polyline(points="8,6 2,12 8,18")
-              span(data-es="Softwares" data-en="Software") Softwares
+              span(data-es="Capacidades" data-en="Capabilities") Capacidades
         .lang-switcher(aria-label="Cambiar idioma / Switch language")
           button.lang-opt(data-lang="es" title="Español" onclick="epSetLang('es')") ES
           button.lang-opt(data-lang="en" title="English" onclick="epSetLang('en')") EN
@@ -56,8 +62,11 @@ html(lang="es")
         a(href="/integracion-iso")
           span(data-es="Integración ISO" data-en="ISO Integration") Integración ISO
         |  ·
+        a(href="/agentes")
+          span(data-es="Agentes" data-en="Agents") Agentes
+        |  ·
         a(href="/servicios-software")
-          span(data-es="Servicios de Software" data-en="Software Services") Servicios de Software
+          span(data-es="Capacidades" data-en="Capabilities") Capacidades
 
     script(src="/public/easter-eggs.js" defer)
     script.

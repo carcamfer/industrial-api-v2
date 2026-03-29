@@ -9,6 +9,7 @@ import auditRouter from './routes/auditRoutes.js';
 import isoLandingRouter from './routes/isoLandingRoutes.js';
 import serviciosRouter from './routes/serviciosRoutes.js';
 import chatRouter from './routes/chatRoutes.js';
+import agentesRouter from './routes/agentesRoutes.js';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/dashboard', dashboardRouter);
 app.use('/audit-report', auditRouter);
 app.use('/integracion-iso', isoLandingRouter);
 app.use('/servicios-software', serviciosRouter);
+app.use('/agentes', agentesRouter);
 
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {

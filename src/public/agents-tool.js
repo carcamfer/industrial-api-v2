@@ -1,0 +1,263 @@
+(function () {
+  'use strict';
+
+  var lang = localStorage.getItem('ep-lang') || 'es';
+  var toolId = window.TOOL_ID;
+
+  // ── Schema accordion toggles ───────────────────────────
+  var toggles = document.querySelectorAll('.schema-toggle');
+  toggles.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = btn.closest('.schema-item');
+      var body = item && item.querySelector('.schema-body');
+      var chevron = btn.querySelector('.schema-chevron');
+      if (!body) return;
+      var open = body.classList.toggle('open');
+      if (chevron) chevron.textContent = open ? '▴' : '▾';
+    });
+  });
+
+  // ── Tool Demo Runner ───────────────────────────────────
+  var btnRun    = document.getElementById('btn-run-tool-demo');
+  var btnRunTxt = document.getElementById('btn-run-tool-demo-text');
+  var btnReset  = document.getElementById('btn-reset-tool-demo');
+  var demoBody  = document.getElementById('tool-demo-body');
+  var demoIdle  = document.getElementById('tool-demo-idle');
+  var demoDot   = document.getElementById('tool-demo-dot');
+  var demoStat  = document.getElementById('tool-demo-status-text');
+
+  if (!btnRun || !toolId) return;
+
+  function t(es, en) { return lang === 'es' ? es : en; }
+
+  function makePill(key, val) {
+    var isWarn = typeof val === 'boolean' && val &&
+      (key.includes('anomaly') || key.includes('defect') || key.includes('violation') ||
+       key.includes('overrun') || key.includes('idle'));
+    var display = typeof val === 'boolean'
+      ? (val ? '✓' : '✗')
+      : typeof val === 'string' && val.length > 18
+        ? val.slice(0, 16) + '…'
+        : String(val);
+    var pill = document.createElement('span');
+    pill.className = 'demo-out-pill' + (isWarn ? ' demo-out-pill-warn' : '');
+    pill.innerHTML = '<span class="demo-out-key">' + key + '</span>'
+      + '<span class="demo-out-val">' + display + '</span>';
+    return pill;
+  }
+
+  function renderSection(title, data, cls) {
+    var wrap = document.createElement('div');
+    wrap.className = 'tool-demo-section ' + cls;
+    var label = document.createElement('div');
+    label.className = 'tool-demo-section-label';
+    label.textContent = title;
+    wrap.appendChild(label);
+
+    if (!data || Object.keys(data).length === 0) {
+      var empty = document.createElement('span');
+      empty.className = 'tool-demo-section-empty';
+      empty.textContent = t('Sin datos', 'No data');
+      wrap.appendChild(empty);
+      return wrap;
+    }
+
+    var pillRow = document.createElement('div');
+    pillRow.className = 'tool-demo-pills';
+    var count = 0;
+    for (var k in data) {
+      if (!Object.prototype.hasOwnProperty.call(data, k)) continue;
+      var v = data[k];
+      if (v === null || typeof v === 'object') continue;
+      if (count >= 6) break;
+      pillRow.appendChild(makePill(k, v));
+      count++;
+    }
+    if (count === 0) {
+      var empty2 = document.createElement('span');
+      empty2.className = 'tool-demo-section-empty';
+      empty2.textContent = t('Datos complejos (ver JSON)', 'Complex data (see JSON)');
+      wrap.appendChild(empty2);
+    } else {
+      wrap.appendChild(pillRow);
+    }
+    return wrap;
+  }
+
+  function renderFlowRow(demo) {
+    var row = document.createElement('div');
+    row.className = 'demo-card-flow tool-demo-flow';
+
+    // incoming
+    if (demo.incomingRules && demo.incomingRules.length > 0) {
+      var r = demo.incomingRules[0];
+      var fromBadge = document.createElement('span');
+      fromBadge.className = 'demo-card-event-badge';
+      fromBadge.textContent = r.event || t('evento', 'event');
+      var fromProto = document.createElement('span');
+      fromProto.className = 'proto-badge proto-' + (r.protocol || 'rest').toLowerCase().replace('/', '-');
+      fromProto.textContent = r.protocol || '—';
+      var fromCode = document.createElement('code');
+      fromCode.className = 'demo-card-next';
+      fromCode.textContent = r.sourceToolId;
+      var arrowIn = document.createElement('span');
+      arrowIn.className = 'demo-card-arrow';
+      arrowIn.textContent = ' → ';
+      var thisSpan = document.createElement('strong');
+      thisSpan.className = 'tool-demo-self';
+      thisSpan.textContent = demo.toolId;
+      row.appendChild(fromCode);
+      row.appendChild(arrowIn);
+      row.appendChild(fromBadge);
+      row.appendChild(document.createTextNode(' '));
+      row.appendChild(fromProto);
+      var arrowSelf = document.createElement('span');
+      arrowSelf.className = 'demo-card-arrow';
+      arrowSelf.textContent = ' → ';
+      row.appendChild(arrowSelf);
+      row.appendChild(thisSpan);
+    }
+
+    // outgoing
+    if (demo.outgoingRules && demo.outgoingRules.length > 0) {
+      demo.outgoingRules.forEach(function (r) {
+        var sep = document.createElement('span');
+        sep.className = 'demo-card-arrow';
+        sep.textContent = ' → ';
+        var outBadge = document.createElement('span');
+        outBadge.className = 'demo-card-event-badge';
+        outBadge.textContent = r.event || t('evento', 'event');
+        var outProto = document.createElement('span');
+        outProto.className = 'proto-badge proto-' + (r.protocol || 'rest').toLowerCase().replace('/', '-');
+        outProto.textContent = r.protocol || '—';
+        var outArrow = document.createElement('span');
+        outArrow.className = 'demo-card-arrow';
+        outArrow.textContent = ' → ';
+        var outCode = document.createElement('code');
+        outCode.className = 'demo-card-next';
+        outCode.textContent = r.targetToolId;
+        if (demo.incomingRules && demo.incomingRules.length === 0) {
+          row.appendChild(sep);
+        }
+        row.appendChild(outBadge);
+        row.appendChild(document.createTextNode(' '));
+        row.appendChild(outProto);
+        row.appendChild(outArrow);
+        row.appendChild(outCode);
+      });
+    }
+
+    return row;
+  }
+
+  function renderResult(demo) {
+    // Remove idle placeholder
+    if (demoIdle) demoIdle.style.display = 'none';
+
+    var wrap = document.createElement('div');
+    wrap.className = 'tool-demo-result tool-demo-result-' + (demo.status || 'ok');
+
+    // Status header
+    var header = document.createElement('div');
+    header.className = 'tool-demo-result-header';
+    var icon = document.createElement('span');
+    icon.className = 'demo-card-icon demo-card-icon-' + (demo.status || 'ok');
+    icon.textContent = demo.status === 'warn' ? '⚠' : '✓';
+    var typeBadge = document.createElement('span');
+    typeBadge.className = 'badge badge-' + (demo.toolType || 'cloud').toLowerCase() + ' badge-sm';
+    typeBadge.textContent = demo.toolType || '?';
+    var nameEl = document.createElement('span');
+    nameEl.className = 'demo-card-name';
+    nameEl.textContent = lang === 'es' ? (demo.toolNameEs || demo.toolId) : (demo.toolName || demo.toolId);
+    var dur = document.createElement('span');
+    dur.className = 'demo-card-dur';
+    dur.textContent = demo.durationMs + 'ms';
+    header.appendChild(icon);
+    header.appendChild(typeBadge);
+    header.appendChild(nameEl);
+    header.appendChild(dur);
+    wrap.appendChild(header);
+
+    // Flow row
+    var flowRow = renderFlowRow(demo);
+    if (flowRow.childNodes.length > 0) wrap.appendChild(flowRow);
+
+    // Input → Output sections
+    var ioRow = document.createElement('div');
+    ioRow.className = 'tool-demo-io';
+    ioRow.appendChild(renderSection(t('↓ Entrada recibida', '↓ Input received'), demo.inputData, 'tool-demo-input'));
+    var separator = document.createElement('div');
+    separator.className = 'tool-demo-io-sep';
+    separator.textContent = '⚙';
+    ioRow.appendChild(separator);
+    ioRow.appendChild(renderSection(t('↑ Salida producida', '↑ Output produced'), demo.outputData, 'tool-demo-output'));
+    wrap.appendChild(ioRow);
+
+    // Expand JSON button
+    var expandBtn = document.createElement('button');
+    expandBtn.className = 'demo-step-expand';
+    expandBtn.textContent = t('Ver evento estándar JSON', 'View standard event JSON');
+
+    var fullJson = document.createElement('pre');
+    fullJson.className = 'demo-step-full-json';
+    fullJson.style.display = 'none';
+    fullJson.textContent = JSON.stringify(demo.standardEvent || demo.outputData || {}, null, 2);
+
+    expandBtn.addEventListener('click', function () {
+      var isOpen = fullJson.style.display !== 'none';
+      fullJson.style.display = isOpen ? 'none' : 'block';
+      expandBtn.classList.toggle('active', !isOpen);
+      expandBtn.textContent = isOpen
+        ? t('Ver evento estándar JSON', 'View standard event JSON')
+        : t('Ocultar evento', 'Hide event');
+    });
+
+    wrap.appendChild(expandBtn);
+    wrap.appendChild(fullJson);
+
+    demoBody.appendChild(wrap);
+  }
+
+  btnRun.addEventListener('click', function () {
+    btnRun.disabled = true;
+    if (btnRunTxt) btnRunTxt.textContent = t('Ejecutando…', 'Running…');
+    if (demoDot) demoDot.classList.add('active');
+    if (demoStat) demoStat.textContent = t('En ejecución', 'Running');
+
+    // Clear previous result
+    var prev = demoBody.querySelector('.tool-demo-result');
+    if (prev) prev.remove();
+    if (demoIdle) demoIdle.style.display = '';
+
+    fetch('/agentes/api/demo/tool/' + toolId)
+      .then(function (r) { return r.json(); })
+      .then(function (demo) {
+        setTimeout(function () {
+          renderResult(demo);
+          btnRun.disabled = false;
+          if (btnRunTxt) btnRunTxt.textContent = t('Ejecutar Demo', 'Run Demo');
+          if (demoDot) demoDot.classList.remove('active');
+          if (demoStat) demoStat.textContent = t('Completado', 'Completed');
+          if (btnReset) btnReset.style.display = '';
+        }, 800);
+      })
+      .catch(function (err) {
+        btnRun.disabled = false;
+        if (btnRunTxt) btnRunTxt.textContent = t('Ejecutar Demo', 'Run Demo');
+        if (demoDot) demoDot.classList.remove('active');
+        console.error(err);
+      });
+  });
+
+  if (btnReset) {
+    btnReset.addEventListener('click', function () {
+      var prev = demoBody.querySelector('.tool-demo-result');
+      if (prev) prev.remove();
+      if (demoIdle) demoIdle.style.display = '';
+      btnReset.style.display = 'none';
+      if (demoDot) demoDot.classList.remove('active');
+      if (demoStat) demoStat.textContent = t('Listo', 'Ready');
+    });
+  }
+
+})();

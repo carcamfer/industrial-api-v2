@@ -1,0 +1,39 @@
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dataDir = path.join(__dirname, '../data/agents');
+
+const agents = JSON.parse(readFileSync(path.join(dataDir, 'agents.json'), 'utf-8'));
+const tools = JSON.parse(readFileSync(path.join(dataDir, 'tools.json'), 'utf-8'));
+const rules = JSON.parse(readFileSync(path.join(dataDir, 'communication-rules.json'), 'utf-8'));
+const eventStandard = JSON.parse(readFileSync(path.join(dataDir, 'event-standard.json'), 'utf-8'));
+
+const toolsMap = Object.fromEntries(tools.map(t => [t.id, t]));
+
+export function getAllAgents() { return agents; }
+export function getAgentById(id) { return agents.find(a => a.id === id) || null; }
+export function getAllTools() { return tools; }
+export function getToolById(id) { return toolsMap[id] || null; }
+export function getRules() { return rules; }
+export function getEventStandard() { return eventStandard; }
+
+export function resolveToolsForAgent(agent) {
+  const resolved = agent.toolIds.map(id => toolsMap[id] || { id, name: id, type: 'Unknown' });
+  return {
+    cloudTools:  resolved.filter(t => t.type === 'Cloud'),
+    edgeTools:   resolved.filter(t => t.type === 'Edge'),
+    hybridTools: resolved.filter(t => t.type === 'Hybrid'),
+    allTools:    resolved
+  };
+}
+
+export function getAgentsByToolId(toolId) {
+  return agents.filter(a => a.toolIds.includes(toolId));
+}
+
+export function getRulesForTool(toolId) {
+  return rules.rules.filter(r => r.sourceToolId === toolId || r.targetToolId === toolId);
+}

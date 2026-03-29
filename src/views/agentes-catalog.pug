@@ -1,0 +1,66 @@
+extends layout
+
+block content
+  .page-header
+    .page-header-inner
+      div
+        .page-breadcrumb
+          a(href="/") Inicio
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          span(data-es="Agentes Industriales" data-en="Industrial Agents") Agentes Industriales
+        h1.page-title(data-es="Agentes Industriales" data-en="Industrial Agents") Agentes Industriales
+        p.page-subtitle(data-es="Explora los agentes de IA industrial: Cloud, Edge e Híbridos. Haz clic en cualquier agente para ver cómo funciona." data-en="Explore industrial AI agents: Cloud, Edge and Hybrid. Click any agent to see how it works.") Explora los agentes de IA industrial: Cloud, Edge e Híbridos. Haz clic en cualquier agente para ver cómo funciona.
+      .page-actions
+        .catalog-stats
+          span.stat-item
+            span.stat-num= agents.length
+            span.stat-label(data-es=" agentes" data-en=" agents") &nbsp;agentes
+          span.stat-sep ·
+          span.stat-item
+            span.stat-num= agents.filter(a => a.type === 'Cloud').length
+            span.stat-label &nbsp;Cloud
+          span.stat-sep ·
+          span.stat-item
+            span.stat-num= agents.filter(a => a.type === 'Hybrid').length
+            span.stat-label(data-es=" Híbridos" data-en=" Hybrid") &nbsp;Híbridos
+
+  main
+    .filter-bar
+      .filter-buttons
+        button.filter-btn.active(data-filter="all" data-es="Todos" data-en="All") Todos
+        button.filter-btn(data-filter="Cloud")
+          span.badge.badge-cloud Cloud
+        button.filter-btn(data-filter="Hybrid")
+          span.badge.badge-hybrid(data-es="Híbrido" data-en="Hybrid") Híbrido
+      input.search-input(type="text" placeholder="Buscar agente..." data-placeholder-es="Buscar agente..." data-placeholder-en="Search agent...")
+
+    .agents-grid
+      each agent in agents
+        a.agent-card(href='/agentes/agents/' + agent.id data-type=agent.type data-name=agent.nameEs.toLowerCase() data-desc=agent.descriptionEs.toLowerCase())
+          .agent-card-header
+            .agent-card-icon= agent.icon
+            span.badge(class='badge-' + agent.type.toLowerCase() data-es=agent.type === 'Hybrid' ? 'Híbrido' : agent.type data-en=agent.type)= agent.type === 'Hybrid' ? 'Híbrido' : agent.type
+          h3.agent-card-name
+            span(data-es=agent.nameEs data-en=agent.name)= agent.nameEs
+          p.agent-card-desc
+            span(data-es=agent.descriptionEs data-en=agent.descriptionEn)= agent.descriptionEs
+          .agent-card-footer
+            .agent-card-tools
+              span.tool-count-badge.tool-count-cloud
+                svg(width="10" height="10" viewBox="0 0 24 24" fill="currentColor")
+                  path(d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z")
+                | &nbsp;
+                span= agent.toolIds.length
+                span(data-es=" tools" data-en=" tools") &nbsp;tools
+            if agent.downloadAvailable
+              span.download-badge
+                svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                  path(d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4")
+                  polyline(points="7,10 12,15 17,10")
+                  line(x1="12" y1="15" x2="12" y2="3")
+                span(data-es=" Edge disponible" data-en=" Edge available") &nbsp;Edge disponible
+          .agent-card-cta
+            span.btn.btn-sm.btn-primary(data-es="Ver agente →" data-en="View agent →") Ver agente →
+
+  script(src="/public/agents-catalog.js" defer)

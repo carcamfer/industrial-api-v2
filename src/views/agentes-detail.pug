@@ -1,0 +1,171 @@
+extends layout
+
+block head
+  script(src="https://d3js.org/d3.v7.min.js")
+  script.
+    window.AGENT_ID = '!{agent.id}';
+
+block content
+  .page-header
+    .page-header-inner
+      div
+        .page-breadcrumb
+          a(href="/") Inicio
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          a(href="/agentes")
+            span(data-es="Agentes" data-en="Agents") Agentes
+          svg(width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            polyline(points="9,18 15,12 9,6")
+          span= agent.nameEs
+        h1.page-title
+          span= agent.icon
+          | &nbsp;
+          span(data-es=agent.nameEs data-en=agent.name)= agent.nameEs
+        .page-subtitle
+          span.badge(class='badge-' + agent.type.toLowerCase() data-es=agent.type === 'Hybrid' ? 'Híbrido' : agent.type data-en=agent.type)= agent.type === 'Hybrid' ? 'Híbrido' : agent.type
+          | &nbsp;·&nbsp;
+          span.text-muted= agent.category
+      .page-actions
+        if agent.downloadAvailable
+          a.btn.btn-accent(href='/public/downloads/' + agent.downloadFilename download)
+            svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+              path(d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4")
+              polyline(points="7,10 12,15 17,10")
+              line(x1="12" y1="15" x2="12" y2="3")
+            span(data-es="Descargar Edge Agent" data-en="Download Edge Agent") Descargar Edge Agent
+        a.btn.btn-outline(href="/agentes")
+          span(data-es="← Catálogo" data-en="← Catalog") ← Catálogo
+
+  main
+
+    section.agent-section
+      h2.section-title
+        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          circle(cx="12" cy="12" r="10")
+          line(x1="12" y1="8" x2="12" y2="12")
+          line(x1="12" y1="16" x2="12.01" y2="16")
+        span(data-es="Descripción" data-en="Description") Descripción
+      .agent-description.card
+        p.agent-desc-text
+          span(data-es=agent.fullDescriptionEs data-en=agent.fullDescriptionEn)= agent.fullDescriptionEs
+
+    section.agent-section
+      h2.section-title
+        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          path(d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z")
+        span(data-es="Herramientas" data-en="Tools") Herramientas
+
+      .tool-columns
+        if cloudTools.length > 0
+          .tool-column
+            .tool-column-label
+              span.badge.badge-cloud Cloud
+              span.tool-col-count &nbsp;(#{cloudTools.length})
+            each tool in cloudTools
+              a.tool-pill.tool-pill-cloud(href='/agentes/tools/' + tool.id)
+                span.tool-pill-icon
+                  svg(width="12" height="12" viewBox="0 0 24 24" fill="currentColor")
+                    path(d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z")
+                span.tool-pill-name= tool.id
+                span.tool-pill-arrow →
+
+        if edgeTools.length > 0
+          .tool-column
+            .tool-column-label
+              span.badge.badge-edge Edge
+              span.tool-col-count &nbsp;(#{edgeTools.length})
+            each tool in edgeTools
+              a.tool-pill.tool-pill-edge(href='/agentes/tools/' + tool.id)
+                span.tool-pill-icon
+                  svg(width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+                    rect(x="2" y="3" width="20" height="14" rx="2")
+                    line(x1="8" y1="21" x2="16" y2="21")
+                    line(x1="12" y1="17" x2="12" y2="21")
+                span.tool-pill-name= tool.id
+                span.tool-pill-arrow →
+
+        if hybridTools.length > 0
+          .tool-column
+            .tool-column-label
+              span.badge.badge-hybrid(data-es="Híbrido" data-en="Hybrid") Híbrido
+              span.tool-col-count &nbsp;(#{hybridTools.length})
+            each tool in hybridTools
+              a.tool-pill.tool-pill-hybrid(href='/agentes/tools/' + tool.id)
+                span.tool-pill-icon ⚡
+                span.tool-pill-name= tool.id
+                span.tool-pill-arrow →
+
+    section.agent-section
+      h2.section-title
+        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          circle(cx="18" cy="5" r="3")
+          circle(cx="6" cy="12" r="3")
+          circle(cx="18" cy="19" r="3")
+          line(x1="8.59" y1="13.51" x2="15.42" y2="17.49")
+          line(x1="15.41" y1="6.51" x2="8.59" y2="10.49")
+        span(data-es="Diagrama de Comunicación" data-en="Communication Diagram") Diagrama de Comunicación
+      .graph-legend
+        span.graph-legend-item
+          span.graph-legend-dot.graph-legend-cloud
+          span Cloud
+        span.graph-legend-item
+          span.graph-legend-dot.graph-legend-edge
+          span Edge
+        span.graph-legend-item
+          span.graph-legend-dot.graph-legend-hybrid
+          span(data-es="Híbrido" data-en="Hybrid") Híbrido
+      #agent-graph
+
+    section.agent-section
+      h2.section-title
+        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          polyline(points="16,18 22,12 16,6")
+          polyline(points="8,6 2,12 8,18")
+        span(data-es="Esquemas de Herramientas" data-en="Tool Schemas") Esquemas de Herramientas
+      .schema-accordion
+        each tool in allTools
+          .schema-item
+            button.schema-toggle
+              span.schema-toggle-name
+                span.badge(class='badge-' + tool.type.toLowerCase())= tool.type
+                | &nbsp;
+                code= tool.id
+              span.schema-toggle-desc
+                span(data-es=tool.descriptionEs data-en=tool.descriptionEn)= tool.descriptionEs
+              span.schema-chevron ▾
+            .schema-body
+              .schema-split
+                .schema-half
+                  p.schema-label
+                    span(data-es="Entrada (Input)" data-en="Input Schema") Entrada (Input)
+                  pre.schema-pre
+                    code= JSON.stringify(tool.inputSchema, null, 2)
+                .schema-half
+                  p.schema-label
+                    span(data-es="Salida (Output)" data-en="Output Schema") Salida (Output)
+                  pre.schema-pre
+                    code= JSON.stringify(tool.outputSchema, null, 2)
+
+    section.agent-section
+      h2.section-title
+        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+          polygon(points="5,3 19,12 5,21 5,3")
+        span(data-es="Ejecutar Demo" data-en="Run Demo") Ejecutar Demo
+      .demo-panel
+        .demo-panel-header
+          p.demo-description(data-es="Simula una ejecución completa del agente." data-en="Simulates a complete agent execution.") Simula una ejecución completa del agente.
+          .demo-controls
+            button#btn-run-demo.btn.btn-primary
+              svg(width="14" height="14" viewBox="0 0 24 24" fill="currentColor")
+                polygon(points="5,3 19,12 5,21 5,3")
+              span#btn-run-demo-text(data-es="Ejecutar Demo" data-en="Run Demo") Ejecutar Demo
+            button#btn-reset-demo.btn.btn-outline(style="display:none")
+              span(data-es="Reiniciar" data-en="Reset") Reiniciar
+        .demo-log-wrap
+          .sim-status
+            .sim-dot#demo-dot
+            span#demo-status-text(data-es="Listo" data-en="Ready") Listo
+          #demo-log.sim-log
+
+  script(src="/public/agents-detail.js" defer)

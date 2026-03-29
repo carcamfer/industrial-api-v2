@@ -1,0 +1,1988 @@
+[
+  {
+    "id": "get_inventory_status",
+    "name": "get_inventory_status",
+    "nameEs": "Consultar Estado de Inventario",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Consulta niveles actuales de inventario, alertas de stock mínimo y rotación por SKU.",
+    "descriptionEn": "Queries current inventory levels, minimum stock alerts, and SKU rotation.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "warehouseId": { "type": "string" },
+        "skuIds": { "type": "array", "items": { "type": "string" } },
+        "includeAlerts": { "type": "boolean", "default": true }
+      },
+      "required": ["warehouseId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "items": { "type": "array", "items": { "type": "object", "properties": {
+          "skuId": { "type": "string" }, "quantity": { "type": "number" },
+          "minStock": { "type": "number" }, "alert": { "type": "boolean" }
+        }}},
+        "totalAlerts": { "type": "integer" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "predict_demand",
+    "name": "predict_demand",
+    "nameEs": "Predecir Demanda",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Predice la demanda de productos usando modelos de series temporales con factores estacionales.",
+    "descriptionEn": "Predicts product demand using time-series models with seasonal factors.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "skuId": { "type": "string" },
+        "horizonDays": { "type": "integer", "default": 30 },
+        "includeSeasonality": { "type": "boolean", "default": true }
+      },
+      "required": ["skuId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "skuId": { "type": "string" },
+        "predictedUnits": { "type": "number" },
+        "confidenceInterval": { "type": "object", "properties": {
+          "low": { "type": "number" }, "high": { "type": "number" }
+        }},
+        "seasonalityFactor": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "optimize_stock_levels",
+    "name": "optimize_stock_levels",
+    "nameEs": "Optimizar Niveles de Stock",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Calcula niveles óptimos de reorden minimizando costos de almacenamiento y rupturas de stock.",
+    "descriptionEn": "Calculates optimal reorder levels minimizing storage costs and stockouts.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "skuId": { "type": "string" },
+        "leadTimeDays": { "type": "number" },
+        "holdingCostPercent": { "type": "number" }
+      },
+      "required": ["skuId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "skuId": { "type": "string" },
+        "recommendedMinStock": { "type": "number" },
+        "reorderPoint": { "type": "number" },
+        "economicOrderQty": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "recommend_purchase_orders",
+    "name": "recommend_purchase_orders",
+    "nameEs": "Recomendar Órdenes de Compra",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Genera recomendaciones de órdenes de compra basadas en demanda predicha y stock actual.",
+    "descriptionEn": "Generates purchase order recommendations based on predicted demand and current stock.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "warehouseId": { "type": "string" },
+        "maxBudget": { "type": "number" }
+      },
+      "required": ["warehouseId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "orders": { "type": "array", "items": { "type": "object", "properties": {
+          "skuId": { "type": "string" }, "quantity": { "type": "number" },
+          "supplierId": { "type": "string" }, "estimatedCost": { "type": "number" }
+        }}},
+        "totalCost": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "generate_purchase_order",
+    "name": "generate_purchase_order",
+    "nameEs": "Generar Orden de Compra",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Crea y envía órdenes de compra formales al ERP y/o al proveedor automáticamente.",
+    "descriptionEn": "Creates and sends formal purchase orders to ERP and/or supplier automatically.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "supplierId": { "type": "string" },
+        "items": { "type": "array", "items": { "type": "object" } },
+        "deliveryDate": { "type": "string", "format": "date" }
+      },
+      "required": ["supplierId", "items"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string" },
+        "status": { "type": "string", "enum": ["created", "sent", "confirmed"] },
+        "totalAmount": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "evaluate_suppliers",
+    "name": "evaluate_suppliers",
+    "nameEs": "Evaluar Proveedores",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Puntúa proveedores en precio, calidad, lead time y cumplimiento histórico.",
+    "descriptionEn": "Scores suppliers on price, quality, lead time and historical compliance.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "supplierIds": { "type": "array", "items": { "type": "string" } },
+        "criteria": { "type": "array", "items": { "type": "string", "enum": ["price", "quality", "lead_time", "compliance"] } }
+      },
+      "required": ["supplierIds"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "rankings": { "type": "array", "items": { "type": "object", "properties": {
+          "supplierId": { "type": "string" }, "score": { "type": "number" },
+          "recommendation": { "type": "string" }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "analyze_lead_times",
+    "name": "analyze_lead_times",
+    "nameEs": "Analizar Lead Times",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Analiza lead times históricos de proveedores y detecta variaciones anómalas.",
+    "descriptionEn": "Analyzes historical supplier lead times and detects anomalous variations.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "supplierId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 90 }
+      },
+      "required": ["supplierId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "avgLeadTimeDays": { "type": "number" },
+        "stdDev": { "type": "number" },
+        "anomalies": { "type": "array", "items": { "type": "object" } },
+        "trend": { "type": "string", "enum": ["improving", "stable", "worsening"] }
+      }
+    }
+  },
+  {
+    "id": "compare_planned_vs_actual",
+    "name": "compare_planned_vs_actual",
+    "nameEs": "Comparar Planificado vs Real",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Compara métricas planificadas contra ejecución real en producción, compras y costos.",
+    "descriptionEn": "Compares planned metrics against real execution in production, purchasing and costs.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "module": { "type": "string", "enum": ["production", "purchasing", "costs"] },
+        "periodStart": { "type": "string", "format": "date" },
+        "periodEnd": { "type": "string", "format": "date" }
+      },
+      "required": ["module", "periodStart", "periodEnd"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "deviationPercent": { "type": "number" },
+        "status": { "type": "string", "enum": ["on_track", "deviation", "critical"] },
+        "details": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  },
+  {
+    "id": "detect_production_deviation",
+    "name": "detect_production_deviation",
+    "nameEs": "Detectar Desviación de Producción",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Identifica desviaciones entre la producción planificada y la ejecutada, clasificando su causa raíz.",
+    "descriptionEn": "Identifies deviations between planned and executed production, classifying root cause.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "lineId": { "type": "string" },
+        "shiftDate": { "type": "string", "format": "date" }
+      },
+      "required": ["lineId", "shiftDate"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "deviationPercent": { "type": "number" },
+        "rootCause": { "type": "string", "enum": ["machine_failure", "material_shortage", "quality_issue", "operator_error", "schedule_change"] },
+        "impactUnits": { "type": "integer" }
+      }
+    }
+  },
+  {
+    "id": "predict_production_delays",
+    "name": "predict_production_delays",
+    "nameEs": "Predecir Retrasos de Producción",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Predice retrasos en órdenes de producción antes de que ocurran usando señales tempranas.",
+    "descriptionEn": "Predicts production order delays before they occur using early warning signals.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string" },
+        "dueDate": { "type": "string", "format": "date" }
+      },
+      "required": ["orderId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "delayProbability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "estimatedDelayHours": { "type": "number" },
+        "riskFactors": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "optimize_production_schedule",
+    "name": "optimize_production_schedule",
+    "nameEs": "Optimizar Programa de Producción",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Reoptimiza el programa de producción considerando prioridades, capacidad y fechas de entrega.",
+    "descriptionEn": "Re-optimizes the production schedule considering priorities, capacity and delivery dates.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "horizon": { "type": "string", "enum": ["day", "week", "month"] }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "schedule": { "type": "array", "items": { "type": "object" } },
+        "utilizationPercent": { "type": "number" },
+        "onTimeDeliveryForecast": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "track_project_progress",
+    "name": "track_project_progress",
+    "nameEs": "Rastrear Progreso de Proyectos",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Monitorea el avance de proyectos industriales, hitos cumplidos y recursos utilizados.",
+    "descriptionEn": "Monitors industrial project progress, completed milestones and used resources.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" }
+      },
+      "required": ["projectId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "completionPercent": { "type": "number" },
+        "milestonesCompleted": { "type": "integer" },
+        "milestonesTotal": { "type": "integer" },
+        "budgetUsedPercent": { "type": "number" },
+        "status": { "type": "string", "enum": ["on_track", "at_risk", "delayed"] }
+      }
+    }
+  },
+  {
+    "id": "estimate_project_costs",
+    "name": "estimate_project_costs",
+    "nameEs": "Estimar Costos de Proyecto",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Genera estimaciones de costo de proyecto con análisis de riesgo presupuestal.",
+    "descriptionEn": "Generates project cost estimates with budget risk analysis.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "includeContingency": { "type": "boolean", "default": true }
+      },
+      "required": ["projectId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "estimatedCost": { "type": "number" },
+        "contingencyPercent": { "type": "number" },
+        "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] }
+      }
+    }
+  },
+  {
+    "id": "detect_budget_overrun",
+    "name": "detect_budget_overrun",
+    "nameEs": "Detectar Sobrecosto Presupuestal",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Detecta y alerta sobre desviaciones de presupuesto en tiempo real antes de que escalen.",
+    "descriptionEn": "Detects and alerts on budget deviations in real time before they escalate.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "costCenterId": { "type": "string" },
+        "alertThreshold": { "type": "number", "default": 0.1, "description": "Fraction over budget" }
+      },
+      "required": ["costCenterId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "overrunDetected": { "type": "boolean" },
+        "overrunPercent": { "type": "number" },
+        "affectedCategories": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "categorize_expenses",
+    "name": "categorize_expenses",
+    "nameEs": "Categorizar Gastos",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Clasifica automáticamente transacciones y gastos operativos en categorías contables.",
+    "descriptionEn": "Automatically classifies transactions and operational expenses into accounting categories.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "transactions": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["transactions"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "categorized": { "type": "array", "items": { "type": "object", "properties": {
+          "transactionId": { "type": "string" },
+          "category": { "type": "string" },
+          "confidence": { "type": "number" }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "optimize_operational_costs",
+    "name": "optimize_operational_costs",
+    "nameEs": "Optimizar Costos Operativos",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Identifica oportunidades de reducción de costos en operaciones industriales.",
+    "descriptionEn": "Identifies cost reduction opportunities in industrial operations.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "targetReductionPercent": { "type": "number", "default": 10 }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "opportunities": { "type": "array", "items": { "type": "object" } },
+        "estimatedSavingsMonthly": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "generate_kpis",
+    "name": "generate_kpis",
+    "nameEs": "Generar KPIs",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Calcula y consolida KPIs operativos, financieros y de calidad en un reporte unificado.",
+    "descriptionEn": "Calculates and consolidates operational, financial and quality KPIs in a unified report.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "period": { "type": "string", "enum": ["daily", "weekly", "monthly"] }
+      },
+      "required": ["plantId", "period"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "kpis": { "type": "array", "items": { "type": "object", "properties": {
+          "name": { "type": "string" }, "value": { "type": "number" },
+          "unit": { "type": "string" }, "trend": { "type": "string" }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "forecast_revenue",
+    "name": "forecast_revenue",
+    "nameEs": "Pronosticar Ingresos",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Pronostica ingresos futuros combinando ventas históricas, pipeline CRM y señales de mercado.",
+    "descriptionEn": "Forecasts future revenue combining historical sales, CRM pipeline and market signals.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "businessUnit": { "type": "string" },
+        "horizonMonths": { "type": "integer", "default": 3 }
+      },
+      "required": ["businessUnit"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "forecastedRevenue": { "type": "number" },
+        "confidencePercent": { "type": "number" },
+        "byMonth": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  },
+  {
+    "id": "detect_business_anomalies",
+    "name": "detect_business_anomalies",
+    "nameEs": "Detectar Anomalías de Negocio",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Detecta patrones inusuales en métricas de negocio: ventas, márgenes, inventario y costos.",
+    "descriptionEn": "Detects unusual patterns in business metrics: sales, margins, inventory and costs.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "metrics": { "type": "array", "items": { "type": "string" } },
+        "sensitivityLevel": { "type": "string", "enum": ["low", "medium", "high"], "default": "medium" }
+      },
+      "required": ["metrics"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "anomalies": { "type": "array", "items": { "type": "object" } },
+        "criticalCount": { "type": "integer" }
+      }
+    }
+  },
+  {
+    "id": "score_leads",
+    "name": "score_leads",
+    "nameEs": "Puntuar Leads Comerciales",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Puntúa leads del CRM según probabilidad de cierre y valor potencial.",
+    "descriptionEn": "Scores CRM leads by close probability and potential value.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "leadIds": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["leadIds"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "scores": { "type": "array", "items": { "type": "object", "properties": {
+          "leadId": { "type": "string" }, "score": { "type": "number" },
+          "closeProbability": { "type": "number" }, "potentialValue": { "type": "number" }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "predict_sales",
+    "name": "predict_sales",
+    "nameEs": "Predecir Ventas",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Predice ventas por producto, canal y región para el período seleccionado.",
+    "descriptionEn": "Predicts sales by product, channel and region for the selected period.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string" },
+        "channel": { "type": "string" },
+        "horizonDays": { "type": "integer", "default": 30 }
+      },
+      "required": ["productId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "predictedUnits": { "type": "number" },
+        "predictedRevenue": { "type": "number" },
+        "accuracy": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "automate_followups",
+    "name": "automate_followups",
+    "nameEs": "Automatizar Seguimientos",
+    "type": "Cloud",
+    "category": "erp",
+    "descriptionEs": "Genera y envía seguimientos automáticos a leads, proveedores y órdenes pendientes.",
+    "descriptionEn": "Generates and sends automatic follow-ups to leads, suppliers and pending orders.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "targetType": { "type": "string", "enum": ["lead", "supplier", "order"] },
+        "targetIds": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["targetType", "targetIds"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "sent": { "type": "integer" },
+        "failed": { "type": "integer" },
+        "scheduledIds": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "sync_erp_data_local",
+    "name": "sync_erp_data_local",
+    "nameEs": "Sincronizar Datos ERP Local",
+    "type": "Edge",
+    "category": "erp",
+    "descriptionEs": "Extrae datos del ERP local (SAP, Odoo, etc.) y los sincroniza con el cloud de forma incremental.",
+    "descriptionEn": "Extracts data from local ERP (SAP, Odoo, etc.) and incrementally syncs to cloud.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "erpType": { "type": "string", "enum": ["sap", "odoo", "dynamics", "custom"] },
+        "lastSyncTimestamp": { "type": "string", "format": "date-time" },
+        "tables": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["erpType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "recordsSynced": { "type": "integer" },
+        "syncTimestamp": { "type": "string", "format": "date-time" },
+        "errors": { "type": "integer" }
+      }
+    }
+  },
+  {
+    "id": "push_orders_to_erp",
+    "name": "push_orders_to_erp",
+    "nameEs": "Enviar Órdenes al ERP Local",
+    "type": "Edge",
+    "category": "erp",
+    "descriptionEs": "Recibe órdenes generadas en la nube y las ingresa al ERP local de forma transaccional.",
+    "descriptionEn": "Receives cloud-generated orders and transactionally inserts them into the local ERP.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "orders": { "type": "array", "items": { "type": "object" } },
+        "erpType": { "type": "string" }
+      },
+      "required": ["orders", "erpType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "inserted": { "type": "integer" },
+        "failed": { "type": "integer" },
+        "erpOrderIds": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "analyze_network_risk",
+    "name": "analyze_network_risk",
+    "nameEs": "Analizar Riesgo de Red",
+    "type": "Cloud",
+    "category": "cybersecurity",
+    "descriptionEs": "Evalúa el nivel de riesgo global de la red OT/IT usando análisis de grafos y threat intelligence.",
+    "descriptionEn": "Evaluates overall OT/IT network risk using graph analysis and threat intelligence.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "networkId": { "type": "string" },
+        "includeExternalThreatFeed": { "type": "boolean", "default": true }
+      },
+      "required": ["networkId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "riskScore": { "type": "number", "minimum": 0, "maximum": 100 },
+        "riskLevel": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "topThreats": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  },
+  {
+    "id": "detect_anomaly_patterns",
+    "name": "detect_anomaly_patterns",
+    "nameEs": "Detectar Patrones de Anomalía",
+    "type": "Cloud",
+    "category": "cybersecurity",
+    "descriptionEs": "Identifica patrones de comportamiento anómalo en tráfico de red a nivel de campaña de ataque.",
+    "descriptionEn": "Identifies anomalous behavior patterns in network traffic at attack campaign level.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "trafficLogs": { "type": "array", "items": { "type": "object" } },
+        "baselineWindowHours": { "type": "integer", "default": 168 }
+      },
+      "required": ["trafficLogs"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "patternsFound": { "type": "integer" },
+        "attackType": { "type": "string", "enum": ["lateral_movement", "c2_communication", "data_exfiltration", "ransomware_precursor", "none"] },
+        "confidence": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "simulate_attack_scenarios",
+    "name": "simulate_attack_scenarios",
+    "nameEs": "Simular Escenarios de Ataque",
+    "type": "Cloud",
+    "category": "cybersecurity",
+    "descriptionEs": "Simula escenarios de ataque (red team virtual) para identificar vectores de vulnerabilidad.",
+    "descriptionEn": "Simulates attack scenarios (virtual red team) to identify vulnerability vectors.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "networkTopology": { "type": "object" },
+        "attackTypes": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["networkTopology"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "vulnerableAssets": { "type": "array", "items": { "type": "string" } },
+        "criticalPaths": { "type": "array", "items": { "type": "object" } },
+        "riskReduction": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "generate_security_strategy",
+    "name": "generate_security_strategy",
+    "nameEs": "Generar Estrategia de Seguridad",
+    "type": "Cloud",
+    "category": "cybersecurity",
+    "descriptionEs": "Genera una estrategia de seguridad adaptada al perfil de riesgo y cumplimiento normativo.",
+    "descriptionEn": "Generates a security strategy adapted to the risk profile and regulatory compliance.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "riskProfile": { "type": "object" },
+        "complianceFrameworks": { "type": "array", "items": { "type": "string", "enum": ["IEC62443", "NIST", "ISO27001"] } }
+      },
+      "required": ["riskProfile"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "strategyId": { "type": "string" },
+        "recommendations": { "type": "array", "items": { "type": "object" } },
+        "priorityActions": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "detect_network_anomalies_local",
+    "name": "detect_network_anomalies_local",
+    "nameEs": "Detectar Anomalías de Red (Local)",
+    "type": "Edge",
+    "category": "cybersecurity",
+    "descriptionEs": "Detecta anomalías de red OT/IT en tiempo real sin depender de la nube. Latencia < 100ms.",
+    "descriptionEn": "Detects OT/IT network anomalies in real time without cloud dependency. Latency < 100ms.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "interfaceId": { "type": "string" },
+        "sensitivityLevel": { "type": "string", "enum": ["low", "medium", "high"], "default": "high" }
+      },
+      "required": ["interfaceId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "anomalyDetected": { "type": "boolean" },
+        "sourceIp": { "type": "string" },
+        "anomalyType": { "type": "string" },
+        "severity": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] }
+      }
+    }
+  },
+  {
+    "id": "block_ip",
+    "name": "block_ip",
+    "nameEs": "Bloquear IP",
+    "type": "Edge",
+    "category": "cybersecurity",
+    "descriptionEs": "Bloquea una IP o rango de IPs en el firewall local de forma inmediata.",
+    "descriptionEn": "Immediately blocks an IP or IP range in the local firewall.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ipAddress": { "type": "string" },
+        "duration": { "type": "integer", "description": "Duration in seconds, 0 = permanent" },
+        "reason": { "type": "string" }
+      },
+      "required": ["ipAddress"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "blocked": { "type": "boolean" },
+        "ruleId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "segment_network",
+    "name": "segment_network",
+    "nameEs": "Segmentar Red",
+    "type": "Edge",
+    "category": "cybersecurity",
+    "descriptionEs": "Aplica segmentación de red OT/IT aislando zonas afectadas según política de seguridad.",
+    "descriptionEn": "Applies OT/IT network segmentation isolating affected zones per security policy.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "targetZone": { "type": "string" },
+        "segmentationPolicy": { "type": "string", "enum": ["isolate", "restrict", "monitor"] }
+      },
+      "required": ["targetZone", "segmentationPolicy"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "segmented": { "type": "boolean" },
+        "affectedDevices": { "type": "integer" },
+        "policyApplied": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "apply_segmentation",
+    "name": "apply_segmentation",
+    "nameEs": "Aplicar Segmentación",
+    "type": "Edge",
+    "category": "cybersecurity",
+    "descriptionEs": "Aplica reglas de segmentación de red recibidas desde la nube en switches y routers locales.",
+    "descriptionEn": "Applies network segmentation rules received from cloud in local switches and routers.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "rules": { "type": "array", "items": { "type": "object" } },
+        "deviceId": { "type": "string" }
+      },
+      "required": ["rules", "deviceId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "applied": { "type": "boolean" },
+        "rulesCount": { "type": "integer" },
+        "rollbackAvailable": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "monitor_ot_network",
+    "name": "monitor_ot_network",
+    "nameEs": "Monitorear Red OT",
+    "type": "Edge",
+    "category": "cybersecurity",
+    "descriptionEs": "Monitorea continuamente el tráfico de la red OT para detectar comportamientos no autorizados.",
+    "descriptionEn": "Continuously monitors OT network traffic to detect unauthorized behaviors.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "networkSegment": { "type": "string" },
+        "captureMode": { "type": "string", "enum": ["passive", "active"], "default": "passive" }
+      },
+      "required": ["networkSegment"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "packetsAnalyzed": { "type": "integer" },
+        "suspiciousFlows": { "type": "integer" },
+        "newDevicesDetected": { "type": "integer" }
+      }
+    }
+  },
+  {
+    "id": "isolate_device",
+    "name": "isolate_device",
+    "nameEs": "Aislar Dispositivo",
+    "type": "Edge",
+    "category": "cybersecurity",
+    "descriptionEs": "Aísla un dispositivo comprometido de la red OT sin interrumpir el resto de la planta.",
+    "descriptionEn": "Isolates a compromised device from the OT network without disrupting the rest of the plant.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string" },
+        "isolationType": { "type": "string", "enum": ["full", "partial", "monitoring_only"] }
+      },
+      "required": ["deviceId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "isolated": { "type": "boolean" },
+        "deviceId": { "type": "string" },
+        "isolationType": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "inspect_gateway_traffic",
+    "name": "inspect_gateway_traffic",
+    "nameEs": "Inspeccionar Tráfico del Gateway",
+    "type": "Edge",
+    "category": "cybersecurity",
+    "descriptionEs": "Inspección profunda de paquetes (DPI) en el gateway OT/IT para detectar payloads maliciosos.",
+    "descriptionEn": "Deep packet inspection (DPI) at the OT/IT gateway to detect malicious payloads.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "gatewayId": { "type": "string" },
+        "inspectionDepth": { "type": "string", "enum": ["shallow", "deep"], "default": "deep" }
+      },
+      "required": ["gatewayId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "packetsInspected": { "type": "integer" },
+        "maliciousPayloads": { "type": "integer" },
+        "blockedConnections": { "type": "integer" }
+      }
+    }
+  },
+  {
+    "id": "inspect_product_quality",
+    "name": "inspect_product_quality",
+    "nameEs": "Inspeccionar Calidad de Producto",
+    "type": "Edge",
+    "category": "vision",
+    "descriptionEs": "Detecta defectos superficiales en piezas en la línea de producción usando CNN embebida.",
+    "descriptionEn": "Detects surface defects in parts on the production line using embedded CNN.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "cameraId": { "type": "string" },
+        "productType": { "type": "string" },
+        "confidenceThreshold": { "type": "number", "default": 0.85 }
+      },
+      "required": ["cameraId", "productType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "defectFound": { "type": "boolean" },
+        "defectType": { "type": "string", "enum": ["scratch", "dent", "crack", "discoloration", "deformation", "none"] },
+        "confidence": { "type": "number" },
+        "frameId": { "type": "string" },
+        "boundingBox": { "type": "object" }
+      }
+    }
+  },
+  {
+    "id": "count_items_on_conveyor",
+    "name": "count_items_on_conveyor",
+    "nameEs": "Contar Ítems en Cinta",
+    "type": "Edge",
+    "category": "vision",
+    "descriptionEs": "Cuenta ítems que pasan por la cinta transportadora en tiempo real con precisión > 99%.",
+    "descriptionEn": "Counts items passing through the conveyor belt in real time with > 99% accuracy.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "cameraId": { "type": "string" },
+        "countingLine": { "type": "object", "description": "Line definition {x1,y1,x2,y2}" }
+      },
+      "required": ["cameraId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "countTotal": { "type": "integer" },
+        "countPerMinute": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "detect_safety_violations",
+    "name": "detect_safety_violations",
+    "nameEs": "Detectar Violaciones de Seguridad",
+    "type": "Edge",
+    "category": "vision",
+    "descriptionEs": "Detecta violaciones de EPP (casco, chaleco, gafas) y zonas restringidas en tiempo real.",
+    "descriptionEn": "Detects PPE violations (helmet, vest, goggles) and restricted zones in real time.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "cameraId": { "type": "string" },
+        "checkItems": { "type": "array", "items": { "type": "string", "enum": ["helmet", "vest", "goggles", "gloves", "zone_restricted"] } }
+      },
+      "required": ["cameraId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "violationDetected": { "type": "boolean" },
+        "violationType": { "type": "string" },
+        "personId": { "type": "string" },
+        "zoneId": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "monitor_worker_posture",
+    "name": "monitor_worker_posture",
+    "nameEs": "Monitorear Postura del Trabajador",
+    "type": "Edge",
+    "category": "vision",
+    "descriptionEs": "Analiza la postura ergonómica de trabajadores para prevenir lesiones musculoesqueléticas.",
+    "descriptionEn": "Analyzes worker ergonomic posture to prevent musculoskeletal injuries.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "cameraId": { "type": "string" },
+        "workerId": { "type": "string" }
+      },
+      "required": ["cameraId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "postureScore": { "type": "number", "minimum": 0, "maximum": 100 },
+        "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+        "recommendations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "capture_video_stream",
+    "name": "capture_video_stream",
+    "nameEs": "Capturar Stream de Video",
+    "type": "Edge",
+    "category": "vision",
+    "descriptionEs": "Captura y preprocesa frames de cámaras industriales GigE Vision / USB3 Vision para análisis.",
+    "descriptionEn": "Captures and preprocesses frames from industrial GigE Vision / USB3 Vision cameras for analysis.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "cameraId": { "type": "string" },
+        "fps": { "type": "integer", "default": 30 },
+        "resolution": { "type": "string", "enum": ["640x480", "1280x720", "1920x1080"], "default": "1920x1080" }
+      },
+      "required": ["cameraId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "frameId": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "width": { "type": "integer" },
+        "height": { "type": "integer" },
+        "sizeKb": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "train_vision_model",
+    "name": "train_vision_model",
+    "nameEs": "Entrenar Modelo de Visión",
+    "type": "Cloud",
+    "category": "vision",
+    "descriptionEs": "Entrena modelos CNN en la nube con nuevas imágenes de defectos para mejorar la detección.",
+    "descriptionEn": "Trains CNN models in the cloud with new defect images to improve detection.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "datasetId": { "type": "string" },
+        "baseModelId": { "type": "string" },
+        "epochs": { "type": "integer", "default": 50 }
+      },
+      "required": ["datasetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "modelId": { "type": "string" },
+        "accuracy": { "type": "number" },
+        "mAP": { "type": "number" },
+        "trainingTimeMinutes": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "improve_detection_model",
+    "name": "improve_detection_model",
+    "nameEs": "Mejorar Modelo de Detección",
+    "type": "Cloud",
+    "category": "vision",
+    "descriptionEs": "Aplica transfer learning y fine-tuning para mejorar un modelo de detección existente.",
+    "descriptionEn": "Applies transfer learning and fine-tuning to improve an existing detection model.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "modelId": { "type": "string" },
+        "newSamplesCount": { "type": "integer" }
+      },
+      "required": ["modelId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "newModelId": { "type": "string" },
+        "accuracyImprovement": { "type": "number" },
+        "deployReady": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "analyze_visual_patterns",
+    "name": "analyze_visual_patterns",
+    "nameEs": "Analizar Patrones Visuales",
+    "type": "Cloud",
+    "category": "vision",
+    "descriptionEs": "Analiza patrones visuales históricos para identificar tendencias de defectos y causas raíz.",
+    "descriptionEn": "Analyzes historical visual patterns to identify defect trends and root causes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "productType": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 30 }
+      },
+      "required": ["productType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "topDefects": { "type": "array", "items": { "type": "object" } },
+        "defectTrend": { "type": "string", "enum": ["improving", "stable", "worsening"] },
+        "suggestedRootCauses": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "predict_demand_industrial",
+    "name": "predict_demand_industrial",
+    "nameEs": "Predecir Demanda Industrial",
+    "type": "Cloud",
+    "category": "ai-ml",
+    "descriptionEs": "Predice la demanda de componentes industriales usando modelos ML entrenados con señales externas.",
+    "descriptionEn": "Predicts industrial component demand using ML models trained with external signals.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "componentId": { "type": "string" },
+        "includeExternalSignals": { "type": "boolean", "default": true }
+      },
+      "required": ["componentId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "demandForecast": { "type": "array", "items": { "type": "object" } },
+        "modelAccuracy": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "optimize_production_sequence",
+    "name": "optimize_production_sequence",
+    "nameEs": "Optimizar Secuencia de Producción",
+    "type": "Cloud",
+    "category": "ai-ml",
+    "descriptionEs": "Optimiza la secuencia de trabajo en máquinas usando algoritmos de programación combinatoria.",
+    "descriptionEn": "Optimizes job sequence on machines using combinatorial scheduling algorithms.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "jobs": { "type": "array", "items": { "type": "object" } },
+        "machines": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["jobs", "machines"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "optimizedSequence": { "type": "array", "items": { "type": "object" } },
+        "makespanReduction": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "detect_process_deviation",
+    "name": "detect_process_deviation",
+    "nameEs": "Detectar Desviación de Proceso",
+    "type": "Cloud",
+    "category": "ai-ml",
+    "descriptionEs": "Detecta desviaciones en parámetros de proceso industrial usando control estadístico de proceso.",
+    "descriptionEn": "Detects deviations in industrial process parameters using statistical process control.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "processId": { "type": "string" },
+        "parameters": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["processId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "deviationDetected": { "type": "boolean" },
+        "outOfControlParameters": { "type": "array", "items": { "type": "string" } },
+        "cpkValue": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "predict_machine_failure",
+    "name": "predict_machine_failure",
+    "nameEs": "Predecir Falla de Máquina",
+    "type": "Cloud",
+    "category": "ai-ml",
+    "descriptionEs": "Predice fallas de máquina con días de anticipación usando modelos LSTM entrenados con histórico.",
+    "descriptionEn": "Predicts machine failures days in advance using LSTM models trained on historical data.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "sensorReadings": { "type": "array", "items": { "type": "object" } },
+        "horizonHours": { "type": "integer", "default": 72 }
+      },
+      "required": ["assetId", "sensorReadings"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "failureProbability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "estimatedTimeToFailureHours": { "type": "number" },
+        "failureType": { "type": "string", "enum": ["bearing", "motor", "gearbox", "belt", "seal", "none"] },
+        "recommendedAction": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "analyze_vibration_patterns",
+    "name": "analyze_vibration_patterns",
+    "nameEs": "Analizar Patrones de Vibración",
+    "type": "Cloud",
+    "category": "ai-ml",
+    "descriptionEs": "Analiza espectros de frecuencia de vibraciones para identificar firmas de falla específicas.",
+    "descriptionEn": "Analyzes vibration frequency spectra to identify specific failure signatures.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "vibrationData": { "type": "array", "items": { "type": "number" } },
+        "samplingRateHz": { "type": "number" }
+      },
+      "required": ["assetId", "vibrationData", "samplingRateHz"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "dominantFrequency": { "type": "number" },
+        "rmsValue": { "type": "number" },
+        "failureSignature": { "type": "string" },
+        "severity": { "type": "string", "enum": ["normal", "watch", "alert", "danger"] }
+      }
+    }
+  },
+  {
+    "id": "optimize_energy_usage",
+    "name": "optimize_energy_usage",
+    "nameEs": "Optimizar Uso de Energía",
+    "type": "Cloud",
+    "category": "ai-ml",
+    "descriptionEs": "Optimiza el consumo energético de máquinas y líneas usando análisis de patrones y tarifas.",
+    "descriptionEn": "Optimizes energy consumption of machines and lines using pattern analysis and tariffs.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetIds": { "type": "array", "items": { "type": "string" } },
+        "tariffPlan": { "type": "string" }
+      },
+      "required": ["assetIds"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "recommendations": { "type": "array", "items": { "type": "object" } },
+        "estimatedSavingsKwh": { "type": "number" },
+        "estimatedSavingsCurrency": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "identify_bottlenecks",
+    "name": "identify_bottlenecks",
+    "nameEs": "Identificar Cuellos de Botella",
+    "type": "Cloud",
+    "category": "ai-ml",
+    "descriptionEs": "Identifica cuellos de botella en la línea de producción que limitan el throughput global.",
+    "descriptionEn": "Identifies bottlenecks in the production line that limit overall throughput.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "lineId": { "type": "string" },
+        "analysisWindow": { "type": "string", "enum": ["shift", "day", "week"] }
+      },
+      "required": ["lineId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "bottlenecks": { "type": "array", "items": { "type": "object", "properties": {
+          "stationId": { "type": "string" }, "utilizationPercent": { "type": "number" },
+          "lostUnits": { "type": "integer" }
+        }}},
+        "theoreticalCapacityIncrease": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "generate_digital_twin_model",
+    "name": "generate_digital_twin_model",
+    "nameEs": "Generar Modelo de Gemelo Digital",
+    "type": "Cloud",
+    "category": "ai-ml",
+    "descriptionEs": "Construye el modelo matemático del gemelo digital a partir de datos históricos y CAD.",
+    "descriptionEn": "Builds the digital twin mathematical model from historical data and CAD.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "historicalDatasetId": { "type": "string" },
+        "cadFileUrl": { "type": "string" }
+      },
+      "required": ["assetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "modelId": { "type": "string" },
+        "modelAccuracy": { "type": "number" },
+        "simulationReady": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "collect_vibration_data",
+    "name": "collect_vibration_data",
+    "nameEs": "Recolectar Datos de Vibración",
+    "type": "Edge",
+    "category": "ai-ml",
+    "descriptionEs": "Adquiere señales de sensores de vibración MEMS/piezoelétricos a alta frecuencia de muestreo.",
+    "descriptionEn": "Acquires signals from MEMS/piezoelectric vibration sensors at high sampling rates.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sensorId": { "type": "string" },
+        "samplingRateHz": { "type": "number", "default": 10000 },
+        "durationMs": { "type": "integer", "default": 500 }
+      },
+      "required": ["sensorId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "sensorId": { "type": "string" },
+        "samples": { "type": "array", "items": { "type": "number" } },
+        "samplingRateHz": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "collect_process_signals",
+    "name": "collect_process_signals",
+    "nameEs": "Recolectar Señales de Proceso",
+    "type": "Edge",
+    "category": "ai-ml",
+    "descriptionEs": "Lee señales de proceso (temperatura, presión, flujo) desde PLCs y controladores vía OPC-UA/Modbus.",
+    "descriptionEn": "Reads process signals (temperature, pressure, flow) from PLCs and controllers via OPC-UA/Modbus.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string" },
+        "protocol": { "type": "string", "enum": ["opc-ua", "modbus-tcp", "modbus-rtu", "mqtt"] },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["deviceId", "protocol", "tags"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "readings": { "type": "array", "items": { "type": "object", "properties": {
+          "tag": { "type": "string" }, "value": { "type": "number" },
+          "unit": { "type": "string" }, "timestamp": { "type": "string" }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "run_local_inference",
+    "name": "run_local_inference",
+    "nameEs": "Ejecutar Inferencia Local",
+    "type": "Edge",
+    "category": "ai-ml",
+    "descriptionEs": "Ejecuta modelos ML embebidos (ONNX/TensorFlow Lite) en el edge con latencia < 10ms.",
+    "descriptionEn": "Runs embedded ML models (ONNX/TensorFlow Lite) at edge with < 10ms latency.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "modelId": { "type": "string" },
+        "inputTensor": { "type": "array", "items": { "type": "number" } },
+        "modelFormat": { "type": "string", "enum": ["onnx", "tflite", "torchscript"] }
+      },
+      "required": ["modelId", "inputTensor"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "prediction": { "type": "array", "items": { "type": "number" } },
+        "inferenceTimeMs": { "type": "number" },
+        "modelVersion": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "detect_real_time_anomalies",
+    "name": "detect_real_time_anomalies",
+    "nameEs": "Detectar Anomalías en Tiempo Real",
+    "type": "Edge",
+    "category": "ai-ml",
+    "descriptionEs": "Detecta anomalías en señales de proceso en tiempo real usando modelos de umbral adaptativo.",
+    "descriptionEn": "Detects anomalies in process signals in real time using adaptive threshold models.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "signalId": { "type": "string" },
+        "value": { "type": "number" },
+        "windowSize": { "type": "integer", "default": 100 }
+      },
+      "required": ["signalId", "value"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "anomalyDetected": { "type": "boolean" },
+        "zscore": { "type": "number" },
+        "adaptiveThreshold": { "type": "number" },
+        "severity": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] }
+      }
+    }
+  },
+  {
+    "id": "orchestrate_edge_nodes",
+    "name": "orchestrate_edge_nodes",
+    "nameEs": "Orquestar Nodos Edge",
+    "type": "Edge",
+    "category": "infrastructure",
+    "descriptionEs": "Coordina múltiples nodos edge, gestiona su ciclo de vida y balancea carga de trabajo.",
+    "descriptionEn": "Coordinates multiple edge nodes, manages their lifecycle and balances workload.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "clusterName": { "type": "string" },
+        "nodes": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["clusterName"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "activeNodes": { "type": "integer" },
+        "totalNodes": { "type": "integer" },
+        "clusterHealth": { "type": "string", "enum": ["healthy", "degraded", "critical"] }
+      }
+    }
+  },
+  {
+    "id": "manage_edge_devices",
+    "name": "manage_edge_devices",
+    "nameEs": "Gestionar Dispositivos Edge",
+    "type": "Edge",
+    "category": "infrastructure",
+    "descriptionEs": "Registra, monitorea y gestiona el ciclo de vida de sensores, actuadores y gateways.",
+    "descriptionEn": "Registers, monitors and manages the lifecycle of sensors, actuators and gateways.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operation": { "type": "string", "enum": ["list", "provision", "decommission", "reboot"] },
+        "deviceId": { "type": "string" }
+      },
+      "required": ["operation"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "devices": { "type": "array", "items": { "type": "object" } },
+        "operationResult": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "collect_sensor_data",
+    "name": "collect_sensor_data",
+    "nameEs": "Recolectar Datos de Sensores",
+    "type": "Edge",
+    "category": "infrastructure",
+    "descriptionEs": "Agrega lecturas de múltiples sensores (temperatura, presión, vibración) en un buffer local.",
+    "descriptionEn": "Aggregates readings from multiple sensors (temperature, pressure, vibration) in a local buffer.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sensorIds": { "type": "array", "items": { "type": "string" } },
+        "intervalMs": { "type": "integer", "default": 1000 }
+      },
+      "required": ["sensorIds"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "readings": { "type": "array", "items": { "type": "object" } },
+        "bufferedCount": { "type": "integer" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "digitize_analog_signals",
+    "name": "digitize_analog_signals",
+    "nameEs": "Digitalizar Señales Analógicas",
+    "type": "Edge",
+    "category": "infrastructure",
+    "descriptionEs": "Convierte señales analógicas 4-20mA / 0-10V de equipos legacy a datos digitales estructurados.",
+    "descriptionEn": "Converts 4-20mA / 0-10V analog signals from legacy equipment to structured digital data.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "channelId": { "type": "string" },
+        "signalType": { "type": "string", "enum": ["4-20mA", "0-10V", "0-5V", "thermocouple"] },
+        "engineeringMin": { "type": "number" },
+        "engineeringMax": { "type": "number" }
+      },
+      "required": ["channelId", "signalType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "channelId": { "type": "string" },
+        "rawValue": { "type": "number" },
+        "engineeringValue": { "type": "number" },
+        "unit": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "monitor_energy_consumption",
+    "name": "monitor_energy_consumption",
+    "nameEs": "Monitorear Consumo Energético",
+    "type": "Edge",
+    "category": "infrastructure",
+    "descriptionEs": "Lee consumo de energía en tiempo real desde medidores inteligentes DLMS/COSEM.",
+    "descriptionEn": "Reads energy consumption in real time from smart DLMS/COSEM meters.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "meterId": { "type": "string" },
+        "readInterval": { "type": "integer", "default": 60 }
+      },
+      "required": ["meterId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "kw": { "type": "number" },
+        "kwh": { "type": "number" },
+        "powerFactor": { "type": "number" },
+        "voltage": { "type": "number" },
+        "current": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "execute_local_control_action",
+    "name": "execute_local_control_action",
+    "nameEs": "Ejecutar Acción de Control Local",
+    "type": "Edge",
+    "category": "infrastructure",
+    "descriptionEs": "Escribe valores en PLCs y actuadores locales vía OPC-UA, Modbus o protocolos industriales.",
+    "descriptionEn": "Writes values to local PLCs and actuators via OPC-UA, Modbus or industrial protocols.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string" },
+        "tag": { "type": "string" },
+        "value": {},
+        "protocol": { "type": "string", "enum": ["opc-ua", "modbus-tcp", "modbus-rtu"] }
+      },
+      "required": ["deviceId", "tag", "value", "protocol"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "success": { "type": "boolean" },
+        "deviceId": { "type": "string" },
+        "tag": { "type": "string" },
+        "writtenValue": {},
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "deploy_edge_configuration",
+    "name": "deploy_edge_configuration",
+    "nameEs": "Desplegar Configuración Edge",
+    "type": "Cloud",
+    "category": "infrastructure",
+    "descriptionEs": "Despliega configuraciones de agentes y parámetros de sistema a dispositivos edge remotamente.",
+    "descriptionEn": "Deploys agent configurations and system parameters to edge devices remotely.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "configId": { "type": "string" },
+        "targetDevices": { "type": "array", "items": { "type": "string" } },
+        "strategy": { "type": "string", "enum": ["all_at_once", "rolling", "canary"] }
+      },
+      "required": ["configId", "targetDevices"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "deployed": { "type": "integer" },
+        "failed": { "type": "integer" },
+        "rollbackAvailable": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "update_edge_agents",
+    "name": "update_edge_agents",
+    "nameEs": "Actualizar Agentes Edge",
+    "type": "Cloud",
+    "category": "infrastructure",
+    "descriptionEs": "Gestiona actualizaciones OTA de agentes edge en toda la flota de dispositivos.",
+    "descriptionEn": "Manages OTA agent updates across the entire edge device fleet.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "agentId": { "type": "string" },
+        "targetVersion": { "type": "string" },
+        "deviceFilter": { "type": "object" }
+      },
+      "required": ["agentId", "targetVersion"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "updatedDevices": { "type": "integer" },
+        "failedDevices": { "type": "integer" },
+        "updateJobId": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "monitor_edge_health",
+    "name": "monitor_edge_health",
+    "nameEs": "Monitorear Salud del Edge",
+    "type": "Cloud",
+    "category": "infrastructure",
+    "descriptionEs": "Monitorea el estado de salud de todos los nodos edge: CPU, memoria, conectividad y errores.",
+    "descriptionEn": "Monitors health status of all edge nodes: CPU, memory, connectivity and errors.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "fleetId": { "type": "string" },
+        "alertThresholds": { "type": "object" }
+      },
+      "required": ["fleetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "healthySince": { "type": "string", "format": "date-time" },
+        "nodesOnline": { "type": "integer" },
+        "nodesOffline": { "type": "integer" },
+        "alerts": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  },
+  {
+    "id": "manage_device_registry",
+    "name": "manage_device_registry",
+    "nameEs": "Gestionar Registro de Dispositivos",
+    "type": "Cloud",
+    "category": "infrastructure",
+    "descriptionEs": "Mantiene el inventario central de todos los dispositivos edge, sus versiones y configuraciones.",
+    "descriptionEn": "Maintains the central inventory of all edge devices, their versions and configurations.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "operation": { "type": "string", "enum": ["list", "register", "update", "deregister"] },
+        "deviceData": { "type": "object" }
+      },
+      "required": ["operation"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "devices": { "type": "array", "items": { "type": "object" } },
+        "totalDevices": { "type": "integer" },
+        "operationResult": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "simulate_bottlenecks",
+    "name": "simulate_bottlenecks",
+    "nameEs": "Simular Cuellos de Botella",
+    "type": "Cloud",
+    "category": "production",
+    "descriptionEs": "Simula escenarios de cuello de botella en la línea para evaluar impacto antes de cambios reales.",
+    "descriptionEn": "Simulates bottleneck scenarios on the line to evaluate impact before real changes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "lineId": { "type": "string" },
+        "scenario": { "type": "object" }
+      },
+      "required": ["lineId", "scenario"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "throughputChange": { "type": "number" },
+        "oeeDelta": { "type": "number" },
+        "recommendation": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "optimize_production_flow",
+    "name": "optimize_production_flow",
+    "nameEs": "Optimizar Flujo de Producción",
+    "type": "Cloud",
+    "category": "production",
+    "descriptionEs": "Genera el plan de flujo productivo óptimo minimizando WIP, tiempos de espera y cambios de formato.",
+    "descriptionEn": "Generates optimal production flow plan minimizing WIP, wait times and format changes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "lineId": { "type": "string" },
+        "productionOrders": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["lineId", "productionOrders"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "optimizedFlow": { "type": "array", "items": { "type": "object" } },
+        "estimatedOEE": { "type": "number" },
+        "wipReduction": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "plan_production_automatically",
+    "name": "plan_production_automatically",
+    "nameEs": "Planificar Producción Automáticamente",
+    "type": "Cloud",
+    "category": "production",
+    "descriptionEs": "Genera el plan de producción completo de forma automática considerando recursos, materiales y demanda.",
+    "descriptionEn": "Generates the complete production plan automatically considering resources, materials and demand.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "horizon": { "type": "string", "enum": ["day", "week", "month"] },
+        "demandForecast": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["plantId", "horizon"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "productionPlan": { "type": "array", "items": { "type": "object" } },
+        "resourceUtilization": { "type": "object" },
+        "onTimeDeliveryRate": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "identify_idle_time_patterns",
+    "name": "identify_idle_time_patterns",
+    "nameEs": "Identificar Patrones de Tiempo Muerto",
+    "type": "Cloud",
+    "category": "production",
+    "descriptionEs": "Analiza datos históricos para identificar patrones recurrentes de tiempo muerto y sus causas.",
+    "descriptionEn": "Analyzes historical data to identify recurring idle time patterns and their causes.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "lineId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 30 }
+      },
+      "required": ["lineId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "patterns": { "type": "array", "items": { "type": "object" } },
+        "topCauses": { "type": "array", "items": { "type": "string" } },
+        "totalIdleTimeHours": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "collect_production_data",
+    "name": "collect_production_data",
+    "nameEs": "Recolectar Datos de Producción",
+    "type": "Edge",
+    "category": "production",
+    "descriptionEs": "Captura contadores de producción, tiempos de ciclo y paradas directamente desde máquinas.",
+    "descriptionEn": "Captures production counters, cycle times and stoppages directly from machines.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "machineId": { "type": "string" },
+        "protocol": { "type": "string", "enum": ["opc-ua", "modbus", "mqtt", "s7"] }
+      },
+      "required": ["machineId", "protocol"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "partsProduced": { "type": "integer" },
+        "cycleTimeMs": { "type": "number" },
+        "stoppages": { "type": "integer" },
+        "shiftId": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "track_machine_state",
+    "name": "track_machine_state",
+    "nameEs": "Rastrear Estado de Máquina",
+    "type": "Edge",
+    "category": "production",
+    "descriptionEs": "Rastrea el estado operativo de máquinas (produciendo, en pausa, en falla, setup) en tiempo real.",
+    "descriptionEn": "Tracks machine operational state (producing, paused, failed, setup) in real time.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "machineId": { "type": "string" }
+      },
+      "required": ["machineId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "machineId": { "type": "string" },
+        "state": { "type": "string", "enum": ["producing", "idle", "setup", "fault", "maintenance"] },
+        "stateStartedAt": { "type": "string", "format": "date-time" },
+        "stateDurationMs": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "detect_idle_time",
+    "name": "detect_idle_time",
+    "nameEs": "Detectar Tiempo Muerto",
+    "type": "Edge",
+    "category": "production",
+    "descriptionEs": "Detecta y registra tiempos muertos en máquinas, clasificando automáticamente la causa.",
+    "descriptionEn": "Detects and records machine idle times, automatically classifying the cause.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "machineId": { "type": "string" },
+        "minIdleSeconds": { "type": "integer", "default": 60 }
+      },
+      "required": ["machineId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "idleDetected": { "type": "boolean" },
+        "idleDurationSeconds": { "type": "number" },
+        "cause": { "type": "string", "enum": ["material_shortage", "machine_fault", "operator_absent", "planned_stop", "unknown"] }
+      }
+    }
+  },
+  {
+    "id": "execute_production_adjustment",
+    "name": "execute_production_adjustment",
+    "nameEs": "Ejecutar Ajuste de Producción",
+    "type": "Edge",
+    "category": "production",
+    "descriptionEs": "Aplica ajustes de parámetros de máquina o secuencia recomendados por el agente cloud.",
+    "descriptionEn": "Applies machine parameter or sequence adjustments recommended by the cloud agent.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "machineId": { "type": "string" },
+        "adjustments": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["machineId", "adjustments"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "applied": { "type": "boolean" },
+        "adjustmentsCount": { "type": "integer" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "generate_digital_twin",
+    "name": "generate_digital_twin",
+    "nameEs": "Generar Gemelo Digital",
+    "type": "Cloud",
+    "category": "digital-twin",
+    "descriptionEs": "Crea la representación virtual de un activo o sistema industrial con su comportamiento físico.",
+    "descriptionEn": "Creates the virtual representation of an industrial asset or system with its physical behavior.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "assetType": { "type": "string", "enum": ["machine", "line", "plant", "process"] }
+      },
+      "required": ["assetId", "assetType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "twinId": { "type": "string" },
+        "syncStatus": { "type": "string", "enum": ["live", "delayed", "offline"] },
+        "fidelityScore": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "simulate_operations",
+    "name": "simulate_operations",
+    "nameEs": "Simular Operaciones",
+    "type": "Cloud",
+    "category": "digital-twin",
+    "descriptionEs": "Corre simulaciones what-if en el gemelo digital sin afectar la producción real.",
+    "descriptionEn": "Runs what-if simulations on the digital twin without affecting real production.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "twinId": { "type": "string" },
+        "scenarios": { "type": "array", "items": { "type": "object" } },
+        "horizonHours": { "type": "integer", "default": 24 }
+      },
+      "required": ["twinId", "scenarios"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "results": { "type": "array", "items": { "type": "object" } },
+        "bestScenarioId": { "type": "string" },
+        "projectedImprovement": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "optimize_system_performance",
+    "name": "optimize_system_performance",
+    "nameEs": "Optimizar Rendimiento del Sistema",
+    "type": "Cloud",
+    "category": "digital-twin",
+    "descriptionEs": "Aplica optimización global del sistema basada en resultados del gemelo digital.",
+    "descriptionEn": "Applies global system optimization based on digital twin results.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "twinId": { "type": "string" },
+        "optimizationObjective": { "type": "string", "enum": ["throughput", "quality", "energy", "cost"] }
+      },
+      "required": ["twinId", "optimizationObjective"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "optimizationId": { "type": "string" },
+        "recommendations": { "type": "array", "items": { "type": "object" } },
+        "expectedImprovementPercent": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "feed_real_time_data_to_twin",
+    "name": "feed_real_time_data_to_twin",
+    "nameEs": "Alimentar Gemelo con Datos en Tiempo Real",
+    "type": "Edge",
+    "category": "digital-twin",
+    "descriptionEs": "Transmite datos del piso de planta en tiempo real al gemelo digital en la nube.",
+    "descriptionEn": "Transmits shop floor data in real time to the cloud digital twin.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "twinId": { "type": "string" },
+        "sensorReadings": { "type": "array", "items": { "type": "object" } },
+        "batchSize": { "type": "integer", "default": 100 }
+      },
+      "required": ["twinId", "sensorReadings"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "recordsSent": { "type": "integer" },
+        "twinSyncLatencyMs": { "type": "number" },
+        "twinSyncStatus": { "type": "string", "enum": ["live", "buffering", "error"] }
+      }
+    }
+  }
+]
