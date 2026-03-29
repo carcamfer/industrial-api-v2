@@ -159,211 +159,61 @@
     });
   }
 
-  // ── Demo Runner ────────────────────────────────────────
-  var btnRun = document.getElementById('btn-run-demo');
-  var btnRunText = document.getElementById('btn-run-demo-text');
-  var btnReset = document.getElementById('btn-reset-demo');
-  var demoLog = document.getElementById('demo-log');
-  var demoDot = document.getElementById('demo-dot');
-  var demoStatusText = document.getElementById('demo-status-text');
+  // ── Agent Chatbot ──────────────────────────────────────
+  var chatInput   = document.getElementById('agent-chat-input');
+  var chatSend    = document.getElementById('agent-chat-send');
+  var chatMsgs    = document.getElementById('agent-chat-msgs');
+  var agentCategory = window.AGENT_CATEGORY || agentId;
+  var chatHistory = [];
 
-  // Extract top scalar values from outputData for display as pills
-  function extractOutputPills(outputData) {
-    if (!outputData || typeof outputData !== 'object') return [];
-    var pills = [];
-    var entries = Object.entries(outputData);
-    for (var i = 0; i < entries.length && pills.length < 4; i++) {
-      var key = entries[i][0];
-      var val = entries[i][1];
-      if (val === null || typeof val === 'object') continue;
-      var display = typeof val === 'boolean'
-        ? (val ? '✓' : '✗')
-        : typeof val === 'string' && val.length > 18 ? val.slice(0, 16) + '…' : String(val);
-      pills.push({ key: key, val: display, isWarn: typeof val === 'boolean' && val && (key.includes('anomaly') || key.includes('defect') || key.includes('violation') || key.includes('overrun') || key.includes('idle')) });
-    }
-    return pills;
+  function appendChatBubble(text, role) {
+    var bubble = document.createElement('div');
+    bubble.className = 'agent-chat-bubble agent-bubble-' + role;
+    bubble.textContent = text;
+    chatMsgs.appendChild(bubble);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
   }
 
-  function appendStep(step) {
-    var isWarn = step.status === 'warn';
-    var card = document.createElement('div');
-    card.className = 'demo-card demo-card-' + (step.status || 'ok');
+  function sendChatMessage() {
+    var text = chatInput ? chatInput.value.trim() : '';
+    if (!text) return;
+    appendChatBubble(text, 'user');
+    chatHistory.push({ role: 'user', content: text });
+    if (chatInput) chatInput.value = '';
+    if (chatSend) chatSend.disabled = true;
 
-    // ── Header row ──────────────────────────────────────────
-    var header = document.createElement('div');
-    header.className = 'demo-card-header';
+    var thinkingBubble = document.createElement('div');
+    thinkingBubble.className = 'agent-chat-bubble agent-bubble-bot agent-bubble-thinking';
+    thinkingBubble.textContent = lang === 'es' ? 'Escribiendo…' : 'Typing…';
+    chatMsgs.appendChild(thinkingBubble);
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
 
-    var num = document.createElement('span');
-    num.className = 'demo-card-num';
-    num.textContent = String(step.step).padStart(2, '0');
-
-    var statusIcon = document.createElement('span');
-    statusIcon.className = 'demo-card-icon demo-card-icon-' + (step.status || 'ok');
-    statusIcon.textContent = isWarn ? '⚠' : '✓';
-
-    var typeBadge = document.createElement('span');
-    typeBadge.className = 'badge badge-' + (step.toolType || 'cloud').toLowerCase() + ' badge-sm';
-    typeBadge.textContent = step.toolType || '?';
-
-    var toolName = document.createElement('span');
-    toolName.className = 'demo-card-name';
-    toolName.textContent = lang === 'es' ? (step.toolNameEs || step.toolId) : (step.toolName || step.toolId);
-
-    var durEl = document.createElement('span');
-    durEl.className = 'demo-card-dur';
-    durEl.textContent = step.durationMs + 'ms';
-
-    header.appendChild(num);
-    header.appendChild(statusIcon);
-    header.appendChild(typeBadge);
-    header.appendChild(toolName);
-    header.appendChild(durEl);
-
-    // ── Input summary row ───────────────────────────────────
-    var inputRow = document.createElement('div');
-    inputRow.className = 'demo-card-input';
-    var inputLabel = document.createElement('span');
-    inputLabel.className = 'demo-card-label';
-    inputLabel.textContent = lang === 'es' ? 'Entrada:' : 'Input:';
-    var inputVal = document.createElement('span');
-    inputVal.className = 'demo-card-input-val';
-    inputVal.textContent = step.inputSummary || '—';
-    inputRow.appendChild(inputLabel);
-    inputRow.appendChild(inputVal);
-
-    // ── Event + protocol + next tool row ────────────────────
-    var flowRow = document.createElement('div');
-    flowRow.className = 'demo-card-flow';
-
-    var eventBadge = document.createElement('span');
-    eventBadge.className = 'demo-card-event-badge';
-    eventBadge.textContent = step.event || '—';
-
-    var viaSpan = document.createElement('span');
-    viaSpan.className = 'demo-card-via';
-    viaSpan.textContent = ' via ';
-
-    var protoBadge = document.createElement('span');
-    protoBadge.className = 'proto-badge proto-' + (step.protocol || 'https').toLowerCase().replace('/', '-');
-    protoBadge.textContent = step.protocol || '—';
-
-    flowRow.appendChild(eventBadge);
-    flowRow.appendChild(viaSpan);
-    flowRow.appendChild(protoBadge);
-
-    if (step.nextToolId) {
-      var arrow = document.createElement('span');
-      arrow.className = 'demo-card-arrow';
-      arrow.textContent = ' → ';
-      var nextTool = document.createElement('code');
-      nextTool.className = 'demo-card-next';
-      nextTool.textContent = step.nextToolId;
-      flowRow.appendChild(arrow);
-      flowRow.appendChild(nextTool);
-    }
-
-    // ── Output pills row ────────────────────────────────────
-    var pills = extractOutputPills(step.outputData);
-    var outputRow = document.createElement('div');
-    outputRow.className = 'demo-card-output';
-
-    if (pills.length > 0) {
-      var outputLabel = document.createElement('span');
-      outputLabel.className = 'demo-card-label';
-      outputLabel.textContent = lang === 'es' ? 'Resultado:' : 'Output:';
-      outputRow.appendChild(outputLabel);
-      pills.forEach(function (p) {
-        var pill = document.createElement('span');
-        pill.className = 'demo-out-pill' + (p.isWarn ? ' demo-out-pill-warn' : '');
-        pill.innerHTML = '<span class="demo-out-key">' + p.key + '</span><span class="demo-out-val">' + p.val + '</span>';
-        outputRow.appendChild(pill);
+    fetch('/api/v1/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ module: agentCategory, messages: chatHistory })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        chatMsgs.removeChild(thinkingBubble);
+        var reply = (data.message && data.message.content && data.message.content[0] && data.message.content[0].text) || (lang === 'es' ? 'Sin respuesta' : 'No response');
+        chatHistory.push({ role: 'assistant', content: reply });
+        appendChatBubble(reply, 'bot');
+        if (chatSend) chatSend.disabled = false;
+      })
+      .catch(function () {
+        chatMsgs.removeChild(thinkingBubble);
+        appendChatBubble(lang === 'es' ? 'Error al conectar con el agente.' : 'Error connecting to agent.', 'bot');
+        if (chatSend) chatSend.disabled = false;
       });
-    }
-
-    // ── Expand JSON button ──────────────────────────────────
-    var expandBtn = document.createElement('button');
-    expandBtn.className = 'demo-step-expand';
-    expandBtn.textContent = lang === 'es' ? 'Ver evento completo' : 'View full event';
-    expandBtn.title = lang === 'es' ? 'Ver JSON del evento estándar' : 'View standard event JSON';
-
-    var fullJson = document.createElement('pre');
-    fullJson.className = 'demo-step-full-json';
-    fullJson.style.display = 'none';
-    fullJson.textContent = JSON.stringify(step.standardEvent || step.outputData || {}, null, 2);
-
-    expandBtn.addEventListener('click', function () {
-      var isOpen = fullJson.style.display !== 'none';
-      fullJson.style.display = isOpen ? 'none' : 'block';
-      expandBtn.classList.toggle('active', !isOpen);
-      expandBtn.textContent = isOpen
-        ? (lang === 'es' ? 'Ver evento completo' : 'View full event')
-        : (lang === 'es' ? 'Ocultar evento' : 'Hide event');
-    });
-
-    card.appendChild(header);
-    card.appendChild(inputRow);
-    card.appendChild(flowRow);
-    if (pills.length > 0) card.appendChild(outputRow);
-    card.appendChild(expandBtn);
-    card.appendChild(fullJson);
-    demoLog.appendChild(card);
-    demoLog.scrollTop = demoLog.scrollHeight;
   }
 
-  function appendFinal(steps) {
-    var total = steps.reduce(function (s, st) { return s + st.durationMs; }, 0);
-    var warns = steps.filter(function (s) { return s.status === 'warn'; }).length;
-    var oks = steps.length - warns;
-    var row = document.createElement('div');
-    row.className = 'demo-final-card';
-    row.innerHTML = '<span class="demo-final-icon">✓</span>'
-      + '<span class="demo-final-text">'
-      + (lang === 'es' ? 'Ejecución completada' : 'Execution complete')
-      + '</span>'
-      + '<span class="demo-final-pill demo-final-pill-ok">' + oks + (lang === 'es' ? ' ok' : ' ok') + '</span>'
-      + (warns > 0 ? '<span class="demo-final-pill demo-final-pill-warn">⚠ ' + warns + (lang === 'es' ? ' alertas' : ' alerts') + '</span>' : '')
-      + '<span class="demo-final-pill demo-final-pill-dur">' + total + 'ms</span>';
-    demoLog.appendChild(row);
-    demoLog.scrollTop = demoLog.scrollHeight;
+  if (chatSend) {
+    chatSend.addEventListener('click', sendChatMessage);
   }
-
-  if (btnRun) {
-    btnRun.addEventListener('click', function () {
-      btnRun.disabled = true;
-      if (btnRunText) btnRunText.textContent = lang === 'es' ? 'Ejecutando…' : 'Running…';
-      if (demoDot) demoDot.classList.add('active');
-      if (demoStatusText) demoStatusText.textContent = lang === 'es' ? 'En ejecución' : 'Running';
-
-      fetch('/agentes/api/demo/' + agentId)
-        .then(function (r) { return r.json(); })
-        .then(function (steps) {
-          steps.forEach(function (step, i) {
-            setTimeout(function () {
-              appendStep(step);
-              if (i === steps.length - 1) {
-                appendFinal(steps);
-                btnRun.disabled = false;
-                if (btnRunText) btnRunText.textContent = lang === 'es' ? 'Ejecutar Demo' : 'Run Demo';
-                if (demoDot) demoDot.classList.remove('active');
-                if (demoStatusText) demoStatusText.textContent = lang === 'es' ? 'Completado' : 'Completed';
-                if (btnReset) btnReset.style.display = '';
-              }
-            }, i * 650);
-          });
-        })
-        .catch(function (err) {
-          btnRun.disabled = false;
-          console.error(err);
-        });
-    });
-  }
-
-  if (btnReset) {
-    btnReset.addEventListener('click', function () {
-      if (demoLog) demoLog.innerHTML = '';
-      btnReset.style.display = 'none';
-      if (demoDot) demoDot.classList.remove('active');
-      if (demoStatusText) demoStatusText.textContent = lang === 'es' ? 'Listo' : 'Ready';
+  if (chatInput) {
+    chatInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
     });
   }
 

@@ -4,6 +4,7 @@ block head
   script(src="https://d3js.org/d3.v7.min.js")
   script.
     window.AGENT_ID = '!{agent.id}';
+    window.AGENT_CATEGORY = '!{agent.category}';
 
 block content
   .page-header
@@ -150,22 +151,18 @@ block content
     section.agent-section
       h2.section-title
         svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
-          polygon(points="5,3 19,12 5,21 5,3")
-        span(data-es="Ejecutar Demo" data-en="Run Demo") Ejecutar Demo
-      .demo-panel
-        .demo-panel-header
-          p.demo-description(data-es="Simula una ejecución completa del agente." data-en="Simulates a complete agent execution.") Simula una ejecución completa del agente.
-          .demo-controls
-            button#btn-run-demo.btn.btn-primary
-              svg(width="14" height="14" viewBox="0 0 24 24" fill="currentColor")
-                polygon(points="5,3 19,12 5,21 5,3")
-              span#btn-run-demo-text(data-es="Ejecutar Demo" data-en="Run Demo") Ejecutar Demo
-            button#btn-reset-demo.btn.btn-outline(style="display:none")
-              span(data-es="Reiniciar" data-en="Reset") Reiniciar
-        .demo-log-wrap
-          .sim-status
-            .sim-dot#demo-dot
-            span#demo-status-text(data-es="Listo" data-en="Ready") Listo
-          #demo-log.sim-log
+          path(d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z")
+        span(data-es="Consultar Agente" data-en="Ask the Agent") Consultar Agente
+      .agent-chat-panel
+        .agent-chat-messages#agent-chat-msgs
+          .agent-chat-bubble.agent-bubble-bot
+            span(data-es="Hola, soy el especialista en " data-en="Hi, I'm the specialist for ") Hola, soy el especialista en
+            |
+            strong= agent.nameEs
+            span(data-es=". ¿En qué puedo ayudarte?" data-en=". How can I help you?") . ¿En qué puedo ayudarte?
+        .agent-chat-input-row
+          input.agent-chat-input#agent-chat-input(type="text" placeholder="Pregunta algo sobre este agente…" data-placeholder-es="Pregunta algo sobre este agente…" data-placeholder-en="Ask something about this agent…")
+          button.btn.btn-primary#agent-chat-send
+            span(data-es="Enviar" data-en="Send") Enviar
 
   script(src="/public/agents-detail.js" defer)

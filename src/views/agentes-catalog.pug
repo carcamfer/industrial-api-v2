@@ -63,4 +63,14 @@ block content
           .agent-card-cta
             span.btn.btn-sm.btn-primary(data-es="Ver agente →" data-en="View agent →") Ver agente →
 
+  section.agent-section.pres-section
+    h2.section-title
+      svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+        rect(x="2" y="3" width="20" height="14" rx="2")
+        line(x1="8" y1="21" x2="16" y2="21")
+        line(x1="12" y1="17" x2="12" y2="21")
+      span(data-es="¿Qué pueden hacer nuestros agentes?" data-en="What can our agents do?") ¿Qué pueden hacer nuestros agentes?
+    .pres-frame
+      iframe(src="/servicios-software/presentacion" title="Capacidades de Agentes" loading="lazy" allowfullscreen)
+
   script(src="/public/agents-catalog.js" defer)

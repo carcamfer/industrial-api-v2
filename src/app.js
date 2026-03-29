@@ -7,7 +7,6 @@ import eventsRouter from './routes/eventsRoutes.js';
 import dashboardRouter from './routes/dashboardRoutes.js';
 import auditRouter from './routes/auditRoutes.js';
 import isoLandingRouter from './routes/isoLandingRoutes.js';
-import serviciosRouter from './routes/serviciosRoutes.js';
 import chatRouter from './routes/chatRoutes.js';
 import agentesRouter from './routes/agentesRoutes.js';
 
@@ -38,7 +37,9 @@ app.get('/', (req, res) => {
 app.use('/dashboard', dashboardRouter);
 app.use('/audit-report', auditRouter);
 app.use('/integracion-iso', isoLandingRouter);
-app.use('/servicios-software', serviciosRouter);
+app.get('/servicios-software/presentacion', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/presentacion_industrial.html'));
+});
 app.use('/agentes', agentesRouter);
 
 app.use((err, req, res, next) => {

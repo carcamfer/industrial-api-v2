@@ -218,6 +218,34 @@
     demoBody.appendChild(wrap);
   }
 
+  function saveIsoEvent(standardEvent) {
+    if (!standardEvent) return;
+    var events = JSON.parse(localStorage.getItem('iso_events') || '[]');
+    events.unshift({
+      timestamp: standardEvent.timestamp,
+      severity: (standardEvent.event.severity || 'low').toUpperCase(),
+      module_id: standardEvent.module.id,
+      asset_id: standardEvent.asset.asset_id,
+      event_type: standardEvent.event.type,
+      category: standardEvent.event.category,
+      data: standardEvent.data
+    });
+    localStorage.setItem('iso_events', JSON.stringify(events));
+  }
+
+  function renderIsoBanner() {
+    var prev = demoBody.querySelector('.tool-iso-banner');
+    if (prev) prev.remove();
+    var banner = document.createElement('div');
+    banner.className = 'tool-iso-banner';
+    banner.innerHTML =
+      '<span class="tool-iso-banner-check">✓</span>' +
+      '<span>' + t('Evento guardado en ISO Dashboard', 'Event saved to ISO Dashboard') + '</span>' +
+      '<a class="btn btn-sm btn-outline" href="/dashboard">' + t('Ver Dashboard', 'View Dashboard') + ' →</a>' +
+      '<a class="btn btn-sm btn-outline" href="/audit-report">' + t('Ver Reporte', 'View Report') + ' →</a>';
+    demoBody.appendChild(banner);
+  }
+
   btnRun.addEventListener('click', function () {
     btnRun.disabled = true;
     if (btnRunTxt) btnRunTxt.textContent = t('Ejecutando…', 'Running…');
@@ -227,6 +255,8 @@
     // Clear previous result
     var prev = demoBody.querySelector('.tool-demo-result');
     if (prev) prev.remove();
+    var prevBanner = demoBody.querySelector('.tool-iso-banner');
+    if (prevBanner) prevBanner.remove();
     if (demoIdle) demoIdle.style.display = '';
 
     fetch('/agentes/api/demo/tool/' + toolId)
@@ -234,6 +264,8 @@
       .then(function (demo) {
         setTimeout(function () {
           renderResult(demo);
+          saveIsoEvent(demo.standardEvent);
+          renderIsoBanner();
           btnRun.disabled = false;
           if (btnRunTxt) btnRunTxt.textContent = t('Ejecutar Demo', 'Run Demo');
           if (demoDot) demoDot.classList.remove('active');
