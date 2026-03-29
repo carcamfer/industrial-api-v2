@@ -121,36 +121,6 @@ block content
     section.agent-section
       h2.section-title
         svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
-          polyline(points="16,18 22,12 16,6")
-          polyline(points="8,6 2,12 8,18")
-        span(data-es="Esquemas de Herramientas" data-en="Tool Schemas") Esquemas de Herramientas
-      .schema-accordion
-        each tool in allTools
-          .schema-item
-            button.schema-toggle
-              span.schema-toggle-name
-                span.badge(class='badge-' + tool.type.toLowerCase())= tool.type
-                | &nbsp;
-                code= tool.id
-              span.schema-toggle-desc
-                span(data-es=tool.descriptionEs data-en=tool.descriptionEn)= tool.descriptionEs
-              span.schema-chevron ▾
-            .schema-body
-              .schema-split
-                .schema-half
-                  p.schema-label
-                    span(data-es="Entrada (Input)" data-en="Input Schema") Entrada (Input)
-                  pre.schema-pre
-                    code= JSON.stringify(tool.inputSchema, null, 2)
-                .schema-half
-                  p.schema-label
-                    span(data-es="Salida (Output)" data-en="Output Schema") Salida (Output)
-                  pre.schema-pre
-                    code= JSON.stringify(tool.outputSchema, null, 2)
-
-    section.agent-section
-      h2.section-title
-        svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
           path(d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z")
         span(data-es="Consultar Agente" data-en="Ask the Agent") Consultar Agente
       .agent-chat-panel
