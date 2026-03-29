@@ -1150,3 +1150,93 @@ footer a:hover { text-decoration:underline; }
   .page-title { font-size:1.4rem; }
   .metric { font-size:2.2rem; }
 }
+
+/* ── Agent as a Service — Home section ───────────────── */
+.ep-agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ep-agent-card {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+.ep-agent-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139,92,246,.15);
+}
+
+.ep-agent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .75rem;
+}
+
+.ep-agent-icon { font-size: 1.5rem; line-height: 1; }
+
+.ep-agent-badge {
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  padding: .18rem .45rem;
+  border-radius: 4px;
+}
+.ep-badge-cloud  { background:rgba(59,130,246,.15);  color:#60a5fa; border:1px solid rgba(59,130,246,.3); }
+.ep-badge-edge   { background:rgba(16,185,129,.15);  color:#34d399; border:1px solid rgba(16,185,129,.3); }
+.ep-badge-hybrid { background:rgba(139,92,246,.15);  color:#a78bfa; border:1px solid rgba(139,92,246,.3); }
+
+.ep-agent-name {
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 .4rem;
+}
+.ep-agent-desc {
+  font-size: .78rem;
+  color: var(--text-3);
+  line-height: 1.5;
+  margin: 0 0 .75rem;
+}
+.ep-agent-tools {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--primary-light);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.ep-aaas-cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.ep-section-divider {
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding-top: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.ep-section-note {
+  font-size: .75rem;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+@media (max-width:640px) {
+  .ep-agents-grid { grid-template-columns: 1fr; }
+  .ep-aaas-cta { flex-direction: column; align-items: stretch; }
+}

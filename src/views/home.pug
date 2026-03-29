@@ -66,32 +66,32 @@ block content
       .ep-ticker
         span(data-es="Conectando talento e industria" data-en="Connecting talent and industry") Conectando talento e industria
         span.sep /
-        span(data-es="Ideas que transforman" data-en="Ideas that transform") Ideas que transforman
+        span Agent as a Service
         span.sep /
-        span(data-es="Tecnología con impacto" data-en="Technology with impact") Tecnología con impacto
+        span(data-es="7 agentes · 63 herramientas" data-en="7 agents · 63 tools") 7 agentes · 63 herramientas
         span.sep /
-        span(data-es="Impulsa tu visión" data-en="Drive your vision") Impulsa tu visión
+        span(data-es="Cloud + Edge + Hybrid" data-en="Cloud + Edge + Hybrid") Cloud + Edge + Hybrid
         span.sep /
-        span(data-es="Pensar en grande, programar mejor" data-en="Think big, code better") Pensar en grande, programar mejor
+        span(data-es="Industria 4.0 en tiempo real" data-en="Industry 4.0 in real time") Industria 4.0 en tiempo real
         span.sep /
-        span(data-es="Ecosistemas que inspiran" data-en="Inspiring ecosystems") Ecosistemas que inspiran
+        span(data-es="Agentes que aprenden tu operación" data-en="Agents that learn your operation") Agentes que aprenden tu operación
         span.sep /
         span Hackatón CTRL+HACK 2.0
         span.sep /
-        span(data-es="Soluciones para el futuro" data-en="Solutions for the future") Soluciones para el futuro
+        span(data-es="No software — inteligencia industrial" data-en="Not software — industrial intelligence") No software — inteligencia industrial
         span.sep /
         //- duplicate for infinite loop
         span(data-es="Conectando talento e industria" data-en="Connecting talent and industry") Conectando talento e industria
         span.sep /
-        span(data-es="Ideas que transforman" data-en="Ideas that transform") Ideas que transforman
+        span Agent as a Service
         span.sep /
-        span(data-es="Tecnología con impacto" data-en="Technology with impact") Tecnología con impacto
+        span(data-es="7 agentes · 63 herramientas" data-en="7 agents · 63 tools") 7 agentes · 63 herramientas
         span.sep /
-        span(data-es="Impulsa tu visión" data-en="Drive your vision") Impulsa tu visión
+        span(data-es="Cloud + Edge + Hybrid" data-en="Cloud + Edge + Hybrid") Cloud + Edge + Hybrid
         span.sep /
-        span(data-es="Pensar en grande, programar mejor" data-en="Think big, code better") Pensar en grande, programar mejor
+        span(data-es="Industria 4.0 en tiempo real" data-en="Industry 4.0 in real time") Industria 4.0 en tiempo real
         span.sep /
-        span(data-es="Mentes brillantes" data-en="Brilliant minds") Mentes brillantes
+        span(data-es="Agentes que aprenden tu operación" data-en="Agents that learn your operation") Agentes que aprenden tu operación
         span.sep /
 
     //- ── ASÍ SE VIVIÓ 2025 (SOBRE EL EVENTO) ───────────────────────
@@ -176,13 +176,77 @@ block content
             button.ep-carousel-btn.ep-carousel-btn-prev(onclick="carouselPrev('hackaton')") &#8249;
             button.ep-carousel-btn.ep-carousel-btn-next(onclick="carouselNext('hackaton')") &#8250;
 
-    //- ── SERVICIOS DE SOFTWARE (cards del Express) ──────────────────
+    //- ── AGENT AS A SERVICE ─────────────────────────────────────────
     section.ep-section.ep-section-alt#plataforma
       .ep-section-inner
         .ep-section-head
-          p.ep-section-badge(data-es="SERVICIOS DE SOFTWARE" data-en="SOFTWARE SERVICES") SERVICIOS DE SOFTWARE
-          h2.ep-section-title(data-es="Sistema industrial en tiempo real" data-en="Real-time Industrial System") Sistema industrial en tiempo real
-          p.ep-section-subdesc(data-es="Monitorea, audita y controla desde una sola plataforma. Todas las herramientas del ecosistema CTRLHACK en tu pantalla." data-en="Monitor, audit and control from a single platform. All CTRLHACK ecosystem tools on your screen.") Monitorea, audita y controla desde una sola plataforma. Todas las herramientas del ecosistema CTRLHACK en tu pantalla.
+          p.ep-section-badge(data-es="AGENT AS A SERVICE" data-en="AGENT AS A SERVICE") AGENT AS A SERVICE
+          h2.ep-section-title(data-es="Agentes industriales que trabajan por ti" data-en="Industrial agents that work for you") Agentes industriales que trabajan por ti
+          p.ep-section-subdesc(data-es="No vendemos software — desplegamos agentes especializados que aprenden tu operación, detectan anomalías y toman acción. 7 agentes, 63 herramientas industriales." data-en="We don't sell software — we deploy specialized agents that learn your operation, detect anomalies and take action. 7 agents, 63 industrial tools.") No vendemos software — desplegamos agentes especializados que aprenden tu operación, detectan anomalías y toman acción. 7 agentes, 63 herramientas industriales.
+
+        .ep-agents-grid
+          a.ep-agent-card(href="http://localhost:3001/agents/erp-gestion-empresarial" target="_blank")
+            .ep-agent-header
+              span.ep-agent-icon 🧩
+              span.ep-agent-badge.ep-badge-cloud Cloud
+            p.ep-agent-name(data-es="ERP & Gestión Empresarial" data-en="ERP & Business Management") ERP & Gestión Empresarial
+            p.ep-agent-desc(data-es="Inventario, compras, finanzas y ventas automatizadas con IA." data-en="Inventory, purchasing, finance and sales automated with AI.") Inventario, compras, finanzas y ventas automatizadas con IA.
+            span.ep-agent-tools 24 tools
+          a.ep-agent-card(href="http://localhost:3001/agents/ciberseguridad-industrial" target="_blank")
+            .ep-agent-header
+              span.ep-agent-icon 🔐
+              span.ep-agent-badge.ep-badge-hybrid Hybrid
+            p.ep-agent-name(data-es="Ciberseguridad Industrial" data-en="Industrial Cybersecurity") Ciberseguridad Industrial
+            p.ep-agent-desc(data-es="Protege redes OT/IT con detección de anomalías y bloqueo en tiempo real." data-en="Protects OT/IT networks with anomaly detection and real-time blocking.") Protege redes OT/IT con detección de anomalías y bloqueo en tiempo real.
+            span.ep-agent-tools 11 tools
+          a.ep-agent-card(href="http://localhost:3001/agents/vision-artificial-industrial" target="_blank")
+            .ep-agent-header
+              span.ep-agent-icon 👁
+              span.ep-agent-badge.ep-badge-hybrid Hybrid
+            p.ep-agent-name(data-es="Visión Artificial Industrial" data-en="Industrial Vision") Visión Artificial Industrial
+            p.ep-agent-desc(data-es="Inspección de calidad, conteo en línea y seguridad laboral con visión por computadora." data-en="Quality inspection, line counting and workplace safety with computer vision.") Inspección de calidad, conteo en línea y seguridad laboral con visión por computadora.
+            span.ep-agent-tools 8 tools
+          a.ep-agent-card(href="http://localhost:3001/agents/ai-ml-industrial" target="_blank")
+            .ep-agent-header
+              span.ep-agent-icon 🤖
+              span.ep-agent-badge.ep-badge-hybrid Hybrid
+            p.ep-agent-name(data-es="AI & Machine Learning Industrial" data-en="Industrial AI & ML") AI & Machine Learning Industrial
+            p.ep-agent-desc(data-es="Predicción de fallas, optimización de secuencias y detección de desviaciones con ML." data-en="Failure prediction, sequence optimization and deviation detection with ML.") Predicción de fallas, optimización de secuencias y detección de desviaciones con ML.
+            span.ep-agent-tools 12 tools
+          a.ep-agent-card(href="http://localhost:3001/agents/infraestructura-edge" target="_blank")
+            .ep-agent-header
+              span.ep-agent-icon 🏗
+              span.ep-agent-badge.ep-badge-hybrid Hybrid
+            p.ep-agent-name(data-es="Infraestructura & Edge" data-en="Infrastructure & Edge") Infraestructura & Edge
+            p.ep-agent-desc(data-es="Orquesta nodos edge, digitaliza señales analógicas y gestiona dispositivos industriales." data-en="Orchestrates edge nodes, digitizes analog signals and manages industrial devices.") Orquesta nodos edge, digitaliza señales analógicas y gestiona dispositivos industriales.
+            span.ep-agent-tools 10 tools
+          a.ep-agent-card(href="http://localhost:3001/agents/produccion-avanzada" target="_blank")
+            .ep-agent-header
+              span.ep-agent-icon 🏭
+              span.ep-agent-badge.ep-badge-hybrid Hybrid
+            p.ep-agent-name(data-es="Producción Avanzada" data-en="Advanced Production") Producción Avanzada
+            p.ep-agent-desc(data-es="Optimiza flujos productivos, detecta tiempos muertos y ajusta parámetros en tiempo real." data-en="Optimizes production flows, detects idle times and adjusts parameters in real time.") Optimiza flujos productivos, detecta tiempos muertos y ajusta parámetros en tiempo real.
+            span.ep-agent-tools 8 tools
+          a.ep-agent-card(href="http://localhost:3001/agents/digital-twin" target="_blank")
+            .ep-agent-header
+              span.ep-agent-icon 🧠
+              span.ep-agent-badge.ep-badge-cloud Cloud
+            p.ep-agent-name(data-es="Digital Twin" data-en="Digital Twin") Digital Twin
+            p.ep-agent-desc(data-es="Genera gemelos digitales, simula operaciones y optimiza el rendimiento con datos en tiempo real." data-en="Generates digital twins, simulates operations and optimizes performance with real-time data.") Genera gemelos digitales, simula operaciones y optimiza el rendimiento con datos en tiempo real.
+            span.ep-agent-tools 4 tools
+
+        .ep-aaas-cta
+          a.btn.btn-primary(href="http://localhost:3001" target="_blank")
+            span(data-es="Explorar todos los agentes" data-en="Explore all agents") Explorar todos los agentes
+            svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+              line(x1="5" y1="12" x2="19" y2="12")
+              polyline(points="12,5 19,12 12,19")
+          a.btn.btn-outline(href="/servicios-software")
+            span(data-es="Ver capacidades" data-en="View capabilities") Ver capacidades
+
+        .ep-section-divider
+          p.ep-section-note(data-es="También incluimos:" data-en="Also included:") También incluimos:
+
         .ep-features-grid
           a.ep-feat(href="/integracion-iso")
             .ep-feat-icon.ep-feat-icon-green
@@ -202,10 +266,10 @@ block content
               svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF5722" stroke-width="2")
                 polyline(points="16,18 22,12 16,6")
                 polyline(points="8,6 2,12 8,18")
-            .ep-feat-title(data-es="Softwares" data-en="Software") Softwares
-            p.ep-feat-desc(data-es="28+ módulos, arquitectura modular, ecosistema conectado." data-en="28+ modules, modular architecture, connected ecosystem.") 28+ módulos, arquitectura modular, ecosistema conectado.
+            .ep-feat-title(data-es="Capacidades" data-en="Capabilities") Capacidades
+            p.ep-feat-desc(data-es="63 herramientas que nuestros agentes dominan, en 7 categorías industriales." data-en="63 tools our agents master, across 7 industrial categories.") 63 herramientas que nuestros agentes dominan, en 7 categorías industriales.
             span.ep-feat-link
-              span(data-es="Ver softwares" data-en="View software") Ver softwares
+              span(data-es="Ver capacidades" data-en="View capabilities") Ver capacidades
               svg(width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
                 line(x1="5" y1="12" x2="19" y2="12")
                 polyline(points="12,5 19,12 12,19")
