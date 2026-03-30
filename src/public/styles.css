@@ -770,6 +770,15 @@ code {
 .log-severity-LOW      { color:var(--green-light); }
 .log-asset { color:var(--text-2); }
 
+/* ─── Demo Industrial (catalog) ─────────────────────── */
+.demo-controls { margin-bottom:1rem; }
+.demo-results {
+  background:rgba(0,0,0,.3);
+  border:1px solid var(--border-dim);
+  border-radius:var(--radius);
+  padding:1.25rem;
+}
+
 /* ─── ISO Integration Landing ───────────────────────── */
 .iso-tabs {
   display:flex;

@@ -63,6 +63,115 @@ block content
           .agent-card-cta
             span.btn.btn-sm.btn-primary(data-es="Ver agente →" data-en="View agent →") Ver agente →
 
+  section.agent-section#demo-section
+    h2.section-title
+      svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+        polygon(points="13,2 3,14 12,14 11,22 21,10 12,10 13,2")
+      span(data-es="Demo Industrial" data-en="Industrial Demo") Demo Industrial
+    p(style="color:var(--text-2);font-size:.9rem;margin-bottom:1.5rem;" data-es="Ejecuta 10 herramientas industriales y genera alarmas reales de distintos niveles de severidad para verlas en el reporte ISO." data-en="Run 10 industrial tools and generate real alarms at different severity levels to view them in the ISO report.") Ejecuta 10 herramientas industriales y genera alarmas reales de distintos niveles de severidad para verlas en el reporte ISO.
+    .demo-controls
+      button.btn.btn-primary#btn-run-demo
+        svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+          polygon(points="5,3 19,12 5,21 5,3")
+        span(data-es=" Ejecutar Demo" data-en=" Run Demo") &nbsp;Ejecutar Demo
+    .demo-results#demo-results(style="display:none")
+      .demo-summary#demo-summary
+      .sim-log#demo-log(style="margin-top:1rem")
+      .demo-cta#demo-cta(style="margin-top:1.5rem;display:flex;gap:.75rem;flex-wrap:wrap")
+        a.btn.btn-primary(href="/integracion-iso" target="_blank")
+          span(data-es="Ver en Reporte ISO" data-en="View in ISO Report") Ver en Reporte ISO
+          svg(width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+            line(x1="5" y1="12" x2="19" y2="12")
+            polyline(points="12,5 19,12 12,19")
+        a.btn.btn-outline(href="/dashboard" target="_blank")
+          span(data-es="Ver Dashboard" data-en="View Dashboard") Ver Dashboard
+
+  script.
+    (function() {
+      var STORAGE_KEY = 'iso_session_start';
+      var EVENTS_KEY  = 'iso_events';
+
+      var DEMO_EVENTS = [
+        { module_id:'safety',      asset_id:'robot-01',     severity:'CRITICAL', event_type:'ALARM',   data:{value:91.2, incident_type:'equipment_contact', zone:'Zone-A'} },
+        { module_id:'vision',      asset_id:'conveyor-01',  severity:'CRITICAL', event_type:'ALARM',   data:{value:114.3, defect_rate:12.1, unit:'celsius'} },
+        { module_id:'maintenance', asset_id:'press-01',     severity:'CRITICAL', event_type:'ALARM',   data:{value:9.1, hours_since_maintenance:4700, oil_pressure:11.2} },
+        { module_id:'energy',      asset_id:'hvac-01',      severity:'HIGH',     event_type:'ALARM',   data:{value:391.5, power_factor:0.63, peak_demand:true} },
+        { module_id:'quality',     asset_id:'robot-01',     severity:'HIGH',     event_type:'ALARM',   data:{value:52.3, reject_count:13, batch_id:'BATCH-DEMO-001'} },
+        { module_id:'environment', asset_id:'sensor-env-01',severity:'HIGH',     event_type:'ALARM',   data:{value:1520.0, temperature:34.1, humidity:78.0, unit:'ppm_CO2'} },
+        { module_id:'maintenance', asset_id:'robot-02',     severity:'MEDIUM',   event_type:'WARNING', data:{value:4.8, hours_since_maintenance:2300, oil_pressure:44.0} },
+        { module_id:'energy',      asset_id:'press-01',     severity:'MEDIUM',   event_type:'WARNING', data:{value:295.0, power_factor:0.71, peak_demand:false} },
+        { module_id:'quality',     asset_id:'conveyor-01',  severity:'LOW',      event_type:'INFO',    data:{value:88.5, reject_count:2, batch_id:'BATCH-DEMO-002'} },
+        { module_id:'vision',      asset_id:'robot-02',     severity:'LOW',      event_type:'INFO',    data:{value:65.0, defect_rate:1.3, unit:'celsius'} },
+      ];
+
+      var TOOL_NAMES = {
+        safety:      'safety_zone_monitor',
+        vision:      'vision_defect_inspector',
+        maintenance: 'predictive_maintenance_scan',
+        energy:      'energy_consumption_tracker',
+        quality:     'quality_score_evaluator',
+        environment: 'env_emission_monitor',
+      };
+
+      var btn  = document.getElementById('btn-run-demo');
+      var results = document.getElementById('demo-results');
+      var log  = document.getElementById('demo-log');
+      var summary = document.getElementById('demo-summary');
+
+      btn.addEventListener('click', function() {
+        btn.disabled = true;
+        btn.textContent = '⚙ Ejecutando…';
+        log.innerHTML = '';
+        summary.innerHTML = '';
+
+        var ts = Date.now();
+        localStorage.setItem(STORAGE_KEY, ts);
+        localStorage.setItem(EVENTS_KEY, '[]');
+
+        var counts = { CRITICAL:0, HIGH:0, MEDIUM:0, LOW:0 };
+        var delay = 0;
+
+        DEMO_EVENTS.forEach(function(tpl, i) {
+          setTimeout(function() {
+            var ev = Object.assign({}, tpl, {
+              event_id:  'demo-' + ts + '-' + i,
+              timestamp: new Date().toISOString(),
+              plant_id:  'PLT-01',
+            });
+            var events = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
+            events.unshift(ev);
+            localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+            counts[ev.severity]++;
+
+            var entry = document.createElement('div');
+            entry.className = 'log-entry';
+            var t = new Date().toLocaleTimeString('es-MX');
+            entry.innerHTML =
+              '<span class="log-time">' + t + '</span>' +
+              '<span class="log-module">' + (TOOL_NAMES[ev.module_id] || ev.module_id) + '</span>' +
+              '<span class="log-severity-' + ev.severity + '">' + ev.severity + '</span>' +
+              '&nbsp;&nbsp;<span class="log-asset">' + ev.asset_id + ' · ' + ev.event_type + '</span>';
+            log.insertBefore(entry, log.firstChild);
+
+            if (i === DEMO_EVENTS.length - 1) {
+              summary.innerHTML =
+                '<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem">' +
+                '<span class="badge badge-critical">🔴 ' + counts.CRITICAL + ' Críticas</span>' +
+                '<span class="badge badge-high">🟡 ' + counts.HIGH + ' Altas</span>' +
+                '<span class="badge badge-medium">🔵 ' + counts.MEDIUM + ' Medias</span>' +
+                '<span class="badge badge-low">🟢 ' + counts.LOW + ' Bajas</span>' +
+                '</div>' +
+                '<p style="color:var(--text-2);font-size:.85rem">10 herramientas ejecutadas · Eventos guardados en sesión</p>';
+              btn.textContent = '✓ Demo ejecutado';
+            }
+          }, delay);
+          delay += 180;
+        });
+
+        results.style.display = 'block';
+      });
+    })();
+
   section.agent-section.pres-section
     h2.section-title
       svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
