@@ -227,10 +227,19 @@ block content
           .ep-hack-img-col
             img.ep-hack-bases-img(src="/public/img/hack-bases.jpg" alt="Bases del concurso CTRL+HACK 2.0" loading="lazy")
           .ep-hack-cta-col
-            a.btn.btn-primary(href="https://1drv.ms/b/c/5f57c3e18a2a9e37/IQBpx0aXGTRLTp0L4XpCgRmsAQiPNf8vS9mhFSbZZd1nksM" target="_blank")
-              svg(width="16" height="16" viewBox="0 0 384 512" fill="currentColor")
-                path(d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z")
-              span(data-es="Consultar Bases" data-en="View Rules") Consultar Bases
+            .ep-hack-docs
+              a.ep-hack-doc-btn(href="/public/docs/BASES-CTRLHACK-2.0.pdf" target="_blank")
+                svg(width="15" height="15" viewBox="0 0 384 512" fill="currentColor")
+                  path(d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z")
+                span(data-es="Bases Oficiales" data-en="Official Rules") Bases Oficiales
+              a.ep-hack-doc-btn(href="/public/docs/RUBRICA-EVALUACION.pdf" target="_blank")
+                svg(width="15" height="15" viewBox="0 0 384 512" fill="currentColor")
+                  path(d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z")
+                span(data-es="Rúbrica de Evaluación" data-en="Scoring Rubric") Rúbrica de Evaluación
+              a.ep-hack-doc-btn(href="/public/docs/INDUSTRIAL-EVENT-STANDARD.pdf" target="_blank")
+                svg(width="15" height="15" viewBox="0 0 384 512" fill="currentColor")
+                  path(d="M369.9 97.9L286 14C277 5 264.8-.1 252.1-.1H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V131.9c0-12.7-5.1-25-14.1-34zM332.1 128H256V51.9l76.1 76.1zM48 464V48h160v104c0 13.3 10.7 24 24 24h104v288H48z")
+                span(data-es="Estándar de Eventos" data-en="Event Standard") Estándar de Eventos
           .ep-hack-prizes-col
             p.ep-hack-col-label(data-es="Premios" data-en="Prizes") Premios
             .ep-prizes
@@ -471,6 +480,9 @@ block content
     .ep-hack-col-label { font-size: .7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--primary-light); margin-bottom: .9rem; }
     .ep-hack-img-col { display: flex; flex-direction: column; }
     .ep-hack-cta-col { display: flex; align-items: center; justify-content: center; }
+    .ep-hack-docs { display: flex; flex-direction: column; gap: .6rem; }
+    .ep-hack-doc-btn { display: inline-flex; align-items: center; gap: .55rem; padding: .55rem 1.1rem; border-radius: var(--radius); background: rgba(118,77,240,.12); border: 1px solid rgba(118,77,240,.35); color: var(--primary-light); font-size: .82rem; font-weight: 600; text-decoration: none; transition: background .2s, border-color .2s; white-space: nowrap; }
+    .ep-hack-doc-btn:hover { background: rgba(118,77,240,.25); border-color: rgba(118,77,240,.65); }
     .ep-hack-prizes-col { display: flex; flex-direction: column; align-items: center; }
     .ep-hack-bases-img { width: 100%; max-width: 260px; border-radius: var(--radius-lg); border: 1px solid var(--border-dim); display: block; }
     @media (max-width: 640px) { .ep-hack-layout { grid-template-columns: 1fr; } }
