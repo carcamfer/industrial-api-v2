@@ -41,14 +41,15 @@
         return { source: r.sourceToolId, target: r.targetToolId, event: r.event, protocol: r.protocol };
       });
 
-      var w = graphEl.clientWidth || 700;
-      var h = 420;
-
+      // ── (A) SVG responsive con viewBox ──────────────────
+      var W = 700, H = 420;
       var svg = d3.select('#agent-graph')
         .append('svg')
-        .attr('width', w)
-        .attr('height', h);
+        .attr('viewBox', '0 0 ' + W + ' ' + H)
+        .attr('preserveAspectRatio', 'xMidYMid meet')
+        .attr('width', '100%');
 
+      // ── (B) Arrowhead marker ─────────────────────────────
       svg.append('defs').append('marker')
         .attr('id', 'arrowhead')
         .attr('viewBox', '-0 -5 10 10')
@@ -61,34 +62,80 @@
         .attr('d', 'M 0,-5 L 10,0 L 0,5')
         .attr('fill', 'rgba(139,92,246,.7)');
 
+      // ── (C) BFS layered layout ───────────────────────────
+      var inDeg = {}, succ = {};
+      nodes.forEach(function (n) { inDeg[n.id] = 0; succ[n.id] = []; });
+      links.forEach(function (l) {
+        var s = l.source.id || l.source, t = l.target.id || l.target;
+        inDeg[t] = (inDeg[t] || 0) + 1;
+        if (succ[s]) succ[s].push(t);
+      });
+
+      var lvl = {}, visits = {};
+      nodes.forEach(function (n) { lvl[n.id] = 0; visits[n.id] = 0; });
+
+      var q = nodes.filter(function (n) { return inDeg[n.id] === 0; }).map(function (n) { return n.id; });
+      if (q.length === 0) nodes.forEach(function (n) { q.push(n.id); });
+
+      var qi = 0;
+      while (qi < q.length) {
+        var cur = q[qi++];
+        visits[cur] = (visits[cur] || 0) + 1;
+        if (visits[cur] > nodes.length) continue;
+        (succ[cur] || []).forEach(function (sid) {
+          if (lvl[cur] + 1 > lvl[sid]) { lvl[sid] = lvl[cur] + 1; q.push(sid); }
+        });
+      }
+
+      var maxLvl = 0;
+      nodes.forEach(function (n) { if (lvl[n.id] > maxLvl) maxLvl = lvl[n.id]; });
+
+      var cols = {};
+      nodes.forEach(function (n) {
+        var c = lvl[n.id];
+        if (!cols[c]) cols[c] = [];
+        cols[c].push(n);
+      });
+
+      var padX = 60, padY = 50;
+      var colStep = maxLvl > 0 ? (W - 2 * padX) / maxLvl : 0;
+      Object.keys(cols).forEach(function (c) {
+        cols[c].forEach(function (n, i) {
+          n.x = padX + Number(c) * colStep;
+          n.y = padY + (i + 0.5) * (H - 2 * padY) / cols[c].length;
+        });
+      });
+
+      // ── (D) Resolver IDs a objetos ───────────────────────
+      var byId = {};
+      nodes.forEach(function (n) { byId[n.id] = n; });
+      var rLinks = links.map(function (l) {
+        return { source: byId[l.source.id || l.source], target: byId[l.target.id || l.target], event: l.event };
+      }).filter(function (l) { return l.source && l.target; });
+
+      // ── (E) Render estático ──────────────────────────────
       var g = svg.append('g');
 
-      var simulation = d3.forceSimulation(nodes)
-        .force('link', d3.forceLink(links).id(function (d) { return d.id; }).distance(160))
-        .force('charge', d3.forceManyBody().strength(-400))
-        .force('center', d3.forceCenter(w / 2, h / 2))
-        .force('collision', d3.forceCollide().radius(50))
-        .alphaDecay(0.05);
-
-      var link = g.append('g').selectAll('line')
-        .data(links)
-        .enter().append('line')
+      g.append('g').selectAll('line').data(rLinks).enter().append('line')
         .attr('class', 'graph-link')
-        .attr('marker-end', 'url(#arrowhead)');
+        .attr('marker-end', 'url(#arrowhead)')
+        .attr('x1', function (d) { return d.source.x; })
+        .attr('y1', function (d) { return d.source.y; })
+        .attr('x2', function (d) { return d.target.x; })
+        .attr('y2', function (d) { return d.target.y; });
 
-      var linkLabel = g.append('g').selectAll('text')
-        .data(links)
-        .enter().append('text')
+      g.append('g').selectAll('text').data(rLinks).enter().append('text')
         .attr('class', 'graph-link-label')
+        .attr('x', function (d) { return (d.source.x + d.target.x) / 2; })
+        .attr('y', function (d) { return (d.source.y + d.target.y) / 2 - 6; })
         .text(function (d) {
           var t = d.event || '';
           return t.length > 20 ? t.slice(0, 18) + '…' : t;
         });
 
-      var nodeGroup = g.append('g').selectAll('g')
-        .data(nodes)
-        .enter().append('g')
+      var nodeGroup = g.append('g').selectAll('g').data(nodes).enter().append('g')
         .attr('class', 'graph-node-group')
+        .attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; })
         .on('click', function (event, d) {
           window.location.href = '/agentes/tools/' + d.id;
         });
@@ -125,20 +172,6 @@
         .on('mouseleave', function () {
           tooltip.style('display', 'none');
         });
-
-      simulation.on('tick', function () {
-        link
-          .attr('x1', function (d) { return d.source.x; })
-          .attr('y1', function (d) { return d.source.y; })
-          .attr('x2', function (d) { return d.target.x; })
-          .attr('y2', function (d) { return d.target.y; });
-
-        linkLabel
-          .attr('x', function (d) { return (d.source.x + d.target.x) / 2; })
-          .attr('y', function (d) { return (d.source.y + d.target.y) / 2 - 6; });
-
-        nodeGroup.attr('transform', function (d) { return 'translate(' + d.x + ',' + d.y + ')'; });
-      });
     }).catch(function (err) {
       graphEl.innerHTML = '<p style="color:var(--text-3);padding:2rem;text-align:center;">No se pudo cargar el grafo.</p>';
       console.error(err);
