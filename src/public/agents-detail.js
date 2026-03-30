@@ -63,15 +63,12 @@
 
       var g = svg.append('g');
 
-      svg.call(d3.zoom().scaleExtent([0.3, 3]).on('zoom', function (event) {
-        g.attr('transform', event.transform);
-      }));
-
       var simulation = d3.forceSimulation(nodes)
         .force('link', d3.forceLink(links).id(function (d) { return d.id; }).distance(160))
         .force('charge', d3.forceManyBody().strength(-400))
         .force('center', d3.forceCenter(w / 2, h / 2))
-        .force('collision', d3.forceCollide().radius(50));
+        .force('collision', d3.forceCollide().radius(50))
+        .alphaDecay(0.05);
 
       var link = g.append('g').selectAll('line')
         .data(links)
@@ -92,17 +89,6 @@
         .data(nodes)
         .enter().append('g')
         .attr('class', 'graph-node-group')
-        .call(d3.drag()
-          .on('start', function (event, d) {
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x; d.fy = d.y;
-          })
-          .on('drag', function (event, d) { d.fx = event.x; d.fy = event.y; })
-          .on('end', function (event, d) {
-            if (!event.active) simulation.alphaTarget(0);
-            d.fx = null; d.fy = null;
-          })
-        )
         .on('click', function (event, d) {
           window.location.href = '/agentes/tools/' + d.id;
         });
