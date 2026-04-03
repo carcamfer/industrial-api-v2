@@ -2358,3 +2358,62 @@ footer a:hover { text-decoration:underline; }
   border:1px solid rgba(118,77,240,.3);
   box-shadow:0 0 40px rgba(118,77,240,.15);
 }
+
+/* ── Dev Spec — Guía de Implementación ──────────────────── */
+.dev-spec-section { margin-top: 0; }
+
+.dev-spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 768px) {
+  .dev-spec-grid { grid-template-columns: 1fr; }
+}
+
+.dev-spec-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: .6rem;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  transition: border-color .2s;
+}
+.dev-spec-card:hover { border-color: rgba(118,77,240,.4); }
+
+.dev-spec-card-header {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.dev-spec-icon {
+  display: flex;
+  align-items: center;
+  opacity: .55;
+}
+.dev-spec-label {
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+.dev-spec-body {
+  font-size: .875rem;
+  color: var(--text-1);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Color accent por tarjeta */
+.dev-spec-input  { border-left: 3px solid rgba(118,77,240,.5); }
+.dev-spec-calc   { border-left: 3px solid rgba(255,87,34,.5); }
+.dev-spec-output { border-left: 3px solid rgba(0,200,150,.4); }
+.dev-spec-ui     { border-left: 3px solid rgba(30,160,255,.4); }
+
+.dev-spec-input  .dev-spec-label { color: rgba(149,107,255,.9); }
+.dev-spec-calc   .dev-spec-label { color: rgba(255,120,60,.9); }
+.dev-spec-output .dev-spec-label { color: rgba(0,200,150,.9); }
+.dev-spec-ui     .dev-spec-label { color: rgba(30,180,255,.9); }

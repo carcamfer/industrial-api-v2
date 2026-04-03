@@ -1,0 +1,541 @@
+[
+  {
+    "id": "get_inventory_status",
+    "whyInput": "Se necesita warehouseId para consultar solo el almacén correcto en sistemas multi-planta. skuIds permite filtrar los artículos de interés (si se omite, devuelve todo el inventario). includeAlerts activa la comparación contra mínimos de stock para que el agente actúe solo cuando hay riesgo real de ruptura.",
+    "calculations": "Consultar la base de datos de inventario filtrando por warehouseId y opcionalmente por skuIds. Para cada SKU, comparar quantity contra minStock y generar el flag alert. Contar el total de alertas activas. Registrar el timestamp de la consulta para trazabilidad.",
+    "whyOutput": "items permite al agente iterar sobre cada SKU y decidir si lanzar una orden de compra. totalAlerts es el KPI que dispara alertas al equipo de compras. timestamp permite verificar que los datos son recientes antes de tomar decisiones.",
+    "uiSuggestion": "Tabla de inventario con columnas SKU, Cantidad, Mínimo y semáforo (rojo/amarillo/verde) en la columna Alerta. Badge contador con el total de alertas activas en la cabecera. Botón de acción rápida por fila para lanzar orden de compra."
+  },
+  {
+    "id": "predict_demand",
+    "whyInput": "skuId identifica el producto específico a predecir (cada SKU tiene su propio patrón de consumo). horizonDays define el alcance temporal: 30 días para reorden semanal, 90 para planificación mensual. includeSeasonality activa factores como temporada alta, picos navideños o ciclos industriales que mejoran la precisión del modelo.",
+    "calculations": "Aplicar un modelo de series temporales (ARIMA, Prophet o LSTM según disponibilidad de datos históricos) sobre el historial de ventas/consumo del SKU. Si includeSeasonality=true, multiplicar por el factor estacional calculado con descomposición STL. Calcular el intervalo de confianza al 95% para gestión de riesgo.",
+    "whyOutput": "predictedUnits es la cantidad que el agente usará para calcular la orden de compra óptima. confidenceInterval permite al agente ser más conservador (usar el valor high) o más agresivo (usar low) según la política de inventario. seasonalityFactor sirve para explicar al operador por qué la demanda varía.",
+    "uiSuggestion": "Gráfica de línea temporal con la predicción central y banda sombreada del intervalo de confianza. Eje X con fechas del horizonte, eje Y con unidades. Chip de seasonalityFactor con ícono de calendario y color según la magnitud del factor estacional."
+  },
+  {
+    "id": "optimize_stock_levels",
+    "whyInput": "skuId para identificar el artículo a optimizar. leadTimeDays es crítico: es el tiempo que tarda el proveedor en entregar y define cuándo hacer el pedido. holdingCostPercent es el costo anual de mantener una unidad en bodega (típicamente 20-30% del valor), necesario para calcular el lote económico.",
+    "calculations": "Usar la fórmula EOQ (Economic Order Quantity): EOQ = √(2DS/H) donde D=demanda anual, S=costo de orden, H=costo de holding. Calcular el Punto de Reorden = (demanda diaria promedio × leadTimeDays) + stock de seguridad. El stock de seguridad = Z × σ × √leadTimeDays donde Z es el nivel de servicio deseado.",
+    "whyOutput": "recommendedMinStock es el stock mínimo a mantener para no romper servicio, usado como umbral de alerta. reorderPoint es el momento exacto de lanzar la compra (cuando el stock llega a ese nivel). economicOrderQty es la cantidad óptima a pedir para minimizar costos totales de inventario.",
+    "uiSuggestion": "Tarjeta con tres gauges circulares: Stock Mínimo, Punto de Reorden y EOQ. Línea de tiempo horizontal mostrando el ciclo de inventario (consumo → reorden → recepción). Indicador de ahorro estimado vs política actual."
+  },
+  {
+    "id": "recommend_purchase_orders",
+    "whyInput": "warehouseId para obtener el inventario actual y las predicciones de demanda de ese almacén específico. maxBudget es la restricción financiera del período — el agente no puede superar este límite al generar órdenes, priorizando los SKUs más críticos si el presupuesto es limitado.",
+    "calculations": "Para cada SKU con stock bajo el punto de reorden: calcular la cantidad a pedir (EOQ o diferencia hasta stock máximo). Estimar el costo por proveedor. Ordenar por criticidad (días hasta ruptura). Seleccionar SKUs hasta agotar maxBudget usando un algoritmo greedy por criticidad/costo.",
+    "whyOutput": "orders es la lista ejecutable de compras que el agente puede convertir directamente en órdenes. totalCost permite verificar que no se excede el presupuesto antes de ejecutar. supplierId en cada orden permite agrupar items por proveedor para consolidar pedidos.",
+    "uiSuggestion": "Lista de órdenes recomendadas agrupadas por proveedor con SKU, cantidad y costo estimado por línea. Barra de progreso de presupuesto (totalCost vs maxBudget). Botón 'Aprobar todas' y checkboxes por orden para aprobación selectiva."
+  },
+  {
+    "id": "generate_purchase_order",
+    "whyInput": "supplierId identifica al proveedor en el sistema ERP para enviarle la orden y aplicar sus condiciones comerciales. items contiene el detalle completo de lo que se solicita (SKU, cantidad, precio unitario). deliveryDate es la fecha prometida para planificar la recepción y alertar si el lead time no es suficiente.",
+    "calculations": "Validar que supplierId existe en el catálogo de proveedores. Calcular totalAmount sumando precio × cantidad de cada item más impuestos aplicables. Generar un orderId único (UUID o consecutivo según el ERP). Registrar la orden en la BD y enviarla al ERP o al proveedor vía API/EDI/email.",
+    "whyOutput": "orderId es el identificador para rastrear la orden y relacionarla con recepciones futuras. status ('pending','confirmed','sent') permite al agente monitorear si el proveedor aceptó la orden. totalAmount confirma el importe para que el sistema financiero reserve el presupuesto.",
+    "uiSuggestion": "Formulario modal de confirmación con tabla de items, subtotal, impuestos y total. Indicador de estado con pasos (Borrador → Enviada → Confirmada → Recibida). Toast de éxito con el orderId al generar."
+  },
+  {
+    "id": "evaluate_suppliers",
+    "whyInput": "supplierIds lista los proveedores a evaluar — puede ser toda la base o candidatos para una categoría. criteria es el peso de cada dimensión de evaluación (ej: {precio: 0.3, calidad: 0.4, cumplimiento: 0.3}) que el agente aplica según la política de compras de la empresa.",
+    "calculations": "Para cada proveedor, obtener métricas históricas: tasa de entregas a tiempo, porcentaje de rechazo por calidad, precio promedio vs mercado, capacidad de respuesta. Aplicar el método AHP (Analytic Hierarchy Process) o suma ponderada con los pesos de criteria para calcular un score final 0-100.",
+    "whyOutput": "rankings es la lista ordenada de proveedores por score, que el agente usa para seleccionar automáticamente el proveedor óptimo en recommend_purchase_orders. Incluir el score desagregado por criterio permite al equipo de compras auditar la decisión del agente.",
+    "uiSuggestion": "Tabla de ranking con proveedor, score total y mini-barras de progreso por criterio. Gráfica radar (spider chart) comparando los top 3 proveedores. Badge de proveedor preferido/aprobado/suspendido."
+  },
+  {
+    "id": "analyze_lead_times",
+    "whyInput": "supplierId para analizar el historial de entregas de ese proveedor específico. periodDays define la ventana de análisis (ej: 90 días = trimestre) para que el cálculo sea estadísticamente significativo y capture variaciones recientes sin penalizar por eventos históricos muy antiguos.",
+    "calculations": "Consultar el historial de órdenes del proveedor en el período. Calcular avgLeadTimeDays como media aritmética de (fechaRecepción - fechaOrden). Calcular stdDev para medir la variabilidad. Detectar anomalías como entregas que superen media + 2σ. Calcular trend comparando el promedio del primer vs segundo mitad del período.",
+    "whyOutput": "avgLeadTimeDays es el valor que se usa en optimize_stock_levels para calcular el punto de reorden. stdDev permite calcular el stock de seguridad (mayor variabilidad = más colchón). anomalies y trend alertan al equipo de compras sobre deterioro en el desempeño del proveedor.",
+    "uiSuggestion": "Histograma de distribución de lead times con líneas de media y ±1σ. Gráfica de línea con cada entrega en el tiempo para ver el trend. Tarjetas de métricas: Promedio, Variabilidad, Mejor lead time, Peor lead time."
+  },
+  {
+    "id": "compare_planned_vs_actual",
+    "whyInput": "module especifica qué área comparar (producción, ventas, compras, costos) para consultar las tablas correctas. periodStart y periodEnd definen el rango de comparación — normalmente un mes o trimestre — para que el análisis sea homogéneo y comparable con períodos anteriores.",
+    "calculations": "Consultar los valores planificados del presupuesto/plan maestro y los valores reales del sistema de ejecución para el módulo y período dado. Calcular deviationPercent = ((real - plan) / plan) × 100. Clasificar el status: verde si |desviación| < 5%, amarillo si 5-15%, rojo si > 15%. Desglosar las desviaciones por sub-categoría.",
+    "whyOutput": "deviationPercent es el KPI principal que el agente reporta a la dirección y que dispara alertas si supera umbrales. status permite filtrar rápidamente qué áreas necesitan atención. details es el drill-down que los managers usan para identificar la raíz de la desviación.",
+    "uiSuggestion": "Gráfica de barras agrupadas (Plan vs Real) por sub-categoría. Velocímetro o gauge central con la desviación total y colores de semáforo. Tabla de detalles expandible con variación absoluta y porcentual por partida."
+  },
+  {
+    "id": "detect_production_deviation",
+    "whyInput": "lineId identifica la línea de producción específica (cada línea tiene su propia meta de producción). shiftDate selecciona el turno a analizar — las desviaciones se calculan por turno para poder comparar entre turnos y detectar problemas relacionados con operadores o condiciones específicas del turno.",
+    "calculations": "Obtener la producción planificada del plan maestro. Obtener la producción real de los sistemas SCADA/MES para lineId y shiftDate. Calcular deviationPercent. Aplicar análisis de causa raíz consultando los registros de paros: si hay un paro mayor al 10% del tiempo del turno, es el rootCause. Calcular impactUnits = meta × (deviationPercent/100).",
+    "whyOutput": "deviationPercent es el indicador que el agente usa para decidir si escalar la alerta a supervisión. rootCause permite al agente generar una acción correctiva específica (ej: si es 'falta de material', lanzar un pedido urgente). impactUnits cuantifica el costo de la desviación en unidades no producidas.",
+    "uiSuggestion": "Panel de turno con indicador circular de OEE real vs meta. Barra horizontal comparando producción planificada vs real. Chip de causa raíz con ícono de alerta y texto descriptivo. Timeline del turno mostrando períodos de producción y paros."
+  },
+  {
+    "id": "predict_production_delays",
+    "whyInput": "orderId identifica la orden de producción específica con su ruta de operaciones, materiales y recursos asignados. dueDate es la fecha comprometida con el cliente, contra la que se evalúa el riesgo — el agente la usa para determinar si hay margen de recuperación o si se debe alertar al cliente.",
+    "calculations": "Obtener el estado actual de la orden (operaciones completadas, en proceso, pendientes). Calcular el tiempo restante estimado basado en velocidades actuales y la capacidad disponible. Calcular delayProbability usando regresión logística entrenada con datos históricos de órdenes similares. Identificar riskFactors: cuellos de botella, materiales pendientes, mantenimientos programados.",
+    "whyOutput": "delayProbability permite al agente priorizar qué órdenes atender primero. estimatedDelayHours es el tiempo que el equipo de ventas necesita para negociar una nueva fecha con el cliente. riskFactors indica al agente qué acciones tomar: acelerar compra de materiales, reasignar recursos o ajustar la secuencia de producción.",
+    "uiSuggestion": "Tarjeta de orden con barra de progreso y fecha estimada de completación. Indicador de probabilidad de retraso con color (verde <30%, amarillo 30-70%, rojo >70%). Lista de factores de riesgo con íconos descriptivos y botones de acción rápida."
+  },
+  {
+    "id": "optimize_production_schedule",
+    "whyInput": "plantId identifica la planta completa con todas sus líneas, recursos y restricciones de capacidad. horizon define el período de planificación (ej: '1w', '2w', '1m') — horizontes cortos dan mayor detalle pero menor flexibilidad; horizontes largos permiten optimizar recursos a mayor escala pero con menor precisión.",
+    "calculations": "Modelar el problema como un Job Shop Scheduling Problem (JSSP). Aplicar metaheurísticas (Algoritmo Genético, Simulated Annealing o PSO) para minimizar el makespan total y maximizar la utilización. Considerar restricciones: capacidad por línea, tiempos de setup entre productos, ventanas de mantenimiento programado, disponibilidad de materiales.",
+    "whyOutput": "schedule es el plan ejecutable que los operadores de planta y el MES reciben para programar la producción hora a hora. utilizationPercent es el KPI de eficiencia que la dirección monitorea. onTimeDeliveryForecast indica qué porcentaje de órdenes se entregarán a tiempo con este plan.",
+    "uiSuggestion": "Diagrama de Gantt interactivo con líneas en el eje Y y tiempo en el eje X. Cada bloque coloreado por producto/orden. Panel lateral con métricas: Utilización promedio, OTD forecast, Conflictos detectados. Botón para exportar el plan al MES."
+  },
+  {
+    "id": "track_project_progress",
+    "whyInput": "projectId es el único parámetro necesario porque el agente consulta toda la información del proyecto (hitos, tareas, presupuesto, recursos) a partir de ese ID. Esto permite que el agente genere reportes de status automáticos sin que el operador tenga que especificar qué métricas quiere ver.",
+    "calculations": "Consultar todos los entregables y hitos del proyecto en la BD de gestión. Calcular completionPercent como (tareas completadas / total de tareas) × 100. Calcular budgetUsedPercent como (gasto real acumulado / presupuesto total) × 100. Determinar status comparando completionPercent y budgetUsedPercent con el progreso esperado a la fecha.",
+    "whyOutput": "completionPercent es el indicador principal para reportes a stakeholders. milestonesCompleted/Total permite identificar si el proyecto está en riesgo de completar hitos clave a tiempo. budgetUsedPercent combinado con completionPercent detecta sobreejercicio del presupuesto.",
+    "uiSuggestion": "Dashboard de proyecto con dos gauges: Avance físico y Avance presupuestal. Timeline de hitos con íconos de completado/en-progreso/pendiente. Indicador de salud del proyecto (En tiempo / En riesgo / Retrasado) con semáforo de color."
+  },
+  {
+    "id": "estimate_project_costs",
+    "whyInput": "projectId para acceder al WBS (Work Breakdown Structure) completo con todas las partidas de costo. includeContingency activa el cálculo de reservas para riesgos — en proyectos industriales es estándar incluir 10-15% de contingencia para imprevistos como variaciones de materiales o extensiones de scope.",
+    "calculations": "Sumar todos los costos del WBS: mano de obra (horas × tarifa), materiales (cantidad × precio), servicios externos, equipos. Si includeContingency=true, agregar contingencyPercent sobre el subtotal basado en el riskLevel. Aplicar técnica de Earned Value para proyectos en ejecución: EAC = BAC / CPI.",
+    "whyOutput": "estimatedCost es el número que se presenta a la dirección para aprobación o para actualizar el presupuesto. contingencyPercent justifica ante los stakeholders la reserva de riesgos incluida. riskLevel orienta al agente a recomendar acciones preventivas si el riesgo es alto.",
+    "uiSuggestion": "Gráfica de barras apiladas con desglose de costos por categoría (labor, materiales, servicios). Indicador de contingencia con porcentaje y monto en pesos/dólares. Comparativa EAC vs BAC con indicador de varianza de costo (CPI)."
+  },
+  {
+    "id": "detect_budget_overrun",
+    "whyInput": "costCenterId identifica el centro de costo a monitorear (planta, departamento, línea). alertThreshold define el porcentaje de sobrejercicio que dispara la alerta — permite calibrar la sensibilidad según la política financiera (ej: 5% para centros críticos, 15% para operaciones generales).",
+    "calculations": "Consultar el presupuesto asignado al centro de costo para el período actual y el gasto real acumulado. Calcular overrunPercent = ((gasto_real - presupuesto) / presupuesto) × 100. Si overrunPercent > alertThreshold, marcar overrunDetected=true. Desglosar por categorías de gasto para identificar affectedCategories.",
+    "whyOutput": "overrunDetected es el flag que el agente usa para disparar notificaciones automáticas al CFO o gerente de planta. overrunPercent cuantifica la severidad para priorizar la respuesta. affectedCategories permite al agente generar recomendaciones específicas (ej: si es energía, recomendar optimize_energy_usage).",
+    "uiSuggestion": "Widget de alerta financiera con presupuesto vs real en barras horizontales. Gauge de termómetro mostrando overrunPercent con zona de alerta en rojo. Lista de categorías afectadas con varianza por categoría en formato tabla."
+  },
+  {
+    "id": "categorize_expenses",
+    "whyInput": "transactions es el array de movimientos financieros sin categorizar (típicamente exportados del ERP o sistema contable). Incluye descripción del proveedor, monto y fecha. El agente necesita categorizarlos automáticamente para análisis de costos sin intervención manual en cada transacción.",
+    "calculations": "Aplicar clasificación con NLP: usar un modelo de texto (BERT fine-tuned o reglas + ML) entrenado con el catálogo de cuentas contables de la empresa. Mapear cada transacción a una categoría (materia prima, mantenimiento, energía, mano de obra, etc.) y subcategoría. Marcar para revisión humana si confianza < 80%.",
+    "whyOutput": "categorized permite al agente generar reportes de costo por categoría, detectar anomalías de gasto y alimentar detect_budget_overrun con datos estructurados. La subcategoría permite análisis granular para decisiones de reducción de costos específicos.",
+    "uiSuggestion": "Vista de lista de transacciones con dropdown editable de categoría por fila para correcciones manuales. Gráfica de dona mostrando distribución del gasto por categoría. Botón de exportar categorización para importar al ERP."
+  },
+  {
+    "id": "optimize_operational_costs",
+    "whyInput": "plantId para analizar todos los centros de costo de esa planta (energía, mantenimiento, mano de obra, materiales auxiliares). targetReductionPercent es el objetivo de ahorro que la dirección ha definido — el agente lo usa para filtrar solo las oportunidades que contribuyen significativamente a esa meta.",
+    "calculations": "Analizar el gasto histórico por categoría de la planta. Comparar con benchmarks industriales por tipo de proceso. Identificar desviaciones entre el costo actual y el benchmark. Priorizar oportunidades por: impacto económico, facilidad de implementación y payback period. Calcular el ahorro estimado con modelos de regresión sobre datos históricos.",
+    "whyOutput": "opportunities es la lista de iniciativas concretas que el agente presenta al gerente de planta con un business case por cada una. estimatedSavingsMonthly es el ROI mensual que justifica la inversión en cada iniciativa. El agente puede lanzar automáticamente las oportunidades de costo cero.",
+    "uiSuggestion": "Tabla de oportunidades con columnas: Área, Ahorro mensual estimado, Dificultad de implementación, Payback. Gráfica de burbujas con ahorro (eje Y) vs dificultad (eje X) y tamaño de burbuja = impacto anual. Botón de acción por oportunidad para crear un plan de implementación."
+  },
+  {
+    "id": "generate_kpis",
+    "whyInput": "plantId para obtener todos los datos operativos de esa planta (producción, calidad, energía, seguridad). period define el granulado del cálculo: 'daily' para revisiones operativas, 'weekly' para reuniones de seguimiento, 'monthly' para reportes a dirección. Cada período tiene diferentes fuentes de datos y niveles de consolidación.",
+    "calculations": "Para cada KPI de la planta, consultar los datos fuente (sistemas MES, SCADA, ERP, calidad). Calcular el valor actual del período. Calcular el trend comparando con el período anterior. Clasificar el status comparando con los targets configurados (verde/amarillo/rojo). KPIs típicos: OEE, PPM defectos, Entregas a tiempo, Costo por unidad, LTIF.",
+    "whyOutput": "kpis es el conjunto de indicadores que el agente presenta en el dashboard de dirección y que dispara alertas automáticas cuando alguno está en rojo. name y unit permiten renderizar el KPI correctamente. trend permite al agente identificar deterioro antes de que el status cambie a rojo.",
+    "uiSuggestion": "Grid de tarjetas KPI con valor grande, unidad, trend (flecha arriba/abajo/estable) y color de estado. Panel de semáforo ejecutivo con conteo de KPIs verdes/amarillos/rojos. Selector de período con comparativa vs target y vs período anterior."
+  },
+  {
+    "id": "forecast_revenue",
+    "whyInput": "businessUnit para segmentar la proyección por unidad de negocio (diferentes productos, mercados o canales tienen dinámicas distintas). horizonMonths define el alcance de la proyección: 3 meses para operaciones, 12 meses para presupuesto anual, 24-36 para planificación estratégica.",
+    "calculations": "Usar series temporales (Prophet o SARIMA) entrenadas con el historial de ventas de la unidad de negocio. Incorporar señales externas: estacionalidad del sector, índices macroeconómicos relevantes, pipeline de ventas del CRM. Calcular el forecast mensual con intervalos de confianza. Calcular la confianza general del modelo con métricas MAPE o RMSE.",
+    "whyOutput": "forecastedRevenue es el ingreso proyectado que el CFO usa para planificar el flujo de caja y el presupuesto. confidencePercent comunica la incertidumbre del modelo para que los tomadores de decisión sepan qué tan confiable es la proyección. byMonth permite planificar recursos mes a mes según los picos de demanda proyectados.",
+    "uiSuggestion": "Gráfica de área con histórico (línea sólida) y proyección (línea punteada con banda de confianza). Tabla de forecast mensual con columnas: Mes, Proyección, Rango inferior, Rango superior. Indicador de confianza del modelo con semáforo."
+  },
+  {
+    "id": "detect_business_anomalies",
+    "whyInput": "metrics es el snapshot actual de los indicadores de negocio (ventas, costos, clientes, producción) que el agente monitorea periódicamente. sensitivityLevel controla el umbral de detección: 'high' detecta desviaciones pequeñas pero genera más falsos positivos, 'low' solo alerta sobre anomalías severas.",
+    "calculations": "Para cada métrica, calcular el valor esperado basado en el historial reciente (media móvil ponderada). Aplicar detección de anomalías: Z-score para distribuciones normales, IQR para distribuciones sesgadas, o Isolation Forest para anomalías multivariables. Ajustar umbrales según sensitivityLevel. Clasificar anomalías en críticas vs informativas.",
+    "whyOutput": "anomalies es la lista que el agente analiza para determinar si debe disparar alertas, investigar causas o escalar a humanos. criticalCount es el número que determina la urgencia: si criticalCount > 0, el agente notifica inmediatamente a la dirección y suspende acciones automáticas hasta revisión.",
+    "uiSuggestion": "Feed de alertas de anomalías con severidad (crítica/moderada/informativa), métrica afectada y desviación porcentual. Gráfica de dispersión mostrando valores normales vs anómalos. Panel de timeline con histórico de anomalías detectadas."
+  },
+  {
+    "id": "score_leads",
+    "whyInput": "leadIds es la lista de prospectos a evaluar del CRM. El agente lo usa para priorizar el esfuerzo del equipo de ventas — en lugar de contactar a todos los leads por igual, el agente identifica cuáles tienen mayor probabilidad de conversión y cuáles requieren nurturing antes de contactar.",
+    "calculations": "Para cada lead, extraer del CRM sus atributos: industria, tamaño de empresa, cargo del contacto, actividad en el sitio web, interacciones previas, perfil de cliente ideal (ICP) match. Aplicar un modelo de scoring (regresión logística o XGBoost) entrenado con datos históricos de conversiones. Calcular el score 0-100 y clasificar en categorías: Hot (>70), Warm (40-70), Cold (<40).",
+    "whyOutput": "scores permite al agente asignar automáticamente los leads Hot al equipo de ventas directas, los Warm a secuencias de email marketing, y los Cold a nurturing de largo plazo. nextAction es la instrucción específica que el vendedor debe ejecutar, generada por el agente basándose en el perfil del lead.",
+    "uiSuggestion": "Lista de leads ordenada por score (mayor a menor) con barra de progreso coloreada. Columna de categoría con badge Hot/Warm/Cold. Columna de siguiente acción recomendada con ícono del tipo de contacto (llamada, email, demo). Filtros por categoría e industria."
+  },
+  {
+    "id": "predict_sales",
+    "whyInput": "productId para obtener el historial de ventas específico de ese producto (cada producto tiene su propia curva de demanda). channel distingue el comportamiento por canal (eCommerce tiene mayor estacionalidad, distribuidores tienen patrones de pedido más regulares). horizonDays define cuántos días hacia adelante proyectar para planificar la producción o el reabastecimiento.",
+    "calculations": "Entrenar o cargar un modelo de series temporales por combinación productId + channel. Aplicar regresión con variables exógenas: estacionalidad, días festivos, promociones activas, precio. Calcular la predicción puntual y la métrica de accuracy (MAPE) del modelo en el período de validación más reciente.",
+    "whyOutput": "predictedUnits alimenta el plan de producción para que la planta fabrique la cantidad correcta. predictedRevenue ayuda al área de finanzas a proyectar el flujo de caja. accuracy permite al agente informar al usuario qué tan confiable es la predicción antes de actuar sobre ella.",
+    "uiSuggestion": "Gráfica de barras con ventas históricas y proyección futura diferenciadas por color. Panel de accuracy del modelo con nivel de confianza. Desglose de predicción por semana en tabla. Selector de canal con comparativa entre canales."
+  },
+  {
+    "id": "automate_followups",
+    "whyInput": "targetType define el tipo de destinatario ('lead', 'client', 'opportunity') para usar la plantilla y el tono correcto de comunicación. targetIds es la lista de IDs sobre los que el agente ejecutará la secuencia de seguimiento automático según las reglas del CRM.",
+    "calculations": "Para cada targetId, verificar el historial de interacciones y determinar si cumple los criterios de seguimiento (ej: sin respuesta en X días). Seleccionar la plantilla de mensaje adecuada según el stage del target. Personalizar el mensaje con datos del CRM. Enviar vía el canal configurado (email/WhatsApp/LinkedIn) usando el gateway de mensajería.",
+    "whyOutput": "sent confirma cuántos seguimientos se ejecutaron exitosamente para el reporte de actividad del equipo de ventas. failed permite identificar problemas de configuración (correos inválidos, límites de API). scheduledIds lista los seguimientos programados para futuras fechas para que el agente los monitoree.",
+    "uiSuggestion": "Panel de actividad de seguimientos con contador de enviados/fallidos/programados. Lista de seguimientos con estado por destinatario. Timeline de actividades programadas por fecha. Alert de seguimientos fallidos con causa del error."
+  },
+  {
+    "id": "sync_erp_data_local",
+    "whyInput": "erpType identifica el sistema ERP local (SAP, Odoo, SAGE, etc.) para usar el conector correcto. lastSyncTimestamp permite una sincronización incremental — solo se transfieren los registros modificados desde la última sync, minimizando el volumen de datos y el tiempo de transferencia. tables especifica qué entidades sincronizar según las necesidades del momento.",
+    "calculations": "Conectar al ERP local usando el conector configurado para erpType. Ejecutar una query incremental: SELECT * FROM tabla WHERE updated_at > lastSyncTimestamp. Mapear los campos del ERP local al esquema estándar de la plataforma cloud. Insertar o actualizar en la BD cloud. Registrar cualquier error de mapeo o conflicto de datos en el array errors.",
+    "whyOutput": "recordsSynced confirma que los datos están actualizados en el cloud para que las tools de análisis trabajen con información fresca. syncTimestamp se guarda para la próxima ejecución incremental. errors permite al equipo de IT identificar y corregir problemas de mapeo de datos entre sistemas.",
+    "uiSuggestion": "Panel de sincronización con última fecha de sync, estado (Sincronizado/Error/En progreso) y número de registros sincronizados. Barra de progreso durante la sync activa. Log de errores expandible. Botón de forzar sync completa."
+  },
+  {
+    "id": "push_orders_to_erp",
+    "whyInput": "orders es el array de órdenes generadas en el cloud que deben registrarse en el ERP local para mantener la sincronía operativa. erpType determina el formato y el endpoint de la API del ERP al que se enviarán las órdenes.",
+    "calculations": "Para cada orden en el array, transformar el objeto al formato requerido por el ERP (mapeo de campos, formatos de fecha, códigos de artículo locales). Enviar la orden al ERP vía API REST, EDI o conexión directa a la BD según erpType. Capturar el ID que el ERP asigna a la orden y guardarlo en erpOrderIds para trazabilidad bidireccional.",
+    "whyOutput": "inserted confirma cuántas órdenes quedaron registradas en el ERP local para que los compradores puedan gestionarlas desde su sistema habitual. failed permite al agente reintentar las órdenes fallidas o notificar al equipo. erpOrderIds es el vínculo de trazabilidad entre el cloud y el ERP local.",
+    "uiSuggestion": "Lista de órdenes con estado de sincronización (Sincronizada/Error/Pendiente) por fila. Contador de éxitos y fallos en la cabecera. Detalle de error expandible por orden fallida. Botón de reintento para órdenes fallidas."
+  },
+  {
+    "id": "analyze_network_risk",
+    "whyInput": "networkId identifica la red OT/IT a analizar con su topología, activos y políticas de seguridad registradas. includeExternalThreatFeed activa la integración con feeds de inteligencia de amenazas (MISP, VirusTotal, CISA KEV) para contrastar los activos de la red contra vulnerabilidades conocidas actualmente activas en el sector industrial.",
+    "calculations": "Inventariar todos los activos de la red (servidores, PLCs, HMIs, switches). Para cada activo, consultar su CVE score y parchado. Evaluar la configuración de red (segmentación, firewall rules, accesos remotos). Si includeExternalThreatFeed=true, cruzar con activos comprometidos reportados en el sector. Calcular riskScore 0-100 usando el framework CVSS adaptado para OT.",
+    "whyOutput": "riskScore es el número que el CISO usa para reportar postura de seguridad a la dirección y priorizar el presupuesto de seguridad. riskLevel (critical/high/medium/low) determina la urgencia de la respuesta del agente. topThreats es la lista priorizada de vulnerabilidades que el equipo de seguridad debe atender primero.",
+    "uiSuggestion": "Gauge de riesgo grande con nivel y color (rojo/naranja/amarillo/verde). Mapa de red con nodos coloreados por riesgo individual. Lista de amenazas críticas con CVE ID, severidad y activos afectados. Histórico de riskScore con línea de tendencia."
+  },
+  {
+    "id": "detect_anomaly_patterns",
+    "whyInput": "trafficLogs es el array de registros de tráfico de red (netflow, logs de firewall, SIEM) que el agente analiza. baselineWindowHours define cuántas horas de tráfico normal usar para establecer la línea base — 24h captura patrones diarios, 168h (1 semana) captura también patrones semanales.",
+    "calculations": "Calcular estadísticas de baseline (volumen de tráfico, IPs únicas, puertos usados, protocolos) sobre baselineWindowHours. Aplicar detección de anomalías sobre el tráfico reciente: comparar contra baseline usando Z-score, DBSCAN o Isolation Forest. Clasificar el tipo de ataque si se detecta patrón conocido: port scan, DDoS, lateral movement, C2 communication.",
+    "whyOutput": "patternsFound indica si el agente detectó actividad anómala que requiere investigación. attackType es la clasificación que el SOC usa para seleccionar el playbook de respuesta correcto. confidence determina si el agente debe actuar automáticamente (alta confianza) o solo alertar al equipo humano (baja confianza).",
+    "uiSuggestion": "Gráfica de volumen de tráfico temporal con anotaciones en las anomalías detectadas. Mapa de calor de actividad por hora del día y día de la semana. Panel de alertas con attackType, confianza e IPs involucradas. Timeline de eventos anómalos."
+  },
+  {
+    "id": "simulate_attack_scenarios",
+    "whyInput": "networkTopology es el mapa completo de la red (activos, conexiones, zonas de seguridad) necesario para simular cómo un atacante se movería entre sistemas. attackTypes define qué escenarios simular (ransomware, supply chain, insider threat) para evaluar la postura de defensa ante las amenazas más relevantes para el sector.",
+    "calculations": "Aplicar metodología MITRE ATT&CK for ICS. Para cada attackType, simular el kill chain completo: reconocimiento, acceso inicial, movimiento lateral, exfiltración/impacto. Modelar el grafo de ataque usando el algoritmo de camino más corto para encontrar criticalPaths. Calcular riskReduction estimado al mitigar cada vulnerabilidad en los caminos críticos.",
+    "whyOutput": "vulnerableAssets es la lista priorizada de activos que el equipo de seguridad debe fortalecer urgentemente. criticalPaths muestra las rutas de ataque que el atacante usaría, para que el equipo diseñe controles específicos en esos puntos. riskReduction cuantifica el beneficio de cada mejora para justificar la inversión.",
+    "uiSuggestion": "Diagrama de grafo de ataque interactivo con nodos como activos y aristas como vectores de ataque. Activos vulnerables resaltados en rojo. Panel lateral con detalle del escenario seleccionado. Tabla de recomendaciones ordenadas por riskReduction."
+  },
+  {
+    "id": "generate_security_strategy",
+    "whyInput": "riskProfile es el resultado de analyze_network_risk con el estado actual de vulnerabilidades y activos en riesgo. complianceFrameworks lista los marcos normativos que la empresa debe cumplir (IEC 62443 para OT, NIST CSF, ISO 27001) — el agente genera controles específicos para cada uno.",
+    "calculations": "Mapear cada vulnerabilidad del riskProfile a controles recomendados en los frameworks de complianceFrameworks. Priorizar controles usando análisis costo-beneficio: riesgo mitigado vs costo de implementación. Generar un roadmap de implementación agrupando controles por: inmediatos (0-30 días), corto plazo (1-3 meses), largo plazo (3-12 meses).",
+    "whyOutput": "recommendations es el plan de seguridad completo que el CISO presenta al consejo directivo para aprobación de presupuesto. priorityActions son los primeros controles a implementar — el agente puede ejecutar algunos automáticamente (block_ip, isolate_device) y escalar los demás al equipo de seguridad.",
+    "uiSuggestion": "Roadmap de seguridad en formato timeline con fases de implementación. Tabla de controles con framework origen, prioridad y responsable asignado. Gauge de madurez de seguridad actual vs objetivo. Exportar a PDF para presentación ejecutiva."
+  },
+  {
+    "id": "detect_network_anomalies_local",
+    "whyInput": "interfaceId identifica el adaptador de red OT (puerto del switch industrial, interfaz del firewall perimetral) donde se captura el tráfico en el edge, sin enviar datos sensibles de la red al cloud. sensitivityLevel calibra el balance entre falsos positivos y falsos negativos según el nivel de riesgo aceptable en esa zona de la red.",
+    "calculations": "Capturar tráfico de la interfaz en modo promiscuo (o recibir netflow). Comparar contra una línea base local (comunicaciones OT esperadas: IPs autorizadas, protocolos Modbus/OPC-UA, rangos de volumen típico). Detectar anomalías: nuevas IPs, protocolos no autorizados, volúmenes anómalos. Clasificar el tipo de anomalía y calcular la severidad sin enviar los paquetes al cloud.",
+    "whyOutput": "anomalyDetected es el flag que dispara inmediatamente block_ip o isolate_device en el edge sin esperar respuesta del cloud. sourceIp es la IP a bloquear en la siguiente acción. anomalyType y severity determinan qué acción ejecutar: una anomalía de severity='critical' requiere aislamiento inmediato de la red OT.",
+    "uiSuggestion": "Monitor de tráfico en tiempo real con indicador ON/OFF de anomalía. Mapa de comunicaciones OT con flechas entre dispositivos y resaltado de flujos anómalos. Lista de últimas alertas con sourceIp, tipo y timestamp. Botón de bloqueo rápido por IP."
+  },
+  {
+    "id": "block_ip",
+    "whyInput": "ipAddress es la IP a bloquear, obtenida directamente de detect_network_anomalies_local o detect_anomaly_patterns. duration define cuánto tiempo aplica el bloqueo — temporales para investigar sin interrumpir permanentemente servicios legítimos, permanentes para IPs de atacantes confirmados. reason se registra en el log de auditoría para cumplimiento normativo.",
+    "calculations": "Agregar una regla de denegación al firewall local o al switch industrial vía su API (iptables, Cisco ACL, Fortinet API, etc.). Configurar el timeout de la regla si duration > 0. Generar un ruleId único para poder auditar o revertir la regla. Registrar la acción en el log de seguridad con timestamp, operador o agente que la ejecutó y la razón.",
+    "whyOutput": "blocked confirma que el bloqueo fue efectivo — si es false, el agente debe escalar al equipo de redes para intervención manual. ruleId permite al equipo de seguridad revisar, modificar o eliminar la regla desde el panel de gestión. timestamp es esencial para el log de incidentes y para correlacionar con otras alertas en el SIEM.",
+    "uiSuggestion": "Panel de IPs bloqueadas con tabla: IP, Razón, Duración, Tiempo restante, Quién la bloqueó. Botón de desbloqueo por fila. Indicador de tiempo restante con countdown. Form de bloqueo rápido con campos IP, Duración y Razón."
+  },
+  {
+    "id": "segment_network",
+    "whyInput": "targetZone identifica la zona de red OT a segmentar (ej: 'zona-scada', 'zona-plc', 'dmz-industrial') según la arquitectura Purdue o ISA-95. segmentationPolicy define las reglas de comunicación permitidas entre zonas (qué IPs/protocolos pueden cruzar el límite) que el agente aplicará en el firewall industrial.",
+    "calculations": "Consultar la topología de red actual de targetZone. Aplicar las reglas de segmentationPolicy en el firewall industrial o switch gestionado: crear VLANs, configurar ACLs y reglas de firewall. Verificar que los dispositivos críticos (PLCs, HMIs) queden correctamente aislados. Contar affectedDevices para el reporte de impacto operativo.",
+    "whyOutput": "segmented confirma que la zona quedó efectivamente aislada — el agente lo usa para reportar la acción de contención. affectedDevices informa al operador cuántos equipos quedaron en el nuevo segmento para que verifique que la producción no se interrumpió. policyApplied documenta exactamente qué política se aplicó para el registro de auditoría.",
+    "uiSuggestion": "Diagrama de red OT con zonas coloreadas por nivel de seguridad. Antes/después de la segmentación animado. Lista de reglas aplicadas con protocolo, origen y destino permitido. Estado de segmentación por zona (Segmentada/No segmentada/En proceso)."
+  },
+  {
+    "id": "apply_segmentation",
+    "whyInput": "rules es el conjunto específico de reglas de firewall/ACL a aplicar (generadas por generate_security_strategy). deviceId identifica el dispositivo de red (firewall, switch L3) donde se aplicarán — cada dispositivo tiene su propio API de gestión y sintaxis de reglas.",
+    "calculations": "Conectar al API del dispositivo (REST, SSH, NETCONF según el fabricante). Convertir cada regla del array al formato nativo del dispositivo. Aplicar las reglas en el orden correcto (más específicas primero). Hacer un dry-run primero para detectar conflictos. Si todo es correcto, aplicar en producción. Guardar el estado anterior para rollback.",
+    "whyOutput": "applied confirma que las reglas están activas y la red está protegida. rulesCount permite verificar que se aplicaron todas las reglas esperadas. rollbackAvailable es crítico: si la segmentación rompe comunicaciones legítimas, el operador puede revertir en segundos.",
+    "uiSuggestion": "Lista de reglas aplicadas con estado (Aplicada/Fallida/Pendiente) por regla. Botón de Rollback con confirmación de doble click. Contador de reglas activas en el dispositivo. Log de cambios con timestamp de cada regla."
+  },
+  {
+    "id": "monitor_ot_network",
+    "whyInput": "networkSegment identifica la zona OT a monitorear (ej: 'nivel-0-field-devices', 'nivel-1-control', 'nivel-2-supervisorio'). captureMode define la profundidad del análisis: 'passive' no interfiere con la red de control (esencial en OT), 'active' ejecuta queries adicionales para identificar dispositivos.",
+    "calculations": "Capturar tráfico del segmento OT usando técnicas pasivas (span port, tap de red) para no afectar los tiempos de ciclo de los PLCs. Decodificar protocolos industriales: Modbus, EtherNet/IP, PROFINET, OPC-UA. Identificar todos los dispositivos comunicándose (newDevicesDetected). Analizar patrones de comunicación y detectar flujos fuera del perfil normal (suspiciousFlows).",
+    "whyOutput": "packetsAnalyzed confirma que el monitoreo está activo y con qué volumen. suspiciousFlows es el número que determina si el agente debe disparar una alerta de seguridad. newDevicesDetected alerta sobre dispositivos no autorizados conectados a la red OT — un indicador crítico de compromiso o error operativo.",
+    "uiSuggestion": "Dashboard de tráfico OT en tiempo real con gráfica de paquetes por segundo. Mapa de comunicaciones entre dispositivos con líneas de diferente grosor según volumen. Lista de dispositivos nuevos detectados con botones de autorizar o bloquear. Contador de flujos sospechosos con detalle expandible."
+  },
+  {
+    "id": "isolate_device",
+    "whyInput": "deviceId identifica el equipo comprometido o sospechoso (PLC, HMI, servidor industrial) que debe ser aislado para contener el incidente. isolationType permite elegir entre aislamiento completo ('full': sin ninguna comunicación) o parcial ('partial': solo bloquear tráfico externo manteniendo comunicaciones de control críticas).",
+    "calculations": "Identificar todas las interfaces de red del dispositivo. Aplicar reglas de firewall/ACL en el switch adyacente para bloquear todo el tráfico hacia/desde el deviceId según el isolationType. Si es 'partial', mantener solo las comunicaciones esenciales del nivel de control. Registrar la acción con timestamp para el incidente.",
+    "whyOutput": "isolated confirma que el dispositivo quedó efectivamente contenido. deviceId e isolationType en la salida sirven para el reporte del incidente. timestamp es el inicio del período de aislamiento para SLA de respuesta.",
+    "uiSuggestion": "Mapa de planta con dispositivos representados como íconos. Dispositivos aislados con borde rojo pulsante. Panel de acciones de respuesta al incidente: Aislar / Restaurar / Analizar. Timeline del incidente con cada acción ejecutada."
+  },
+  {
+    "id": "inspect_gateway_traffic",
+    "whyInput": "gatewayId identifica el gateway OT/IT (firewall perimetral, router industrial, DMZ gateway) que conecta la red industrial con redes externas o corporativas. inspectionDepth define el nivel de análisis: 'shallow' revisa solo cabeceras (rápido, menor overhead) vs 'deep' que hace DPI para detectar payloads maliciosos ocultos en protocolos permitidos.",
+    "calculations": "Capturar el tráfico que pasa por el gateway. Con 'shallow', analizar cabeceras IP/TCP/UDP: puertos, IPs, flags, volumen. Con 'deep', desencapsular hasta la capa de aplicación y analizar el contenido de cada paquete contra firmas de malware industrial. Contar blockedConnections si hay reglas activas de denegación.",
+    "whyOutput": "packetsInspected confirma que la inspección está activa y la escala del análisis. maliciousPayloads es el número crítico que dispara una alerta inmediata al SOC — incluso 1 payload malicioso justifica aislar el gateway. blockedConnections muestra la efectividad de las reglas de firewall existentes.",
+    "uiSuggestion": "Monitor de tráfico del gateway con throughput en tiempo real (Mbps). Contador de payloads maliciosos detectados con badge de alerta roja. Lista de últimos bloqueados con IP origen, destino y tipo de amenaza. Selector de profundidad de inspección con impacto en latencia."
+  },
+  {
+    "id": "inspect_product_quality",
+    "whyInput": "cameraId identifica la cámara industrial instalada en el punto de inspección de la línea. productType permite al modelo de visión cargar los criterios de defecto correctos para ese producto. confidenceThreshold define el umbral mínimo de confianza para declarar un defecto — umbral alto = menos falsos positivos pero más defectos pasan.",
+    "calculations": "Capturar el frame actual de la cámara. Pre-procesar la imagen (normalización, recorte de ROI). Ejecutar inferencia con el modelo CNN (ResNet, EfficientDet o YOLO) entrenado para productType. Si la probabilidad del defecto más probable supera confidenceThreshold, marcar como defectFound=true. Extraer boundingBox con las coordenadas del defecto para localización visual.",
+    "whyOutput": "defectFound es el flag que dispara la eyección automática de la pieza defectuosa en la línea. defectType permite clasificar el defecto para ajustar el proceso. confidence permite al operador saber cuándo revisar manualmente. boundingBox permite marcar visualmente el defecto en la pantalla del inspector.",
+    "uiSuggestion": "Vista de cámara en tiempo real con overlay del boundingBox del defecto resaltado en rojo. Contador de piezas inspeccionadas/buenas/defectuosas con tasas porcentuales. Galería de últimos defectos detectados con tipo y confianza. Indicador de estado del sistema de eyección."
+  },
+  {
+    "id": "count_items_on_conveyor",
+    "whyInput": "cameraId identifica la cámara ubicada sobre la banda transportadora. countingLine es la línea virtual (coordenadas en la imagen) que los objetos deben cruzar para ser contados — permite contar en puntos específicos de la banda sin confundir objetos que se mueven en paralelo o en sentido contrario.",
+    "calculations": "Detectar y trackear objetos en el video usando un algoritmo de tracking (SORT, DeepSORT o ByteTrack). Detectar cuándo el centroide de un objeto cruza la countingLine en la dirección correcta. Incrementar el contador y calcular countPerMinute como la tasa media de cruces en la ventana temporal reciente.",
+    "whyOutput": "countTotal es el acumulado del turno que se compara contra la meta de producción para calcular el OEE. countPerMinute es la tasa actual que el agente monitorea para detectar ralentizaciones de la línea. timestamp permite sincronizar el conteo con los registros del MES.",
+    "uiSuggestion": "Visualización de la cámara con la línea de conteo superpuesta en azul. Contador digital grande mostrando total del turno y meta. Gráfica de barras por hora con meta horizontal. Indicador de tasa actual (piezas/min) con flecha de tendencia."
+  },
+  {
+    "id": "detect_safety_violations",
+    "whyInput": "cameraId identifica la cámara de seguridad instalada en la zona de trabajo. checkItems lista los EPPs a verificar para esa zona específica (zona de soldadura requiere casco + visera + guantes; zona de químicos requiere traje completo). El agente solo verifica lo que es relevante para cada área.",
+    "calculations": "Detectar personas en el frame usando un detector de personas (YOLOv8 o similar). Para cada persona detectada, analizar si porta cada item de checkItems usando un clasificador específico por EPP. Si algún EPP requerido está ausente, marcar violationDetected=true.",
+    "whyOutput": "violationDetected dispara una alerta inmediata (alarma sonora, notificación al supervisor, registro fotográfico). violationType especifica qué EPP falta para que la alerta sea accionable. personId (si el sistema tiene identificación facial) permite notificar al trabajador específico. zoneId permite correlacionar violaciones por área para identificar zonas de alto riesgo.",
+    "uiSuggestion": "Vista de cámara con overlay: bounding box verde para personas correctas, rojo con ícono del EPP faltante para violaciones. Panel de alertas activas con foto del incidente, zona y tipo. Histórico de violaciones por zona y turno. Botón de notificar al supervisor."
+  },
+  {
+    "id": "monitor_worker_posture",
+    "whyInput": "cameraId para capturar el video del trabajador. workerId permite personalizar los umbrales de riesgo según el historial de salud del trabajador y el tipo de tarea que está realizando — un ergónomo puede configurar umbrales más estrictos para trabajadores con historial de lesiones musculoesqueléticas.",
+    "calculations": "Aplicar un estimador de pose corporal (MediaPipe Pose o OpenPose) para detectar los 33 keypoints del cuerpo. Calcular ángulos articulares: ángulo de cuello, ángulo de espalda, ángulo de hombros. Aplicar el método RULA o REBA para calcular un score de riesgo ergonómico global (0-100). Generar recommendations basadas en las articulaciones en posición de riesgo.",
+    "whyOutput": "postureScore es el indicador que el sistema de seguridad usa para acumular tiempo de exposición ergonómica por trabajador. riskLevel determina si el agente debe interrumpir la actividad (critical), alertar al supervisor (high) o solo registrar (low/medium). recommendations son instrucciones específicas que el agente puede mostrar al trabajador en tiempo real.",
+    "uiSuggestion": "Esqueleto 3D animado del trabajador con articulaciones coloreadas por nivel de riesgo (verde/amarillo/rojo). Gauge de postureScore y riskLevel. Lista de recomendaciones ergonómicas con íconos. Histórico de exposición acumulada por articulación en el turno."
+  },
+  {
+    "id": "capture_video_stream",
+    "whyInput": "cameraId identifica la cámara fuente en el sistema de gestión de cámaras (ONVIF, RTSP). fps define la tasa de captura — mayor fps captura movimientos rápidos pero consume más ancho de banda y CPU. resolution define la calidad de imagen requerida: mayor resolución para detectar defectos pequeños, menor para conteo de personas.",
+    "calculations": "Conectar al stream de la cámara usando el protocolo configurado (RTSP, ONVIF, GStreamer). Capturar un frame según los parámetros fps/resolution. Comprimir el frame (JPEG/WebP) para transmisión eficiente. Asignar un frameId único (timestamp + cameraId). Calcular sizeKb del frame comprimido para monitorear el ancho de banda utilizado.",
+    "whyOutput": "frameId permite a las tools de visión (inspect_product_quality, detect_safety_violations) referenciar el frame específico en los resultados. timestamp sincroniza el frame con otros sensores para análisis multimodal. width, height y sizeKb permiten al sistema verificar que la calidad de imagen es suficiente antes de ejecutar inferencia.",
+    "uiSuggestion": "Vista en vivo del stream con overlay de metadatos (cameraId, fps, resolución). Indicador de latencia del stream. Selector de calidad (resolución/fps). Botón de snapshot que guarda el frame actual con su frameId."
+  },
+  {
+    "id": "train_vision_model",
+    "whyInput": "datasetId identifica el dataset de imágenes etiquetadas en el sistema de gestión de datos — puede incluir imágenes de defectos nuevos capturados en producción. baseModelId es el modelo preentrenado a usar como punto de partida (transfer learning) para acelerar el entrenamiento. epochs define cuántas pasadas completas sobre el dataset realizará el entrenamiento.",
+    "calculations": "Cargar el modelo base desde el repositorio. Cargar y pre-procesar el dataset (data augmentation: rotaciones, variaciones de iluminación, recortes aleatorios). Ejecutar fine-tuning del modelo con el dataset usando el optimizador configurado (Adam, SGD). Calcular accuracy y mAP (Mean Average Precision) en el set de validación. Guardar el modelo entrenado con el modelId generado.",
+    "whyOutput": "modelId es la referencia que se usa en inspect_product_quality para cargar este modelo en el edge. accuracy y mAP determinan si el modelo está listo para producción. trainingTimeMinutes es informativo para planificar los ciclos de reentrenamiento.",
+    "uiSuggestion": "Panel de entrenamiento con gráficas de loss y accuracy por epoch (curvas de entrenamiento y validación). Métricas finales: accuracy, mAP, tiempo de entrenamiento. Comparativa con el modelo anterior. Botón de desplegar al edge si métricas superan el umbral."
+  },
+  {
+    "id": "improve_detection_model",
+    "whyInput": "modelId identifica el modelo en producción que se quiere mejorar con nuevos datos recopilados. newSamplesCount indica cuántos ejemplos nuevos se han añadido al dataset (defectos nuevos, casos difíciles, otras condiciones de iluminación) para evaluar si vale la pena reentrenar.",
+    "calculations": "Cargar el modelo identificado por modelId y su dataset de entrenamiento original. Añadir los nuevos ejemplos al dataset. Ejecutar fine-tuning incremental (no reentrenamiento desde cero) para aprovechar el conocimiento previo. Calcular la mejora de accuracy en el conjunto de validación comparando con el modelo original. Si accuracyImprovement > 0.01 (1%), marcar deployReady=true.",
+    "whyOutput": "newModelId es el identificador del modelo mejorado que reemplazará al anterior en producción. accuracyImprovement cuantifica el beneficio del reentrenamiento. deployReady es el flag que autoriza el despliegue automático al edge sin intervención humana.",
+    "uiSuggestion": "Comparativa visual: modelo actual vs nuevo con métricas side-by-side. Ejemplos de imágenes donde el nuevo modelo mejora la detección. Botón de aprobar despliegue con indicador de impacto esperado. Historial de versiones del modelo con accuracy histórica."
+  },
+  {
+    "id": "analyze_visual_patterns",
+    "whyInput": "productType para analizar solo los defectos relevantes para ese tipo de producto y sus características visuales. periodDays define el histórico a analizar — 7 días para revisión semanal de producción, 30 días para análisis de tendencias y correlación con cambios de proceso o proveedor de materiales.",
+    "calculations": "Consultar el historial de inspecciones del período para productType. Agrupar defectos detectados por tipo y calcular frecuencia. Ordenar por frecuencia para obtener topDefects (Pareto de defectos). Calcular defectTrend comparando la tasa de defectos del período vs el período anterior. Para cada defecto en topDefects, analizar correlaciones con parámetros de proceso para sugerir causas raíz.",
+    "whyOutput": "topDefects es el Pareto que el equipo de calidad usa para priorizar las acciones correctivas (el 20% de tipos de defecto que generan el 80% del rechazo). defectTrend alerta si la calidad está deteriorándose. suggestedRootCauses es el análisis que el agente presenta para iniciar una investigación de causa raíz (8D, DMAIC).",
+    "uiSuggestion": "Diagrama de Pareto de defectos (barras de frecuencia + línea de porcentaje acumulado). Gráfica de tendencia de la tasa de defectos en el tiempo. Mapa de calor de defectos por máquina y turno. Panel de causas raíz sugeridas con correlaciones estadísticas."
+  },
+  {
+    "id": "predict_demand_industrial",
+    "whyInput": "componentId identifica el componente o materia prima industrial cuya demanda se quiere predecir (puede ser un rodamiento, un aceite hidráulico o una pieza de repuesto crítica). includeExternalSignals activa señales externas de demanda: índices de producción industrial, precios de materias primas, lead times de proveedores que afectan la planificación.",
+    "calculations": "Usar el historial de consumo del componente. Aplicar modelo de series temporales (Prophet con estacionalidad múltiple para ciclos semanales/mensuales/anuales). Si includeExternalSignals=true, incorporar regresores externos (índice de producción industrial, precios de commodities). Generar el forecast diario o semanal con modelAccuracy calculada por backtesting.",
+    "whyOutput": "demandForecast es el array de fecha+unidades que el sistema MRP usa para calcular las necesidades de aprovisionamiento. modelAccuracy permite al planificador ajustar el margen de seguridad manualmente si la precisión es baja. El agente usa este forecast para lanzar órdenes de compra preventivas.",
+    "uiSuggestion": "Gráfica de área con consumo histórico y forecast futuro diferenciados. Tabla de forecast semanal con unidades y rango de error. Indicador de accuracy del modelo con clasificación (Excelente/Bueno/Regular). Comparativa de forecast con y sin señales externas."
+  },
+  {
+    "id": "optimize_production_sequence",
+    "whyInput": "jobs es la lista de órdenes de producción con sus datos clave: tiempo de procesamiento por operación, fecha de entrega comprometida y prioridad. machines es el número de máquinas disponibles en la línea — el agente usa esto para calcular el problema de secuenciación correcto (single-machine, parallel machines, flow shop).",
+    "calculations": "Modelar como un Flexible Job Shop Scheduling Problem (FJSSP). Aplicar metaheurísticas: Algoritmo Genético con representación de permutación de trabajos, o Tabu Search para escapar de óptimos locales. Objetivo: minimizar makespan (tiempo total de finalización) y el número de retrasos. Calcular makespanReduction comparando la secuencia optimizada contra la secuencia FCFS actual.",
+    "whyOutput": "optimizedSequence es el orden exacto en que cada máquina debe procesar las órdenes — se envía al MES para reprogramar la producción. makespanReduction es el beneficio tangible de la optimización que justifica su uso ante los operadores.",
+    "uiSuggestion": "Diagrama de Gantt comparativo: secuencia actual vs optimizada, con el makespan de cada una resaltado. Tabla de órdenes con posición en secuencia actual y nueva posición. Métricas de beneficio: horas ahorradas, órdenes a tiempo. Botón de aplicar la secuencia al MES."
+  },
+  {
+    "id": "detect_process_deviation",
+    "whyInput": "processId identifica el proceso industrial específico (mezcla, laminado, tratamiento térmico, etc.) con sus parámetros de control configurados. parameters es el snapshot actual de los parámetros de proceso (temperatura, presión, velocidad, pH, etc.) que el agente compara contra los límites de control establecidos.",
+    "calculations": "Comparar cada parámetro en parameters contra sus límites de control (UCL, LCL) definidos en el plan de control del proceso. Aplicar reglas de Nelson para detectar tendencias: punto fuera de control, 7 puntos consecutivos del mismo lado de la media. Calcular el índice Cpk = min((USL-µ)/(3σ), (µ-LSL)/(3σ)) para cada parámetro.",
+    "whyOutput": "deviationDetected dispara una alerta para que el operador revise y corrija el proceso antes de producir defectos. outOfControlParameters lista exactamente qué parámetros están fuera de control para que el operador sepa qué ajustar. cpkValue cuantifica la capacidad del proceso: Cpk > 1.33 es aceptable, < 1.0 requiere acción inmediata.",
+    "uiSuggestion": "Gráficas de control (control charts) en tiempo real para cada parámetro con UCL, LCL y media. Puntos fuera de control resaltados en rojo. Tabla de parámetros con Cpk y estado. Alarma visual y sonora cuando deviationDetected=true."
+  },
+  {
+    "id": "predict_machine_failure",
+    "whyInput": "assetId identifica el activo industrial (bomba, motor, compresor, CNC) con su historial de mantenimiento y fallas previas. sensorReadings es el snapshot actual de sensores críticos del activo (temperatura, vibración, corriente, presión de aceite) que alimentan el modelo predictivo. horizonHours define cuánto tiempo hacia adelante predecir.",
+    "calculations": "Cargar el modelo de ML entrenado para este tipo de activo (LSTM para series temporales de sensores, o Random Forest con features de vibración: RMS, frecuencia dominante, kurtosis). Calcular features del estado actual a partir de sensorReadings. Ejecutar la predicción: failureProbability y estimatedTimeToFailureHours. Clasificar el tipo de falla más probable basándose en el patrón de señales.",
+    "whyOutput": "failureProbability permite al agente priorizar qué activos atender primero en el plan de mantenimiento. estimatedTimeToFailureHours define la ventana disponible para programar el mantenimiento sin afectar la producción. failureType permite al técnico llevar los repuestos correctos. recommendedAction es la instrucción concreta para el equipo de mantenimiento.",
+    "uiSuggestion": "Tarjeta de activo con gauge de probabilidad de falla (0-100%) y color de riesgo. Línea temporal mostrando el estimatedTimeToFailure. Gráficas de tendencia de sensores clave en el tiempo. Panel de acción recomendada con tipo de mantenimiento y repuestos sugeridos."
+  },
+  {
+    "id": "analyze_vibration_patterns",
+    "whyInput": "assetId para cargar el historial de vibración del activo y los umbrales de alarma configurados para ese tipo de máquina. vibrationData es la señal de vibración cruda capturada por el acelerómetro (array de muestras en g). samplingRateHz es la frecuencia de muestreo que permite calcular el espectro de frecuencias correctamente (debe cumplir el criterio de Nyquist).",
+    "calculations": "Aplicar FFT (Fast Fourier Transform) a vibrationData usando samplingRateHz para obtener el espectro de frecuencias. Calcular el valor RMS (Root Mean Square) como indicador de energía total de vibración. Identificar el dominantFrequency (frecuencia pico en el espectro). Comparar las frecuencias con las frecuencias características del activo (BPFO/BPFI/BSF) para identificar failureSignature.",
+    "whyOutput": "dominantFrequency y failureSignature permiten al técnico de mantenimiento identificar el componente específico que está fallando sin necesidad de desmontar la máquina. rmsValue es el KPI de condición que se monitorea en tendencia: un rmsValue creciente indica deterioro acelerado. severity determina la urgencia de la intervención.",
+    "uiSuggestion": "Gráfica de espectro de frecuencias (FFT) con marcadores en las frecuencias características del activo. Gráfica de señal temporal de vibración. Indicador de RMS con histórico y tendencia. Tabla de frecuencias características con estado (normal/alerta/crítico)."
+  },
+  {
+    "id": "optimize_energy_usage",
+    "whyInput": "assetIds es la lista de activos cuyo consumo energético se quiere optimizar (motores, compresores, sistemas HVAC, hornos). tariffPlan contiene la estructura tarifaria eléctrica: precios por período (punta, semipunta, base) y cargos por demanda máxima — esencial para calcular cuándo es más económico operar cada activo.",
+    "calculations": "Obtener el perfil de consumo histórico de cada activo (kW por hora). Analizar patrones de uso vs necesidad real de producción. Identificar oportunidades: activos en marcha sin carga, programación de cargas pesadas en horario de menor tarifa, ajuste de velocidad de motores con variadores. Calcular el ahorro monetario aplicando la tarifa del tariffPlan al perfil de consumo optimizado vs actual.",
+    "whyOutput": "recommendations es la lista concreta de cambios que el operador puede implementar (ej: 'apagar compresor auxiliar entre 18:00-22:00'). estimatedSavingsKwh cuantifica el ahorro energético. estimatedSavingsCurrency convierte el ahorro a pesos/dólares para facilitar la presentación a la dirección.",
+    "uiSuggestion": "Perfil de consumo 24h con curva actual vs curva optimizada superpuestas. Tabla de oportunidades con ahorro mensual estimado por activo. Calculadora de tarifa con desglose de cargos. Indicador de payback de las inversiones recomendadas."
+  },
+  {
+    "id": "identify_bottlenecks",
+    "whyInput": "lineId identifica la línea de producción a analizar con todas sus estaciones y tiempos de ciclo históricos. analysisWindow define el período de datos a analizar ('1shift', '1week', '1month') — ventanas cortas detectan cuellos de botella coyunturales, ventanas largas identifican cuellos de botella estructurales.",
+    "calculations": "Obtener los tiempos de ciclo por estación de trabajo para cada orden procesada en analysisWindow. Calcular la utilización de cada estación: utilizationPercent = (tiempo_ciclo_real / tiempo_ciclo_disponible) × 100. La estación con mayor utilización es el cuello de botella según la Teoría de las Restricciones (TOC) de Goldratt. Calcular theoreticalCapacityIncrease estimando cuánto aumentaría el throughput si se elimina el cuello de botella.",
+    "whyOutput": "bottlenecks lista las estaciones ordenadas por utilización, con los datos que el equipo de ingeniería necesita para el análisis de capacidad. theoreticalCapacityIncrease cuantifica el beneficio de resolver el cuello de botella. waitTimeMs muestra el tiempo de espera acumulado de los trabajos bloqueados.",
+    "uiSuggestion": "Diagrama de flujo de la línea con cada estación como caja, coloreada por utilización (verde/amarillo/rojo). Gráfica de barras de utilización por estación con línea de 100%. KPI de capacidad teórica incrementada. Recomendaciones de balanceo de línea accionables."
+  },
+  {
+    "id": "generate_digital_twin_model",
+    "whyInput": "assetId identifica el activo físico a replicar digitalmente (máquina, celda de manufactura, línea completa). historicalDatasetId apunta al dataset de datos operativos históricos (sensores, parámetros de proceso, fallas, mantenimientos) que se usarán para calibrar el modelo digital. cadFileUrl es el modelo 3D CAD del activo para la representación geométrica fiel del gemelo.",
+    "calculations": "Cargar el modelo CAD y convertirlo al formato de simulación (FMU/FMI standard o formato propietario). Entrenar el modelo físico-dinámico usando los datos históricos: ajustar parámetros del modelo matemático (constantes de tiempo, coeficientes de fricción, etc.) mediante optimización por mínimos cuadrados o algoritmos bayesianos. Calcular modelAccuracy comparando las salidas del modelo vs los datos reales de validación.",
+    "whyOutput": "modelId es la referencia del gemelo digital que se usa en simulate_operations y feed_real_time_data_to_twin. modelAccuracy indica qué tan fielmente representa el gemelo al activo real. simulationReady indica si el gemelo está listo para ejecutar escenarios what-if.",
+    "uiSuggestion": "Visualización 3D interactiva del activo con el modelo CAD renderizado. Indicadores de fidelidad del modelo por subsistema (mecánico, eléctrico, térmico). Panel de métricas de calibración: accuracy, error medio, error máximo. Botón de activar sincronización en tiempo real."
+  },
+  {
+    "id": "collect_vibration_data",
+    "whyInput": "sensorId identifica el acelerómetro específico instalado en el activo (rodamiento, carcasa, eje) — cada sensor tiene su propia posición y orientación que determina qué fallas puede detectar. samplingRateHz debe ser al menos el doble de la frecuencia máxima de interés (criterio de Nyquist). durationMs define cuánto tiempo capturar para obtener suficientes ciclos de vibración para el análisis FFT.",
+    "calculations": "Comunicar con el acelerómetro usando su protocolo de adquisición (USB, Ethernet, módulo DAQ). Configurar la tasa de muestreo y la duración. Capturar el array de muestras de aceleración en unidades de g (gravedad). Verificar la calidad de los datos (sin saturación, sin ruido excesivo). El array se pasa a analyze_vibration_patterns para el análisis FFT.",
+    "whyOutput": "samples es el array de datos crudos que analyze_vibration_patterns necesita para calcular el espectro FFT y detectar firmas de falla. samplingRateHz se incluye en la salida porque es necesario para interpretar correctamente el espectro de frecuencias resultante. timestamp permite sincronizar la medición con el estado operativo del activo.",
+    "uiSuggestion": "Gráfica de señal temporal de vibración en tiempo real durante la captura. Indicador de calidad de señal (saturación, ruido). Historial de capturas recientes por sensor. Botón de captura manual y configuración de captura periódica automática."
+  },
+  {
+    "id": "collect_process_signals",
+    "whyInput": "deviceId identifica el dispositivo de campo (PLC, DCS, PAC) del que se leerán los datos. protocol especifica cómo conectar: OPC-UA es el estándar moderno industrial con seguridad integrada, Modbus TCP/RTU es el protocolo legacy más común en planta, MQTT es para dispositivos IoT edge. tags es la lista de variables a leer.",
+    "calculations": "Establecer conexión con el dispositivo usando el protocolo especificado. Para OPC-UA: conectar al servidor OPC-UA, autenticar con certificado, leer los NodeIDs correspondientes a los tags. Para Modbus: calcular las direcciones de registro para cada tag, ejecutar Read Holding Registers. Para MQTT: suscribirse a los topics correspondientes. Mapear los valores brutos a unidades de ingeniería.",
+    "whyOutput": "readings es el array de valores que alimenta todos los análisis posteriores: detect_real_time_anomalies, predict_machine_failure, run_local_inference. Incluir unit en cada reading es esencial para que los algoritmos de análisis apliquen los umbrales correctos. timestamp permite la sincronización temporal entre señales de diferentes dispositivos.",
+    "uiSuggestion": "Dashboard de señales en tiempo real con un widget por tag: valor actual, unidad, timestamp de última lectura. Indicador de estado de conexión al dispositivo (Online/Offline). Gráficas de tendencia por señal en ventana deslizante. Configurador visual de tags a monitorear."
+  },
+  {
+    "id": "run_local_inference",
+    "whyInput": "modelId identifica el modelo de ML desplegado en el edge (previamente entrenado en el cloud y descargado al dispositivo edge). inputTensor es el vector de características numéricas preparado para el modelo (datos de sensores normalizados, features de vibración, etc.). modelFormat especifica el runtime de inferencia: ONNX Runtime para modelos multi-framework, TFLite para dispositivos con recursos muy limitados.",
+    "calculations": "Cargar el modelo desde el repositorio local usando modelId. Verificar que el inputTensor tiene la forma correcta (dimensiones esperadas por el modelo). Ejecutar el motor de inferencia correspondiente a modelFormat (ONNX Runtime o TFLite Interpreter). Medir el tiempo de inferencia para monitorear la latencia. Devolver la predicción en el formato de salida del modelo.",
+    "whyOutput": "prediction contiene el resultado del modelo (ej: {failure_class: 'bearing', probability: 0.87, recommended_action: 'schedule_maintenance'}). inferenceTimeMs es crítico para verificar que la inferencia cumple los requisitos de latencia en tiempo real (< 50ms para muchas aplicaciones de control). modelVersion permite auditar qué versión del modelo tomó cada decisión.",
+    "uiSuggestion": "Panel de inferencia con entrada (tensor de sensores) y salida (predicción) en formato tarjeta. Indicador de latencia de inferencia con umbral configurable. Historial de predicciones recientes con timestamp y confianza. Alerta si la latencia supera el umbral máximo."
+  },
+  {
+    "id": "detect_real_time_anomalies",
+    "whyInput": "signalId identifica la señal industrial a monitorear (temperatura, presión, vibración, corriente). value es el valor actual de la señal en el instante actual — el agente llama a esta tool en cada ciclo de muestreo para detección en tiempo real. windowSize define cuántos valores históricos usar para calcular la estadística de referencia adaptativa.",
+    "calculations": "Mantener un buffer circular de los últimos windowSize valores de la señal. Calcular µ (media) y σ (desviación estándar) del buffer. Calcular Z-score = (value - µ) / σ. Si |Z-score| > adaptiveThreshold, marcar anomalyDetected=true. El umbral adaptativo se ajusta automáticamente según la tasa de falsas alarmas histórica. Calcular la severidad: low (3σ), medium (4σ), high (5σ).",
+    "whyOutput": "anomalyDetected es el flag que dispara la acción inmediata del agente (alerta, ajuste de proceso, paro preventivo). zscore cuantifica qué tan anómalo es el valor actual — el agente lo usa para priorizar cuál de múltiples anomalías simultáneas atender primero. adaptiveThreshold permite al operador calibrarlo manualmente si es necesario. severity determina la respuesta del agente.",
+    "uiSuggestion": "Gráfica de señal en tiempo real con banda de control (µ ± nσ) en transparente. Punto actual resaltado si es anomalía. Gauge de Z-score con zonas de color. Contador de anomalías en el turno con tasa de falsas alarmas. Panel de configuración del umbral adaptativo."
+  },
+  {
+    "id": "orchestrate_edge_nodes",
+    "whyInput": "clusterName identifica el clúster de nodos edge (ej: 'planta-monterrey-linea-1') para gestionar un conjunto lógico de dispositivos edge de forma unificada. nodes lista los nodos del clúster con su rol: algunos son nodos de procesamiento (inference), otros de recolección (data collectors), otros de actuación (actuators).",
+    "calculations": "Enviar health checks a cada nodeId listado en nodes (ping, API check, verificación de procesos activos). Determinar qué nodos están activos (responden en < timeout) vs offline. Calcular clusterHealth: 'healthy' si todos los nodos críticos están online, 'degraded' si hay nodos no críticos offline, 'critical' si hay nodos críticos offline. Registrar el estado en el sistema de monitoreo.",
+    "whyOutput": "activeNodes/totalNodes permite calcular el porcentaje de disponibilidad del clúster edge. clusterHealth es el estado que el agente usa para decidir si puede continuar operando en modo autónomo o necesita escalar al equipo de IT. En estado 'critical', el agente puede automáticamente redirigir cargas de trabajo a nodos alternativos.",
+    "uiSuggestion": "Mapa de planta con nodos edge representados como puntos en su ubicación física, coloreados por estado (verde=online, rojo=offline, amarillo=degradado). Panel de clúster con contadores y clusterHealth. Lista de nodos con última vez visto online y causa del offline si aplica."
+  },
+  {
+    "id": "manage_edge_devices",
+    "whyInput": "operation especifica la acción CRUD a realizar sobre el registro de dispositivos: 'register' añade un nuevo dispositivo, 'update' modifica su configuración, 'delete' lo retira del sistema, 'list' obtiene el inventario. deviceId identifica el dispositivo específico para operaciones register/update/delete.",
+    "calculations": "Validar que deviceId existe en el registro para operaciones update/delete. Para 'register': generar un UUID para el nuevo dispositivo, validar que los campos obligatorios están presentes (tipo, ubicación, protocolo), insertar en la BD de dispositivos. Para 'update': aplicar los cambios de configuración y propagar al dispositivo edge si está online. Para 'list': consultar y devolver el inventario completo.",
+    "whyOutput": "devices es el inventario actualizado que el sistema de gestión usa para conocer qué activos edge están registrados y su configuración. operationResult confirma si la operación tuvo éxito o explica el error. timestamp es el registro de auditoría de cuándo se realizó el cambio.",
+    "uiSuggestion": "Tabla de inventario de dispositivos con columnas: ID, Tipo, Ubicación, Protocolo, Estado, Última conexión. Buscador y filtros por tipo y estado. Formulario modal de registro/edición de dispositivo. Botón de ping para verificar conectividad. Exportar inventario a CSV."
+  },
+  {
+    "id": "collect_sensor_data",
+    "whyInput": "sensorIds lista todos los sensores a leer en una sola operación (temperatura, presión, flujo, nivel, etc.) para obtener un snapshot sincronizado del estado del proceso. intervalMs define la frecuencia de muestreo — intervalos cortos (100ms) para procesos rápidos de control, intervalos largos (60000ms) para monitoreo de tendencias de proceso lento.",
+    "calculations": "Para cada sensorId, establecer comunicación con el sensor o su concentrador de datos (data gateway). Leer el valor actual en el instante más próximo a la solicitud para maximizar la sincronía entre sensores. Convertir el valor crudo a unidades de ingeniería usando la curva de calibración del sensor. Buffear las lecturas y devolver todas juntas. bufferedCount indica cuántas lecturas se acumularon en el buffer entre intervalos.",
+    "whyOutput": "readings es el array de valores sincronizados que alimenta los análisis de proceso: detect_process_deviation, predict_machine_failure, run_local_inference. El conjunto de lecturas simultáneas permite detectar correlaciones entre señales. bufferedCount ayuda a detectar si la tasa de muestreo está generando acumulación.",
+    "uiSuggestion": "Dashboard de proceso con widgets de gauge por sensor: valor actual con unidad y rango normal. Semáforo de estado por sensor (normal/alerta/alarma). Gráfica multi-línea de tendencia de todos los sensores en el tiempo. Configurador de intervalos de muestreo por sensor."
+  },
+  {
+    "id": "digitize_analog_signals",
+    "whyInput": "channelId identifica el canal del módulo de adquisición de datos (ADC) donde está conectada la señal analógica del sensor. signalType especifica el estándar de señal: 4-20mA (corriente, más robusto contra interferencia para distancias largas) o 0-10V (voltaje, para distancias cortas). engineeringMin y engineeringMax definen la escala de la variable física.",
+    "calculations": "Leer el valor crudo del ADC del channelId (típicamente en cuentas: 0-65535 para 16 bits). Aplicar la conversión de señal: para 4-20mA, el valor crudo corresponde a 4mA (min) a 20mA (max); para 0-10V, 0V a 10V. Mapear linealmente al rango de ingeniería: engineeringValue = engineeringMin + (rawValue - minRaw) / (maxRaw - minRaw) × (engineeringMax - engineeringMin). Aplicar filtros de ruido si están configurados.",
+    "whyOutput": "rawValue permite diagnóstico: si está en 0 o en el máximo, puede indicar cable cortado o sensor en cortocircuito. engineeringValue es el valor en unidades físicas reales (°C, bar, m³/h) que usan todas las tools de análisis. unit permite que las herramientas de análisis apliquen los límites correctos de alarma.",
+    "uiSuggestion": "Widget de medición con dos valores: rawValue (mA o V) y engineeringValue con unidad. Barra horizontal de rango con el valor actual como marcador. Indicador de estado de señal (normal/señal rota/saturada). Histórico de la señal en gráfica de línea."
+  },
+  {
+    "id": "monitor_energy_consumption",
+    "whyInput": "meterId identifica el medidor de energía (PowerLogic, PowerMeter, etc.) instalado en el tablero eléctrico del activo o la línea. readInterval define cada cuántos segundos tomar una medición — intervalos cortos (1-5s) para monitoreo de demanda pico, intervalos largos (60s) para tendencias de consumo y facturación.",
+    "calculations": "Comunicar con el medidor usando su protocolo (Modbus RTU/TCP es el más común en medidores industriales). Leer los registros de: kW (potencia activa instantánea), kWh (energía acumulada), powerFactor (factor de potencia), voltage por fase, current por fase. Calcular la potencia aparente y reactiva si el medidor no las proporciona directamente.",
+    "whyOutput": "kw y kwh son los datos de consumo que el agente usa para optimize_energy_usage y para calcular el costo energético de cada orden de producción. powerFactor alerta cuando está por debajo de 0.90 — las empresas pagan penalización tarifaria por bajo factor de potencia. voltage y current permiten detectar problemas eléctricos: desequilibrio de fases, sobrecarga, baja tensión.",
+    "uiSuggestion": "Panel de energía con gauges de kW actual, kWh acumulado del día y factor de potencia. Gráfica de demanda (kW) en tiempo real. Indicador de alerta si powerFactor < 0.90. Comparativa de consumo vs período anterior. Cálculo de costo energético en tiempo real."
+  },
+  {
+    "id": "execute_local_control_action",
+    "whyInput": "deviceId identifica el dispositivo de campo a controlar (PLC, actuador, variador de frecuencia). tag es el nombre de la variable de salida en el dispositivo (ej: 'Setpoint_Velocidad', 'Valvula_01_Open'). value es el nuevo valor a escribir calculado por el agente a partir de los análisis realizados. protocol especifica cómo conectar al dispositivo para escribir el valor.",
+    "calculations": "Conectar al dispositivo usando el protocol especificado. Validar que tag existe en el dispositivo y que value está dentro del rango seguro permitido. Ejecutar la escritura: para Modbus, escribir el registro de holding; para OPC-UA, llamar al método Write del servidor. Verificar la escritura leyendo el valor de vuelta (write-verify). Registrar la acción en el log de auditoría de control.",
+    "whyOutput": "success confirma que el actuador ejecutó la acción — el agente necesita esta confirmación antes de continuar con la siguiente acción en su plan de respuesta. Si success=false, el agente intenta vías alternativas o escala a un operador humano. writtenValue es el valor efectivamente escrito. timestamp es esencial para el log de auditoría de acciones de control.",
+    "uiSuggestion": "Panel de control con lista de acciones ejecutadas recientemente. Cada acción: ícono de éxito/fallo, dispositivo, tag, valor anterior y nuevo. Log de auditoría completo con filtros. Botón de deshacer la última acción (write el valor anterior). Alarma visual si success=false."
+  },
+  {
+    "id": "deploy_edge_configuration",
+    "whyInput": "configId identifica el paquete de configuración en el repositorio (parámetros de agentes, umbrales de alarma, configuración de protocolos). targetDevices lista los dispositivos edge que recibirán la nueva configuración. strategy controla el riesgo del despliegue: 'rolling' actualiza de a pocos dispositivos para detectar problemas antes de afectar toda la flota, 'all-at-once' es más rápido pero más riesgoso.",
+    "calculations": "Obtener el paquete de configuración de configId del repositorio. Validar la configuración contra el schema esperado. Conectar a cada targetDevice según su protocolo de gestión (SSH, MQTT management, REST API). Aplicar la configuración según strategy: si 'rolling', actualizar de a 10% de la flota por ciclo, verificar salud antes de continuar. Si algún dispositivo falla, marcar como failed y continuar con los demás.",
+    "whyOutput": "deployed y failed son los contadores que muestran el resultado del despliegue masivo para el reporte de operaciones. rollbackAvailable indica si el agente puede revertir automáticamente a la configuración anterior si se detectan problemas post-despliegue. El agente monitorea los dispositivos actualizados durante 10 minutos después del despliegue para confirmar estabilidad.",
+    "uiSuggestion": "Panel de despliegue con barra de progreso y contadores de dispositivos actualizados/fallidos/pendientes. Lista de dispositivos con estado individual. Log en tiempo real del proceso de despliegue. Botón de rollback con confirmación. Historial de despliegues anteriores."
+  },
+  {
+    "id": "update_edge_agents",
+    "whyInput": "agentId identifica el software del agente a actualizar en los dispositivos edge (ej: 'inference-agent', 'data-collector'). targetVersion es la versión a instalar, obtenida del repositorio de artefactos. deviceFilter permite segmentar la actualización: solo dispositivos de cierto tipo, ubicación o estado para hacer rollouts graduales.",
+    "calculations": "Consultar el repositorio para obtener el paquete de la targetVersion para agentId. Filtrar los dispositivos aplicando deviceFilter. Para cada dispositivo: descargar el paquete al dispositivo vía SCP/MQTT, detener el servicio actual, hacer backup de la configuración, instalar la nueva versión, verificar que el servicio arranca correctamente. Generar un updateJobId para rastrear el proceso asíncrono.",
+    "whyOutput": "updatedDevices y failedDevices son los KPIs del rollout que el equipo de IT monitorea. updateJobId permite consultar el estado del proceso asíncrono (la actualización puede tardar minutos u horas en flotas grandes). El agente puede hacer rollback automático en dispositivos donde la actualización falló.",
+    "uiSuggestion": "Dashboard de rollout con mapa de dispositivos coloreados por estado de actualización. Barra de progreso global del rollout. Tabla de dispositivos con versión actual y nueva, y estado (Pendiente/Actualizando/Éxito/Fallo). Log de errores por dispositivo."
+  },
+  {
+    "id": "monitor_edge_health",
+    "whyInput": "fleetId identifica el grupo de dispositivos edge a monitorear (toda la planta, una línea específica, o un tipo de dispositivo). alertThresholds define los límites de recursos que disparan alertas: cpuPercent máximo antes de que el dispositivo se sature, memPercent límite de RAM disponible, diskPercent para detectar discos que se están llenando.",
+    "calculations": "Consultar las métricas de recursos de cada nodo en la flota (CPU, memoria, disco, temperatura, latencia de red) vía el agente de monitoreo instalado en cada dispositivo. Comparar cada métrica contra alertThresholds. Clasificar cada nodo como 'healthy', 'degraded' o 'critical'. Agregar el estado de la flota: nodesOnline/nodesOffline. Generar el array alerts para los nodos que superen algún threshold.",
+    "whyOutput": "nodesOnline/nodesOffline es el KPI de disponibilidad de la infraestructura edge. alerts lista los problemas concretos a atender para que el agente o el equipo de IT tomen acción antes de que fallen los nodos. healthySince permite calcular el uptime de la flota. El agente puede ordenar un reinicio automático de nodos en estado 'degraded'.",
+    "uiSuggestion": "Grid de tarjetas por nodo edge con métricas: CPU%, RAM%, Disco%, temperatura. Semáforo de salud por nodo. Gráficas de tendencia de recursos en el tiempo. Lista de alertas activas con severidad. Mapa de planta con ubicación física de cada nodo."
+  },
+  {
+    "id": "manage_device_registry",
+    "whyInput": "operation especifica qué hacer con el registro de dispositivos industriales del sistema. deviceData contiene el objeto con los datos del dispositivo: ID, tipo (sensor/actuador/PLC/gateway), protocolo de comunicación, ubicación física, parámetros de calibración y configuración de alertas.",
+    "calculations": "Según operation: 'add' valida los campos obligatorios y genera un ID único, luego inserta en la BD. 'remove' verifica que el dispositivo no tenga datos activos o alarmas pendientes antes de eliminar. 'query' ejecuta una búsqueda flexible por los campos de deviceData proporcionados. 'list' devuelve el inventario completo con paginación.",
+    "whyOutput": "devices es el inventario actualizado que todas las tools usan como fuente de verdad para saber qué dispositivos existen y cómo conectarse a ellos. totalDevices es el KPI del inventario para auditoría de activos. operationResult explica claramente si la operación tuvo éxito y qué se hizo, o el motivo del fallo.",
+    "uiSuggestion": "Tabla de inventario con búsqueda y filtros por tipo, protocolo y ubicación. Vista de tarjetas alternativa con ícono por tipo de dispositivo. Formulario de alta/edición de dispositivo con campos dinámicos según el tipo. Exportar inventario completo a Excel/CSV."
+  },
+  {
+    "id": "simulate_bottlenecks",
+    "whyInput": "lineId identifica la línea de producción con su configuración actual de capacidades por estación. scenario define el escenario what-if a simular: capacityChange es el cambio de capacidad en una estación específica (positivo para ampliar, negativo para reducir), demandIncrease es el aumento de pedidos que se quiere evaluar si la línea puede absorber.",
+    "calculations": "Cargar el modelo de simulación de la línea (tiempos de ciclo, capacidades, buffers entre estaciones). Aplicar los cambios del scenario: modificar la capacidad de la estación afectada o la tasa de demanda. Simular el flujo de producción usando un modelo de eventos discretos (DES). Calcular el throughput resultante, el OEE esperado y comparar con la situación actual para obtener throughputChange y oeeDelta.",
+    "whyOutput": "throughputChange cuantifica el impacto del escenario en la producción (ej: '+15% si se añade una máquina paralela en la estación 3'). oeeDelta muestra el efecto en la eficiencia global. recommendation es la conclusión del análisis: qué inversión o cambio operativo genera el mayor beneficio para la línea.",
+    "uiSuggestion": "Diagrama de flujo de la línea antes/después del escenario con throughput por estación. Comparativa de OEE actual vs simulado con gauge. Panel de escenarios guardados para comparar múltiples alternativas. Análisis de sensibilidad: cómo varía el resultado según la capacidad añadida."
+  },
+  {
+    "id": "optimize_production_flow",
+    "whyInput": "lineId para obtener la configuración actual de la línea (capacidades, tiempos de setup, restricciones). productionOrders es la lista de órdenes a programar en la línea con la cantidad a producir, la prioridad del cliente y las restricciones de fecha de entrega que el agente debe respetar al optimizar.",
+    "calculations": "Modelar el problema de scheduling con las restricciones de la línea y las órdenes. Aplicar optimización por programación lineal (PuLP, Gurobi) o metaheurísticas (NSGA-II para objetivos múltiples: maximizar OEE y minimizar WIP). Calcular el estimatedOEE del plan resultante. Calcular wipReduction como la diferencia entre el WIP promedio del plan actual vs el plan optimizado.",
+    "whyOutput": "optimizedFlow es el plan de producción secuenciado que el MES ejecutará en la línea. estimatedOEE es el KPI que justifica el uso del optimizador ante la dirección. wipReduction cuantifica la reducción de inventario en proceso (WIP) que libera capital de trabajo y reduce el tiempo de ciclo total.",
+    "uiSuggestion": "Diagrama de Gantt de la línea con bloques coloreados por orden/producto. KPIs del plan: OEE estimado, WIP promedio, órdenes a tiempo. Comparativa vs plan anterior. Botón de confirmar y enviar al MES. Simulación animada del flujo de producción."
+  },
+  {
+    "id": "plan_production_automatically",
+    "whyInput": "plantId para obtener todos los recursos de la planta (líneas, máquinas, operadores, materiales disponibles). horizon es el número de días que cubre el plan — planes cortos (5-10 días) para producción de alta variabilidad, planes largos (30 días) para producción repetitiva. demandForecast es el input del plan: las cantidades a producir por producto y fecha.",
+    "calculations": "Integrar la demanda, la capacidad disponible y los materiales disponibles (del ERP). Aplicar planificación de capacidad finita (FCS - Finite Capacity Scheduling): asignar órdenes a líneas según capacidad disponible, respetando secuencias de setup, mantenimientos programados y calendarios de turno. Calcular resourceUtilization por recurso y onTimeDeliveryRate del plan.",
+    "whyOutput": "productionPlan es el plan maestro que los planificadores de producción reciben para revisar y aprobar antes de enviarlo al MES. resourceUtilization permite identificar recursos sobreutilizados (cuellos de botella) y subutilizados (capacidad disponible para nuevos pedidos). onTimeDeliveryRate es el compromiso de servicio al cliente que el agente puede comunicar al área comercial.",
+    "uiSuggestion": "Vista de calendario de producción con bloques de órdenes por línea y día. Panel de KPIs del plan: OTD, utilización promedio, costo de producción estimado. Alertas de conflictos (material faltante, sobre capacidad). Botón de aprobar y publicar el plan al MES."
+  },
+  {
+    "id": "identify_idle_time_patterns",
+    "whyInput": "lineId para analizar el historial de paros de esa línea específica con sus causas registradas. periodDays define el historial a analizar — análisis de un período largo (30-90 días) permite identificar patrones recurrentes que no son visibles en datos de una semana.",
+    "calculations": "Consultar todos los registros de paro de la línea en el período con causa, duración, turno y hora de inicio. Agrupar por causa de paro. Calcular la distribución temporal de paros por hora del día y día de la semana para identificar patterns recurrentes. Sumar el totalIdleTimeHours del período para cuantificar el impacto.",
+    "whyOutput": "patterns es el análisis estadístico que permite al equipo de manufactura diseñar contramedidas específicas para los paros más frecuentes. topCauses es el Pareto de causas de paro para priorizar los esfuerzos de mejora continua. totalIdleTimeHours cuantifica la oportunidad de mejora en horas de producción perdidas.",
+    "uiSuggestion": "Mapa de calor de paros por hora del día vs día de la semana (intensidad = duración de paros). Gráfica de Pareto de causas de paro. KPI de tiempo muerto total y % del tiempo disponible. Tabla de patrones identificados con frecuencia y acción recomendada."
+  },
+  {
+    "id": "collect_production_data",
+    "whyInput": "machineId identifica la máquina o celda de manufactura de la que se recolectan los datos de producción. protocol especifica cómo conectar a la máquina: OPC-UA para máquinas modernas con servidor OPC-UA integrado, Modbus para máquinas legacy con registros de contadores y estado en PLC.",
+    "calculations": "Conectar a la máquina usando el protocol especificado. Leer los registros de producción: contador de piezas producidas en el turno (partsProduced), tiempo de ciclo de la última pieza (cycleTimeMs). Consultar el log de paros de la máquina para el turno actual: cada paro con su tiempo de inicio, duración y código de causa. Identificar el shiftId del turno activo según el calendario configurado.",
+    "whyOutput": "partsProduced y cycleTimeMs son los datos base del OEE (Availability × Performance × Quality): cycleTimeMs permite calcular la Performance comparando vs el tiempo de ciclo ideal. stoppages son los eventos de Availability que se analizan con identify_idle_time_patterns. shiftId permite agregar los datos por turno para comparativas entre turnos.",
+    "uiSuggestion": "Panel de producción del turno: piezas producidas vs meta, ciclo actual vs ideal, OEE del turno. Timeline de la máquina mostrando períodos de producción (verde), paro (rojo) y mantenimiento (azul). Contador en tiempo real de piezas con velocidad actual. Alerta si cycleTimeMs supera el estándar."
+  },
+  {
+    "id": "track_machine_state",
+    "whyInput": "machineId identifica la máquina cuyo estado se quiere consultar en tiempo real. Esta tool no requiere más parámetros porque el estado se determina directamente desde la máquina a través de sus señales digitales (señal de producción, señal de alarma, señal de mantenimiento) ya registradas en el sistema.",
+    "calculations": "Consultar las señales digitales del PLC o sistema SCADA de machineId: la combinación de señales determina el estado: señal de ciclo activa + sin alarma = 'running', sin señal de ciclo + sin alarma = 'idle', señal de alarma = 'fault', flag de mantenimiento = 'maintenance'. Calcular stateDurationMs como la diferencia entre el timestamp actual y stateStartedAt.",
+    "whyOutput": "state es el dato fundamental para el cálculo del OEE (componente Availability). stateDurationMs indica cuánto tiempo lleva la máquina en ese estado — una máquina en 'fault' por más de 10 minutos sin intervención dispara una escalación automática. El agente usa state para decidir si ejecutar acciones (no se ejecutan ajustes en máquinas en 'fault').",
+    "uiSuggestion": "Ícono de máquina con color dinámico según estado: verde (running), gris (idle), rojo (fault), naranja (maintenance). Tiempo en el estado actual con contador en tiempo real. Histórico de estados del turno como timeline de colores. Dashboard de planta con estado de todas las máquinas."
+  },
+  {
+    "id": "detect_idle_time",
+    "whyInput": "machineId para consultar las señales de la máquina y determinar si está produciendo o no. minIdleSeconds define el tiempo mínimo de inactividad para considerar que es un paro real vs una microparada normal entre piezas — en líneas de alta velocidad pueden haber interrupciones breves que no son paros reales.",
+    "calculations": "Monitorear la señal de ciclo de producción del machineId (señal digital del PLC que pulsa cada vez que completa una pieza). Si la señal no pulsa durante más de minIdleSeconds, marcar idleDetected=true y comenzar a contar idleDurationSeconds. Consultar el sistema SCADA para intentar determinar la cause: si hay una alarma activa = cause de la alarma, si no hay alarma pero está parada = 'sin causa registrada'.",
+    "whyOutput": "idleDetected dispara una notificación inmediata al supervisor del área para que investigue el paro. idleDurationSeconds permite al agente escalar la alerta: paros < 5 min son normales, paros > 30 min son inusuales y requieren intervención de mantenimiento. cause permite al agente tomar acción específica o registrar automáticamente el paro con su causa en el sistema MES.",
+    "uiSuggestion": "Indicador prominente de PARADA con tiempo acumulado en formato MM:SS. Botón de registrar causa de paro con lista de causas predefinidas. Histórico de paros del turno con duración por evento. Alerta escalada visualmente según la duración (amarillo > 5min, rojo > 30min)."
+  },
+  {
+    "id": "execute_production_adjustment",
+    "whyInput": "machineId identifica la máquina en la que se harán los ajustes de proceso. adjustments contiene los parámetros a modificar y sus nuevos valores (ej: {speed: 1200, temperature: 185, pressure: 6.5}) — el agente calcula estos valores a partir del análisis de desviaciones de proceso o del optimizador de producción.",
+    "calculations": "Validar que machineId está en estado 'running' o 'idle' (nunca ajustar una máquina en falla). Para cada parámetro en adjustments, verificar que el nuevo valor está dentro del rango seguro definido en el plan de control del proceso. Conectar al PLC de la máquina y escribir los nuevos setpoints vía el protocolo configurado. Verificar que los setpoints se aplicaron leyendo los valores actuales vs los escritos.",
+    "whyOutput": "applied confirma que los ajustes se ejecutaron correctamente — el agente continúa monitoreando el proceso para verificar que los cambios mejoran los indicadores objetivo. adjustmentsCount indica cuántos parámetros se ajustaron (si adjustmentsCount < len(adjustments), algunos fallaron). timestamp es el registro de auditoría de cuándo se realizó cada ajuste.",
+    "uiSuggestion": "Panel de ajuste con tabla de parámetros: nombre, valor anterior, valor nuevo, estado de escritura. Comparativa antes/después de las gráficas de proceso. Log de ajustes del turno con usuario/agente que los ejecutó. Botón de revertir al setpoint anterior."
+  },
+  {
+    "id": "generate_digital_twin",
+    "whyInput": "assetId identifica el activo físico a replicar: puede ser una máquina individual, una línea completa o toda la planta. assetType determina la complejidad del gemelo a crear: 'machine' es un modelo de un activo individual con sus parámetros físicos, 'line' modela las interacciones entre máquinas, 'plant' es el gemelo más complejo que incluye logística interna.",
+    "calculations": "Consultar el catálogo de activos para obtener las especificaciones de assetId. Seleccionar la plantilla de modelo según assetType. Inicializar el gemelo digital: crear la representación virtual del activo con sus parámetros configurados (dimensiones, materiales, parámetros de proceso, historial de mantenimiento). Calcular fidelityScore comparando las salidas del modelo vs datos históricos reales usando métricas de error (MAE, RMSE).",
+    "whyOutput": "twinId es el identificador que se usa en simulate_operations y feed_real_time_data_to_twin para referenciar este gemelo específico. syncStatus indica si el gemelo está recibiendo datos en tiempo real ('synced', 'pending', 'offline'). fidelityScore es la confianza en las predicciones del gemelo — un score < 0.85 indica que el modelo necesita recalibración.",
+    "uiSuggestion": "Visualización 3D del activo con el gemelo digital renderizado. Indicador de sincronización en tiempo real (última actualización hace X segundos). Gauge de fidelityScore con umbral configurable. Panel de escenarios what-if disponibles para este gemelo."
+  },
+  {
+    "id": "simulate_operations",
+    "whyInput": "twinId identifica el gemelo digital sobre el que correr la simulación (debe estar en syncStatus='synced' con datos recientes). scenarios es el array de escenarios what-if a evaluar: cada uno tiene un nombre descriptivo y sus parámetros de cambio. horizonHours define cuántas horas hacia adelante simular.",
+    "calculations": "Para cada scenario, inicializar el gemelo con el estado actual (datos del feed en tiempo real). Aplicar los cambios definidos en los parámetros del escenario. Ejecutar la simulación por el tiempo de horizonHours usando el solver configurado (simulación de eventos discretos o ecuaciones diferenciales según el tipo de activo). Calcular los KPIs del resultado: OEE, energía consumida, unidades producidas, defectos estimados. Identificar el bestScenarioId como el que maximiza el objetivo configurado.",
+    "whyOutput": "results con los KPIs de cada escenario permite al equipo de ingeniería comparar alternativas objetivamente antes de implementar cambios en la línea real. bestScenarioId es la recomendación del agente. projectedImprovement cuantifica el beneficio esperado del mejor escenario para el reporte a la dirección.",
+    "uiSuggestion": "Tabla comparativa de escenarios con KPIs en columnas y código de color (mejor=verde, peor=rojo). Gráfica de radar comparando todos los escenarios en múltiples dimensiones. Animación del proceso simulado en el gemelo 3D. Botón de implementar el mejor escenario."
+  },
+  {
+    "id": "optimize_system_performance",
+    "whyInput": "twinId identifica el gemelo digital del sistema a optimizar — debe tener un fidelityScore alto para que las recomendaciones sean confiables. optimizationObjective define qué maximizar/minimizar: 'throughput' para maximizar producción, 'energy' para minimizar consumo energético, 'cost' para minimizar costo total de producción.",
+    "calculations": "Usar el gemelo digital como función objetivo del optimizador. Aplicar un algoritmo de optimización (Bayesian Optimization, PSO, o Gradient Descent si el modelo es diferenciable) para encontrar los parámetros de operación que maximizan/minimizan optimizationObjective. Explorar el espacio de parámetros dentro de los límites seguros de operación. Calcular expectedImprovementPercent comparando el punto óptimo vs el punto de operación actual.",
+    "whyOutput": "recommendations es la lista concreta de cambios de setpoints que el agente debe ejecutar (vía execute_local_control_action) para llevar el sistema al punto óptimo. optimizationId permite rastrear qué optimización generó qué recomendaciones. expectedImprovementPercent justifica ante la dirección la inversión en el sistema de gemelo digital.",
+    "uiSuggestion": "Gráfica de superficie de optimización (heatmap 2D del espacio de parámetros con el óptimo marcado). Panel de recomendaciones con parámetro actual vs óptimo por cada ajuste. Indicador de mejora esperada por KPI. Botón de aplicar todas las recomendaciones con simulación previa."
+  },
+  {
+    "id": "feed_real_time_data_to_twin",
+    "whyInput": "twinId identifica el gemelo digital que se va a actualizar con datos frescos del piso de planta. sensorReadings es el array de lecturas de sensores recolectadas por collect_sensor_data o collect_process_signals — incluye todos los parámetros de estado del activo físico. batchSize define cuántas lecturas enviar en cada llamada para balancear la latencia de sincronización vs el overhead de comunicación.",
+    "calculations": "Validar que twinId existe y está en estado activo. Para cada sensorReading del array, mapear el sensorId al parámetro correspondiente del modelo del gemelo. Actualizar el estado interno del gemelo digital con los nuevos valores. Calcular twinSyncLatencyMs como la diferencia entre el timestamp del sensorReading más reciente y el timestamp actual. Marcar twinSyncStatus según la latencia: 'synced' si < 1s, 'delayed' si < 10s, 'stale' si > 10s.",
+    "whyOutput": "recordsSent confirma que el gemelo recibió datos frescos (si es 0, el gemelo está desactualizado y sus predicciones son poco confiables). twinSyncLatencyMs es el indicador de la calidad del gemelo en tiempo real — latencias altas pueden invalidar los resultados de simulate_operations. twinSyncStatus permite al agente advertir a los usuarios antes de ejecutar simulaciones con un gemelo que tiene datos obsoletos.",
+    "uiSuggestion": "Indicador de sincronización del gemelo con latencia en tiempo real (ms) y estado (Sincronizado/Retrasado/Desactualizado). Gráfica de latencia de sincronización en el tiempo. Contador de registros enviados por minuto. Alerta si twinSyncStatus='stale' bloqueando nuevas simulaciones."
+  }
+]
