@@ -154,5 +154,137 @@
     "downloadAvailable": true,
     "downloadFilename": "digital-twin-edge-feeder-v1.0.tar.gz",
     "tags": ["digital-twin", "simulación", "gemelo", "optimización", "what-if"]
+  },
+  {
+    "id": "mantenimiento-cmms",
+    "name": "Maintenance & CMMS Agent",
+    "nameEs": "Agente de Mantenimiento & CMMS",
+    "type": "Hybrid",
+    "category": "maintenance",
+    "categoryLabel": "Mantenimiento",
+    "icon": "🔧",
+    "descriptionEs": "Gestiona órdenes de trabajo, mantenimiento predictivo y ciclo de vida de activos bajo ISO 55000. Edge monitorea condición, Cloud analiza y programa.",
+    "descriptionEn": "Manages work orders, predictive maintenance and asset lifecycle under ISO 55000. Edge monitors condition, Cloud analyzes and schedules.",
+    "fullDescriptionEs": "El Agente de Mantenimiento & CMMS implementa el estándar ISO 55000 de gestión de activos físicos. Las tools Edge ejecutan monitoreo de condición en tiempo real (vibración, temperatura, corriente) y alertan al instante ante degradación. Las tools Cloud analizan modos de falla (FMEA/RCM), calculan MTBF/MTTR, programan mantenimientos preventivos optimizados, gestionan el inventario de repuestos y rastrean el ciclo de vida completo de cada activo. Reduce costos de mantenimiento hasta 30% pasando de reactivo a predictivo.",
+    "fullDescriptionEn": "The Maintenance & CMMS Agent implements the ISO 55000 physical asset management standard. Edge tools execute real-time condition monitoring (vibration, temperature, current) and alert instantly upon degradation. Cloud tools analyze failure modes (FMEA/RCM), calculate MTBF/MTTR, schedule optimized preventive maintenance, manage spare parts inventory, and track the complete lifecycle of each asset. Reduces maintenance costs up to 30% by shifting from reactive to predictive.",
+    "toolIds": [
+      "manage_work_orders", "schedule_preventive_maintenance",
+      "calculate_mtbf_mttr", "analyze_failure_modes",
+      "manage_spare_parts", "track_asset_lifecycle",
+      "execute_condition_monitoring", "generate_maintenance_kpis"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "cmms-edge-monitor-v1.0.tar.gz",
+    "tags": ["mantenimiento", "cmms", "iso55000", "rcm", "predictivo", "activos", "mtbf"]
+  },
+  {
+    "id": "control-scada",
+    "name": "Control & SCADA Agent",
+    "nameEs": "Agente de Control & SCADA",
+    "type": "Edge",
+    "category": "control",
+    "categoryLabel": "Control & SCADA",
+    "icon": "🎛️",
+    "descriptionEs": "Control de procesos en tiempo real: PID, alarmas, historiador y secuencias de lotes ISA-88. Opera 100% en el edge para máxima velocidad y disponibilidad.",
+    "descriptionEn": "Real-time process control: PID, alarms, historian and ISA-88 batch sequences. Operates 100% at the edge for maximum speed and availability.",
+    "fullDescriptionEs": "El Agente de Control & SCADA es el núcleo de control de cualquier planta de proceso. Opera completamente en el edge para garantizar latencias de respuesta menores a 10ms, independiente de la conectividad a la nube. Monitorea miles de tags de proceso, ejecuta lazos PID con autotuning, gestiona setpoints y perfiles, dispara alarmas priorizadas según ISA-18.2, registra datos en el historiador de proceso y ejecuta secuencias de producción por lotes conforme a ISA-88. El análisis de desempeño de lazos se envía periódicamente a la nube para optimización.",
+    "fullDescriptionEn": "The Control & SCADA Agent is the control core of any process plant. It operates entirely at the edge to guarantee response latencies below 10ms, independent of cloud connectivity. It monitors thousands of process tags, executes PID loops with autotuning, manages setpoints and profiles, triggers prioritized alarms per ISA-18.2, logs data to the process historian, and executes batch production sequences per ISA-88. Loop performance analysis is periodically sent to the cloud for optimization.",
+    "toolIds": [
+      "monitor_scada_tags", "execute_pid_control",
+      "manage_setpoints", "trigger_process_alarm",
+      "log_process_historian", "run_batch_sequence",
+      "acknowledge_alarm", "analyze_control_loop_performance"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "scada-edge-controller-v1.0.tar.gz",
+    "tags": ["scada", "pid", "isa88", "isa95", "alarmas", "historiador", "control", "batch"]
+  },
+  {
+    "id": "calidad-spc",
+    "name": "Quality & SPC Agent",
+    "nameEs": "Agente de Calidad & SPC",
+    "type": "Hybrid",
+    "category": "quality",
+    "categoryLabel": "Calidad",
+    "icon": "📊",
+    "descriptionEs": "Control estadístico de proceso, gestión de no conformidades y análisis de sistema de medición bajo ISO 9001 e IATF 16949. Edge recolecta, Cloud analiza.",
+    "descriptionEn": "Statistical process control, non-conformance management and measurement system analysis under ISO 9001 and IATF 16949. Edge collects, Cloud analyzes.",
+    "fullDescriptionEs": "El Agente de Calidad & SPC cierra el ciclo completo de gestión de calidad manufacturera. Las tools Edge recolectan mediciones directamente de instrumentos y líneas de producción en tiempo real. Las tools Cloud calculan cartas de control Xbar-R, detectan señales fuera de control con reglas de Nelson, calculan índices de capacidad Cpk/Ppk, gestionan el flujo de no conformidades con reporte 8D automatizado, y ejecutan análisis de sistemas de medición (Gage R&R). Cubre los requisitos de IATF 16949 para la industria automotriz.",
+    "fullDescriptionEn": "The Quality & SPC Agent closes the complete manufacturing quality management cycle. Edge tools collect measurements directly from instruments and production lines in real time. Cloud tools calculate Xbar-R control charts, detect out-of-control signals using Nelson rules, calculate Cpk/Ppk capability indices, manage non-conformance flows with automated 8D reports, and run measurement system analyses (Gage R&R). Covers IATF 16949 requirements for the automotive industry.",
+    "toolIds": [
+      "calculate_control_charts", "detect_out_of_control_signals",
+      "manage_nonconformances", "generate_8d_report",
+      "calculate_cpk_ppk", "manage_product_specs",
+      "run_msa_analysis", "collect_quality_measurements"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "quality-spc-edge-v1.0.tar.gz",
+    "tags": ["calidad", "spc", "iso9001", "iatf16949", "cpk", "8d", "noconformidades", "seis-sigma"]
+  },
+  {
+    "id": "energia-sustentabilidad",
+    "name": "Energy & Sustainability Agent",
+    "nameEs": "Agente de Energía & Sustentabilidad",
+    "type": "Hybrid",
+    "category": "energy",
+    "categoryLabel": "Energía",
+    "icon": "⚡",
+    "descriptionEs": "Gestión energética ISO 50001, huella de carbono y sustentabilidad. Edge mide en tiempo real, Cloud optimiza cargas y genera reportes de cumplimiento.",
+    "descriptionEn": "ISO 50001 energy management, carbon footprint and sustainability. Edge measures in real time, Cloud optimizes loads and generates compliance reports.",
+    "fullDescriptionEs": "El Agente de Energía & Sustentabilidad implementa el sistema de gestión de energía ISO 50001 y los requisitos de reporte de huella de carbono (GHG Protocol, ISO 14064). Las tools Edge monitorean medidores de energía eléctrica, gas, vapor y agua en tiempo real con resolución de 15 minutos. Las tools Cloud calculan indicadores de desempeño energético (EnPI), detectan desperdicios, optimizan el despacho de cargas para reducir demanda máxima, calculan emisiones de CO₂ equivalente y generan automáticamente los reportes de auditoría ISO 50001.",
+    "fullDescriptionEn": "The Energy & Sustainability Agent implements the ISO 50001 energy management system and carbon footprint reporting requirements (GHG Protocol, ISO 14064). Edge tools monitor electrical energy, gas, steam, and water meters in real time at 15-minute resolution. Cloud tools calculate energy performance indicators (EnPI), detect waste, optimize load dispatch to reduce peak demand, calculate CO₂ equivalent emissions, and automatically generate ISO 50001 audit reports.",
+    "toolIds": [
+      "monitor_energy_meters", "calculate_energy_kpis",
+      "detect_energy_waste", "optimize_energy_loads",
+      "calculate_carbon_footprint", "generate_iso50001_report",
+      "benchmark_energy_performance", "schedule_energy_audit"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "energy-edge-meter-v1.0.tar.gz",
+    "tags": ["energía", "iso50001", "iso14001", "carbon", "sustentabilidad", "enpi", "ghg"]
+  },
+  {
+    "id": "seguridad-hse",
+    "name": "Industrial Safety & HSE Agent",
+    "nameEs": "Agente de Seguridad Industrial & HSE",
+    "type": "Hybrid",
+    "category": "safety",
+    "categoryLabel": "Seguridad HSE",
+    "icon": "🦺",
+    "descriptionEs": "Gestión de seguridad ISO 45001, análisis HAZOP, niveles SIL y permisos de trabajo. Edge monitorea gases y alarmas críticas, Cloud gestiona cumplimiento.",
+    "descriptionEn": "ISO 45001 safety management, HAZOP analysis, SIL levels and work permits. Edge monitors gases and critical alarms, Cloud manages compliance.",
+    "fullDescriptionEs": "El Agente de Seguridad Industrial & HSE cubre el ciclo completo de seguridad en planta bajo ISO 45001, IEC 61508 y OSHA. Las tools Edge monitorizan sensores de gas, temperatura extrema y condiciones peligrosas con latencia de respuesta crítica — activando evacuaciones o paros de emergencia de forma autónoma. Las tools Cloud gestionan el flujo completo de incidentes (reporte → investigación → causa raíz → acción correctiva), ejecutan análisis HAZOP en nodos de proceso, calculan niveles de integridad de seguridad (SIL) para los sistemas instrumentados y gestionan los permisos de trabajo (PTW) con trazabilidad completa.",
+    "fullDescriptionEn": "The Industrial Safety & HSE Agent covers the complete plant safety cycle under ISO 45001, IEC 61508 and OSHA. Edge tools monitor gas sensors, extreme temperature and hazardous conditions with critical response latency — autonomously triggering evacuations or emergency shutdowns. Cloud tools manage the complete incident flow (report → investigation → root cause → corrective action), execute HAZOP analysis on process nodes, calculate Safety Integrity Levels (SIL) for instrumented systems, and manage work permits (PTW) with full traceability.",
+    "toolIds": [
+      "monitor_gas_sensors", "report_safety_incident",
+      "investigate_root_cause_hse", "run_hazop_analysis",
+      "calculate_sil_level", "manage_work_permits",
+      "track_safety_kpis", "schedule_safety_drills"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "hse-edge-safety-v1.0.tar.gz",
+    "tags": ["seguridad", "iso45001", "hazop", "sil", "iec61508", "hse", "incidentes", "ptw"]
+  },
+  {
+    "id": "cadena-suministro",
+    "name": "Supply Chain Agent",
+    "nameEs": "Agente de Cadena de Suministro",
+    "type": "Cloud",
+    "category": "supply-chain",
+    "categoryLabel": "Supply Chain",
+    "icon": "🚚",
+    "descriptionEs": "Visibilidad end-to-end de la cadena de suministro, optimización de rutas, scorecard de proveedores y predicción de disrupciones bajo ISO 28000.",
+    "descriptionEn": "End-to-end supply chain visibility, route optimization, supplier scorecard and disruption prediction under ISO 28000.",
+    "fullDescriptionEs": "El Agente de Cadena de Suministro provee visibilidad completa desde el proveedor hasta el cliente final, alineado con ISO 28000 (seguridad en la cadena de suministro). Rastreo en tiempo real de envíos multimodales, optimización de rutas de entrega con restricciones de costo y tiempo, predicción de disrupciones usando señales de riesgo geopolítico y climático, gestión del almacén WMS con slotting dinámico, y scorecard automatizado de desempeño de proveedores. La tool Edge `scan_incoming_material` digitaliza entradas de material con QR/RFID para trazabilidad completa lote a lote.",
+    "fullDescriptionEn": "The Supply Chain Agent provides complete visibility from supplier to end customer, aligned with ISO 28000 (supply chain security). Real-time tracking of multimodal shipments, delivery route optimization with cost and time constraints, disruption prediction using geopolitical and climate risk signals, WMS warehouse management with dynamic slotting, and automated supplier performance scorecards. The Edge tool `scan_incoming_material` digitizes material entries with QR/RFID for complete lot-to-lot traceability.",
+    "toolIds": [
+      "track_shipments", "optimize_delivery_routes",
+      "predict_supply_disruptions", "manage_warehouse_wms",
+      "calculate_scm_kpis", "manage_supplier_scorecard",
+      "generate_delivery_report", "scan_incoming_material"
+    ],
+    "downloadAvailable": true,
+    "downloadFilename": "scm-edge-scanner-v1.0.tar.gz",
+    "tags": ["supply-chain", "iso28000", "logística", "wms", "proveedores", "rutas", "rfid"]
   }
 ]

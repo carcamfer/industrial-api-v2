@@ -64,8 +64,8 @@ block content
 
       .card
         h2(data-es="Normas Monitoreadas" data-en="Monitored Standards") Normas Monitoreadas
-        p.metric 7
-        p.subtext ISO 9001 · 27001 · 55001 · 50001 · 22301 · 45001 · 14001
+        p.metric 10
+        p.subtext ISO 9001 · IATF 16949 · IEC 61511 · ISO 28000 · 27001 · 55001 · 50001 · 45001 · 14001 · 22301
 
     //- Standards info
     h3.section-title
@@ -128,6 +128,34 @@ block content
             path(d="M12 8v4l3 3")
         .feature-title(data-es="ISO 14001 — Gestión Ambiental" data-en="ISO 14001 — Environmental Management") ISO 14001 — Gestión Ambiental
         p.feature-desc(style="font-size:.82rem" data-es="Monitoreo de aspectos ambientales, residuos, emisiones y cumplimiento regulatorio con reportes automáticos de desempeño." data-en="Environmental aspects monitoring, waste, emissions and regulatory compliance with automatic performance reports.") Monitoreo de aspectos ambientales, residuos, emisiones y cumplimiento regulatorio con reportes automáticos de desempeño.
+
+      .feature-card
+        .feature-icon(style="background:rgba(249,115,22,.12)")
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="2")
+            path(d="M9 11l3 3L22 4")
+            path(d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11")
+            circle(cx="6" cy="6" r="2")
+        .feature-title(data-es="IATF 16949 — Calidad Automotriz" data-en="IATF 16949 — Automotive Quality") IATF 16949 — Calidad Automotriz
+        p.feature-desc(style="font-size:.82rem" data-es="Control estadístico de proceso (SPC), Cpk/Ppk, plan de control y gestión de no conformidades para proveedores Tier 1/2 de la industria automotriz." data-en="Statistical process control (SPC), Cpk/Ppk, control plan and non-conformance management for Tier 1/2 automotive suppliers.") Control estadístico de proceso (SPC), Cpk/Ppk, plan de control y gestión de no conformidades para proveedores Tier 1/2 de la industria automotriz.
+
+      .feature-card
+        .feature-icon(style="background:rgba(139,92,246,.12)")
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="2")
+            path(d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z")
+            line(x1="12" y1="9" x2="12" y2="13")
+            line(x1="12" y1="17" x2="12.01" y2="17")
+        .feature-title(data-es="IEC 61511 — Seguridad Funcional (SIL)" data-en="IEC 61511 — Functional Safety (SIL)") IEC 61511 — Seguridad Funcional (SIL)
+        p.feature-desc(style="font-size:.82rem" data-es="Sistemas instrumentados de seguridad (SIS), niveles de integridad SIL 1-4, gestión del ciclo de vida de seguridad y operación de lazos de control críticos." data-en="Safety Instrumented Systems (SIS), SIL 1-4 integrity levels, safety lifecycle management and critical control loop operation.") Sistemas instrumentados de seguridad (SIS), niveles de integridad SIL 1-4, gestión del ciclo de vida de seguridad y operación de lazos de control críticos.
+
+      .feature-card
+        .feature-icon(style="background:rgba(6,182,212,.1)")
+          svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="2")
+            rect(x="1" y="3" width="15" height="13" rx="2")
+            path(d="M16 8h6l-2 5")
+            circle(cx="5.5" cy="18.5" r="2.5")
+            circle(cx="18.5" cy="18.5" r="2.5")
+        .feature-title(data-es="ISO 28000 — Seguridad en Cadena de Suministro" data-en="ISO 28000 — Supply Chain Security") ISO 28000 — Seguridad en Cadena de Suministro
+        p.feature-desc(style="font-size:.82rem" data-es="Gestión de riesgos logísticos, trazabilidad de envíos, scorecard de proveedores e incidentes de seguridad en la cadena de suministro." data-en="Logistics risk management, shipment traceability, supplier scorecard and supply chain security incidents.") Gestión de riesgos logísticos, trazabilidad de envíos, scorecard de proveedores e incidentes de seguridad en la cadena de suministro.
 
   script.
     (function() {

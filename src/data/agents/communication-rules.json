@@ -481,6 +481,312 @@
       "topic": "POST /api/twin/optimize",
       "triggerCondition": "projectedImprovement > 0.02",
       "description": "Resultado de simulación con mejora > 2% activa optimización global"
+    },
+
+    {
+      "id": "rule-maint-001",
+      "sourceToolId": "execute_condition_monitoring",
+      "targetToolId": "manage_work_orders",
+      "event": "CONDITION_DEGRADED",
+      "protocol": "MQTT",
+      "topic": "maintenance/condition/alert",
+      "triggerCondition": "conditionIndex < 60 OR recommendedAction IN ['inspect','repair_now']",
+      "description": "Condición de activo degradada genera orden de trabajo automáticamente"
+    },
+    {
+      "id": "rule-maint-002",
+      "sourceToolId": "manage_work_orders",
+      "targetToolId": "manage_spare_parts",
+      "event": "WORK_ORDER_APPROVED",
+      "protocol": "REST",
+      "topic": "POST /api/maintenance/parts/reserve",
+      "triggerCondition": "status == 'in_progress'",
+      "description": "Orden de trabajo aprobada verifica y reserva repuestos necesarios"
+    },
+    {
+      "id": "rule-maint-003",
+      "sourceToolId": "calculate_mtbf_mttr",
+      "targetToolId": "schedule_preventive_maintenance",
+      "event": "RELIABILITY_DATA_UPDATED",
+      "protocol": "REST",
+      "topic": "POST /api/maintenance/pm/schedule",
+      "triggerCondition": "trend == 'degrading' OR mtbfHours < baseline",
+      "description": "MTBF actualizado con tendencia a degradación reajusta plan de PM"
+    },
+    {
+      "id": "rule-maint-004",
+      "sourceToolId": "analyze_failure_modes",
+      "targetToolId": "schedule_preventive_maintenance",
+      "event": "FMEA_CRITICAL_FOUND",
+      "protocol": "REST",
+      "topic": "POST /api/maintenance/pm/schedule",
+      "triggerCondition": "criticalItems > 0",
+      "description": "Modos de falla críticos detectados activan revisión del plan de mantenimiento preventivo"
+    },
+    {
+      "id": "rule-maint-005",
+      "sourceToolId": "generate_maintenance_kpis",
+      "targetToolId": "track_asset_lifecycle",
+      "event": "MAINTENANCE_KPIS_READY",
+      "protocol": "MQTT",
+      "topic": "maintenance/kpis/updated",
+      "triggerCondition": "always",
+      "description": "KPIs de mantenimiento alimentan el modelo de ciclo de vida del activo"
+    },
+
+    {
+      "id": "rule-scada-001",
+      "sourceToolId": "monitor_scada_tags",
+      "targetToolId": "execute_pid_control",
+      "event": "PROCESS_VARIABLE_UPDATED",
+      "protocol": "OPC-UA",
+      "topic": "ns=2;s=Plant/PV/Update",
+      "triggerCondition": "quality == 'good'",
+      "description": "Tags de proceso actualizados alimentan el lazo PID con variable de proceso actual"
+    },
+    {
+      "id": "rule-scada-002",
+      "sourceToolId": "monitor_scada_tags",
+      "targetToolId": "trigger_process_alarm",
+      "event": "TAG_LIMIT_EXCEEDED",
+      "protocol": "OPC-UA",
+      "topic": "ns=2;s=Plant/Alarm/Check",
+      "triggerCondition": "value > hiLimit OR value < loLimit",
+      "description": "Tag de proceso fuera de límites dispara evaluación de alarma"
+    },
+    {
+      "id": "rule-scada-003",
+      "sourceToolId": "trigger_process_alarm",
+      "targetToolId": "acknowledge_alarm",
+      "event": "ALARM_ACTIVATED",
+      "protocol": "MQTT",
+      "topic": "scada/alarms/active",
+      "triggerCondition": "priority IN ['critical','high']",
+      "description": "Alarma crítica o alta activa la notificación al operador para reconocimiento"
+    },
+    {
+      "id": "rule-scada-004",
+      "sourceToolId": "execute_pid_control",
+      "targetToolId": "log_process_historian",
+      "event": "PID_OUTPUT_UPDATED",
+      "protocol": "MQTT",
+      "topic": "scada/historian/write",
+      "triggerCondition": "always",
+      "description": "Salida del controlador PID y PV se registran continuamente en el historiador"
+    },
+    {
+      "id": "rule-scada-005",
+      "sourceToolId": "log_process_historian",
+      "targetToolId": "analyze_control_loop_performance",
+      "event": "HISTORIAN_BATCH_READY",
+      "protocol": "REST",
+      "topic": "POST /api/scada/loop-analysis",
+      "triggerCondition": "recordsStored > 1000",
+      "description": "Datos históricos acumulados se envían al cloud para análisis de desempeño de lazos"
+    },
+
+    {
+      "id": "rule-qual-001",
+      "sourceToolId": "collect_quality_measurements",
+      "targetToolId": "calculate_control_charts",
+      "event": "MEASUREMENTS_CAPTURED",
+      "protocol": "REST",
+      "topic": "POST /api/quality/spc/update",
+      "triggerCondition": "defectsFound >= 0",
+      "description": "Mediciones de calidad capturadas actualizan cartas de control SPC en tiempo real"
+    },
+    {
+      "id": "rule-qual-002",
+      "sourceToolId": "calculate_control_charts",
+      "targetToolId": "detect_out_of_control_signals",
+      "event": "CHART_POINTS_UPDATED",
+      "protocol": "REST",
+      "topic": "POST /api/quality/spc/detect",
+      "triggerCondition": "always",
+      "description": "Cartas de control actualizadas ejecutan detección de señales fuera de control"
+    },
+    {
+      "id": "rule-qual-003",
+      "sourceToolId": "detect_out_of_control_signals",
+      "targetToolId": "manage_nonconformances",
+      "event": "OUT_OF_CONTROL_DETECTED",
+      "protocol": "REST",
+      "topic": "POST /api/quality/nc/create",
+      "triggerCondition": "violationsDetected == true",
+      "description": "Señal fuera de control detectada abre automáticamente una no conformidad"
+    },
+    {
+      "id": "rule-qual-004",
+      "sourceToolId": "manage_nonconformances",
+      "targetToolId": "generate_8d_report",
+      "event": "NC_REQUIRES_8D",
+      "protocol": "REST",
+      "topic": "POST /api/quality/8d/generate",
+      "triggerCondition": "severity IN ['major','critical']",
+      "description": "No conformidad mayor o crítica dispara generación automática de reporte 8D"
+    },
+    {
+      "id": "rule-qual-005",
+      "sourceToolId": "calculate_cpk_ppk",
+      "targetToolId": "manage_product_specs",
+      "event": "CAPABILITY_BELOW_TARGET",
+      "protocol": "REST",
+      "topic": "POST /api/quality/specs/review",
+      "triggerCondition": "cpk < 1.33 OR status == 'not_capable'",
+      "description": "Capacidad de proceso por debajo del objetivo activa revisión de especificaciones"
+    },
+
+    {
+      "id": "rule-energy-001",
+      "sourceToolId": "monitor_energy_meters",
+      "targetToolId": "calculate_energy_kpis",
+      "event": "ENERGY_READING_AVAILABLE",
+      "protocol": "MQTT",
+      "topic": "energy/meters/reading",
+      "triggerCondition": "always",
+      "description": "Lectura de medidores disponible actualiza cálculo de indicadores EnPI"
+    },
+    {
+      "id": "rule-energy-002",
+      "sourceToolId": "calculate_energy_kpis",
+      "targetToolId": "detect_energy_waste",
+      "event": "ENPI_CALCULATED",
+      "protocol": "REST",
+      "topic": "POST /api/energy/waste/detect",
+      "triggerCondition": "vsBaselinePercent > 5",
+      "description": "EnPI supera línea base en 5% activa análisis de desperdicios energéticos"
+    },
+    {
+      "id": "rule-energy-003",
+      "sourceToolId": "detect_energy_waste",
+      "targetToolId": "optimize_energy_loads",
+      "event": "ENERGY_WASTE_FOUND",
+      "protocol": "REST",
+      "topic": "POST /api/energy/loads/optimize",
+      "triggerCondition": "totalSavingsOpportunity > 1000",
+      "description": "Desperdicios detectados con ahorro potencial > 1000 kWh activan optimización de cargas"
+    },
+    {
+      "id": "rule-energy-004",
+      "sourceToolId": "calculate_energy_kpis",
+      "targetToolId": "calculate_carbon_footprint",
+      "event": "CONSUMPTION_DATA_READY",
+      "protocol": "REST",
+      "topic": "POST /api/energy/carbon/calculate",
+      "triggerCondition": "periodDays >= 30",
+      "description": "Datos de consumo mensual disponibles actualizan cálculo de huella de carbono"
+    },
+    {
+      "id": "rule-energy-005",
+      "sourceToolId": "calculate_energy_kpis",
+      "targetToolId": "generate_iso50001_report",
+      "event": "ENPI_PERIOD_CLOSED",
+      "protocol": "REST",
+      "topic": "POST /api/energy/iso50001/report",
+      "triggerCondition": "periodDays == 90",
+      "description": "Cierre de periodo trimestral genera reporte de revisión ISO 50001 automáticamente"
+    },
+
+    {
+      "id": "rule-hse-001",
+      "sourceToolId": "monitor_gas_sensors",
+      "targetToolId": "report_safety_incident",
+      "event": "GAS_ALARM_TRIGGERED",
+      "protocol": "MQTT",
+      "topic": "hse/gas/alarm",
+      "triggerCondition": "status IN ['alarm','evacuation']",
+      "description": "Alarma de gas activa reporte automático de incidente y notificación de emergencia"
+    },
+    {
+      "id": "rule-hse-002",
+      "sourceToolId": "report_safety_incident",
+      "targetToolId": "investigate_root_cause_hse",
+      "event": "INCIDENT_REPORTED",
+      "protocol": "REST",
+      "topic": "POST /api/hse/investigate",
+      "triggerCondition": "investigationRequired == true",
+      "description": "Incidente que requiere investigación abre automáticamente flujo de análisis de causa raíz"
+    },
+    {
+      "id": "rule-hse-003",
+      "sourceToolId": "investigate_root_cause_hse",
+      "targetToolId": "run_hazop_analysis",
+      "event": "ROOT_CAUSE_SYSTEMIC",
+      "protocol": "REST",
+      "topic": "POST /api/hse/hazop/run",
+      "triggerCondition": "similarIncidentRisk IN ['medium','high']",
+      "description": "Causa raíz sistémica con riesgo medio/alto activa HAZOP del nodo de proceso afectado"
+    },
+    {
+      "id": "rule-hse-004",
+      "sourceToolId": "run_hazop_analysis",
+      "targetToolId": "calculate_sil_level",
+      "event": "HAZOP_UNACCEPTABLE_RISK",
+      "protocol": "REST",
+      "topic": "POST /api/hse/sil/calculate",
+      "triggerCondition": "unacceptableRisks > 0",
+      "description": "Riesgo inaceptable en HAZOP activa cálculo de nivel SIL requerido"
+    },
+    {
+      "id": "rule-hse-005",
+      "sourceToolId": "manage_work_permits",
+      "targetToolId": "track_safety_kpis",
+      "event": "PERMIT_CLOSED",
+      "protocol": "REST",
+      "topic": "POST /api/hse/kpis/update",
+      "triggerCondition": "status == 'closed'",
+      "description": "Cierre de permiso de trabajo actualiza los KPIs de seguridad del período"
+    },
+
+    {
+      "id": "rule-scm-001",
+      "sourceToolId": "scan_incoming_material",
+      "targetToolId": "manage_warehouse_wms",
+      "event": "MATERIAL_RECEIVED",
+      "protocol": "REST",
+      "topic": "POST /api/scm/wms/receive",
+      "triggerCondition": "qualityHoldRequired == false",
+      "description": "Material escaneado sin retención de calidad pasa directo a gestión de almacén WMS"
+    },
+    {
+      "id": "rule-scm-002",
+      "sourceToolId": "manage_warehouse_wms",
+      "targetToolId": "calculate_scm_kpis",
+      "event": "WMS_OPERATION_COMPLETE",
+      "protocol": "REST",
+      "topic": "POST /api/scm/kpis/update",
+      "triggerCondition": "operation IN ['ship','receive']",
+      "description": "Operación de recepción o despacho actualiza los KPIs SCOR de la cadena de suministro"
+    },
+    {
+      "id": "rule-scm-003",
+      "sourceToolId": "track_shipments",
+      "targetToolId": "predict_supply_disruptions",
+      "event": "SHIPMENT_DELAYED",
+      "protocol": "MQTT",
+      "topic": "scm/shipments/delay",
+      "triggerCondition": "delayDays > 2",
+      "description": "Envío con retraso > 2 días activa análisis predictivo de disrupciones de suministro"
+    },
+    {
+      "id": "rule-scm-004",
+      "sourceToolId": "predict_supply_disruptions",
+      "targetToolId": "optimize_delivery_routes",
+      "event": "DISRUPTION_RISK_HIGH",
+      "protocol": "REST",
+      "topic": "POST /api/scm/routes/reoptimize",
+      "triggerCondition": "disruptionRisk IN ['high','critical']",
+      "description": "Riesgo alto de disrupción activa reoptimización de rutas con proveedores alternativos"
+    },
+    {
+      "id": "rule-scm-005",
+      "sourceToolId": "manage_supplier_scorecard",
+      "targetToolId": "generate_delivery_report",
+      "event": "SCORECARD_UPDATED",
+      "protocol": "REST",
+      "topic": "POST /api/scm/reports/delivery",
+      "triggerCondition": "classification IN ['conditional','disqualified']",
+      "description": "Proveedor clasificado como condicional o descalificado genera reporte de desempeño de entrega"
     }
   ]
 }

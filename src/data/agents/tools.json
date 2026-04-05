@@ -1984,5 +1984,1420 @@
         "twinSyncStatus": { "type": "string", "enum": ["live", "buffering", "error"] }
       }
     }
+  },
+
+  {
+    "id": "manage_work_orders",
+    "name": "manage_work_orders",
+    "nameEs": "Gestionar Órdenes de Trabajo",
+    "type": "Cloud",
+    "category": "maintenance",
+    "descriptionEs": "Crea, asigna, prioriza y cierra órdenes de trabajo de mantenimiento con trazabilidad completa.",
+    "descriptionEn": "Creates, assigns, prioritizes and closes maintenance work orders with full traceability.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": { "type": "string", "enum": ["create", "update", "close", "list"] },
+        "assetId": { "type": "string" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "description": { "type": "string" }
+      },
+      "required": ["action", "assetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "workOrderId": { "type": "string" },
+        "status": { "type": "string", "enum": ["open", "in_progress", "waiting_parts", "closed"] },
+        "assignedTechnician": { "type": "string" },
+        "estimatedCompletionHours": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "schedule_preventive_maintenance",
+    "name": "schedule_preventive_maintenance",
+    "nameEs": "Programar Mantenimiento Preventivo",
+    "type": "Cloud",
+    "category": "maintenance",
+    "descriptionEs": "Genera planes de mantenimiento preventivo optimizados por MTBF, disponibilidad requerida y costo.",
+    "descriptionEn": "Generates optimized preventive maintenance plans based on MTBF, required availability and cost.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "horizonDays": { "type": "integer", "default": 90 },
+        "availabilityTarget": { "type": "number", "description": "0-1, e.g. 0.95 for 95%" }
+      },
+      "required": ["assetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "scheduledTasks": { "type": "array", "items": { "type": "object", "properties": {
+          "taskId": { "type": "string" }, "dueDate": { "type": "string", "format": "date" },
+          "estimatedHours": { "type": "number" }, "taskType": { "type": "string" }
+        }}},
+        "predictedAvailability": { "type": "number" },
+        "estimatedCost": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "calculate_mtbf_mttr",
+    "name": "calculate_mtbf_mttr",
+    "nameEs": "Calcular MTBF y MTTR",
+    "type": "Cloud",
+    "category": "maintenance",
+    "descriptionEs": "Calcula Tiempo Medio Entre Fallas (MTBF) y Tiempo Medio de Reparación (MTTR) por activo o línea.",
+    "descriptionEn": "Calculates Mean Time Between Failures (MTBF) and Mean Time To Repair (MTTR) per asset or line.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 365 },
+        "includeHistorical": { "type": "boolean", "default": true }
+      },
+      "required": ["assetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "mtbfHours": { "type": "number" },
+        "mttrHours": { "type": "number" },
+        "availability": { "type": "number" },
+        "failureCount": { "type": "integer" },
+        "trend": { "type": "string", "enum": ["improving", "stable", "degrading"] }
+      }
+    }
+  },
+  {
+    "id": "analyze_failure_modes",
+    "name": "analyze_failure_modes",
+    "nameEs": "Analizar Modos de Falla (FMEA/RCM)",
+    "type": "Cloud",
+    "category": "maintenance",
+    "descriptionEs": "Ejecuta análisis de modos y efectos de falla (FMEA) y mantenimiento centrado en confiabilidad (RCM) para priorizar acciones.",
+    "descriptionEn": "Executes Failure Mode and Effects Analysis (FMEA) and Reliability-Centered Maintenance (RCM) to prioritize actions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "analysisType": { "type": "string", "enum": ["fmea", "rcm", "both"] },
+        "includeHistoricalFailures": { "type": "boolean", "default": true }
+      },
+      "required": ["assetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "failureModes": { "type": "array", "items": { "type": "object", "properties": {
+          "mode": { "type": "string" }, "rpn": { "type": "number" },
+          "severity": { "type": "integer" }, "occurrence": { "type": "integer" },
+          "detectability": { "type": "integer" }, "recommendedAction": { "type": "string" }
+        }}},
+        "criticalItems": { "type": "integer" },
+        "maintenanceStrategy": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "manage_spare_parts",
+    "name": "manage_spare_parts",
+    "nameEs": "Gestionar Repuestos",
+    "type": "Cloud",
+    "category": "maintenance",
+    "descriptionEs": "Controla inventario de repuestos críticos, genera alertas de stock mínimo y optimiza niveles según criticidad del activo.",
+    "descriptionEn": "Controls critical spare parts inventory, generates minimum stock alerts and optimizes levels by asset criticality.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "partId": { "type": "string" },
+        "action": { "type": "string", "enum": ["query", "reserve", "consume", "reorder"] },
+        "quantity": { "type": "number" }
+      },
+      "required": ["partId", "action"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "partId": { "type": "string" },
+        "currentStock": { "type": "number" },
+        "minStock": { "type": "number" },
+        "reorderPoint": { "type": "number" },
+        "estimatedCost": { "type": "number" },
+        "alert": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "track_asset_lifecycle",
+    "name": "track_asset_lifecycle",
+    "nameEs": "Rastrear Ciclo de Vida de Activo",
+    "type": "Cloud",
+    "category": "maintenance",
+    "descriptionEs": "Registra el ciclo de vida completo del activo: adquisición, instalación, historial de mantenimiento, depreciación y disposición final.",
+    "descriptionEn": "Records the complete asset lifecycle: acquisition, installation, maintenance history, depreciation and final disposal.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "includeMaintenanceHistory": { "type": "boolean", "default": true },
+        "includeFinancials": { "type": "boolean", "default": false }
+      },
+      "required": ["assetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "ageYears": { "type": "number" },
+        "remainingUsefulLifeYears": { "type": "number" },
+        "totalMaintenanceCost": { "type": "number" },
+        "currentConditionScore": { "type": "number", "description": "0-100" },
+        "lifecycleStage": { "type": "string", "enum": ["new", "operating", "aging", "end_of_life"] }
+      }
+    }
+  },
+  {
+    "id": "execute_condition_monitoring",
+    "name": "execute_condition_monitoring",
+    "nameEs": "Ejecutar Monitoreo de Condición",
+    "type": "Edge",
+    "category": "maintenance",
+    "descriptionEs": "Monitorea vibración, temperatura, corriente y presión del activo en tiempo real para detectar degradación temprana.",
+    "descriptionEn": "Monitors asset vibration, temperature, current and pressure in real time to detect early degradation.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "sensors": { "type": "array", "items": { "type": "string", "enum": ["vibration", "temperature", "current", "pressure", "acoustics"] } },
+        "samplingRateHz": { "type": "number", "default": 100 }
+      },
+      "required": ["assetId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "assetId": { "type": "string" },
+        "conditionIndex": { "type": "number", "description": "0-100, 100=perfect" },
+        "alerts": { "type": "array", "items": { "type": "object", "properties": {
+          "sensor": { "type": "string" }, "value": { "type": "number" },
+          "threshold": { "type": "number" }, "severity": { "type": "string" }
+        }}},
+        "recommendedAction": { "type": "string", "enum": ["none", "monitor", "inspect", "repair_now"] }
+      }
+    }
+  },
+  {
+    "id": "generate_maintenance_kpis",
+    "name": "generate_maintenance_kpis",
+    "nameEs": "Generar KPIs de Mantenimiento",
+    "type": "Cloud",
+    "category": "maintenance",
+    "descriptionEs": "Genera dashboard de KPIs de mantenimiento: OEE, disponibilidad, MTBF, costo por activo y cumplimiento de PM.",
+    "descriptionEn": "Generates maintenance KPI dashboard: OEE, availability, MTBF, cost per asset and PM compliance.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 30 },
+        "groupBy": { "type": "string", "enum": ["asset", "area", "line", "plant"] }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "overallAvailability": { "type": "number" },
+        "pmCompliancePercent": { "type": "number" },
+        "maintenanceCostTotal": { "type": "number" },
+        "reactiveVsPreventiveRatio": { "type": "number" },
+        "topFailingAssets": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+
+  {
+    "id": "monitor_scada_tags",
+    "name": "monitor_scada_tags",
+    "nameEs": "Monitorear Tags SCADA",
+    "type": "Edge",
+    "category": "control",
+    "descriptionEs": "Lee y publica en tiempo real el estado de tags de proceso (AI, DI, AO, DO) desde PLCs y RTUs vía OPC-UA o Modbus.",
+    "descriptionEn": "Reads and publishes real-time status of process tags (AI, DI, AO, DO) from PLCs and RTUs via OPC-UA or Modbus.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tagIds": { "type": "array", "items": { "type": "string" } },
+        "protocol": { "type": "string", "enum": ["opc-ua", "modbus-tcp", "modbus-rtu", "dnp3"] },
+        "scanRateMs": { "type": "integer", "default": 500 }
+      },
+      "required": ["tagIds", "protocol"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "tags": { "type": "array", "items": { "type": "object", "properties": {
+          "tagId": { "type": "string" }, "value": {}, "quality": { "type": "string", "enum": ["good", "bad", "uncertain"] },
+          "timestamp": { "type": "string", "format": "date-time" }, "unit": { "type": "string" }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "execute_pid_control",
+    "name": "execute_pid_control",
+    "nameEs": "Ejecutar Control PID",
+    "type": "Edge",
+    "category": "control",
+    "descriptionEs": "Ejecuta lazos PID con autotuning, control en cascada y feedforward para variables de proceso críticas.",
+    "descriptionEn": "Executes PID loops with autotuning, cascade and feedforward control for critical process variables.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "loopId": { "type": "string" },
+        "setpoint": { "type": "number" },
+        "Kp": { "type": "number" },
+        "Ki": { "type": "number" },
+        "Kd": { "type": "number" },
+        "mode": { "type": "string", "enum": ["auto", "manual", "cascade"] }
+      },
+      "required": ["loopId", "setpoint"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "loopId": { "type": "string" },
+        "processVariable": { "type": "number" },
+        "controlOutput": { "type": "number", "description": "0-100%" },
+        "error": { "type": "number" },
+        "mode": { "type": "string" },
+        "isSteadyState": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "manage_setpoints",
+    "name": "manage_setpoints",
+    "nameEs": "Gestionar Setpoints",
+    "type": "Edge",
+    "category": "control",
+    "descriptionEs": "Lee, escribe y valida setpoints en controladores con límites de seguridad configurables y registro de cambios.",
+    "descriptionEn": "Reads, writes and validates setpoints in controllers with configurable safety limits and change logging.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tagId": { "type": "string" },
+        "action": { "type": "string", "enum": ["read", "write"] },
+        "value": { "type": "number" },
+        "operatorId": { "type": "string" }
+      },
+      "required": ["tagId", "action"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "tagId": { "type": "string" },
+        "previousValue": { "type": "number" },
+        "newValue": { "type": "number" },
+        "withinLimits": { "type": "boolean" },
+        "changeLogged": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "trigger_process_alarm",
+    "name": "trigger_process_alarm",
+    "nameEs": "Disparar Alarma de Proceso",
+    "type": "Edge",
+    "category": "control",
+    "descriptionEs": "Genera y prioriza alarmas de proceso según ISA-18.2: HIHI, HI, LO, LOLO, con supresión de shelving y gestión de inundación.",
+    "descriptionEn": "Generates and prioritizes process alarms per ISA-18.2: HIHI, HI, LO, LOLO, with shelving suppression and flood management.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tagId": { "type": "string" },
+        "alarmType": { "type": "string", "enum": ["HIHI", "HI", "LO", "LOLO", "deviation", "rate_of_change"] },
+        "value": { "type": "number" },
+        "threshold": { "type": "number" }
+      },
+      "required": ["tagId", "alarmType", "value"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "alarmId": { "type": "string" },
+        "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+        "activatedAt": { "type": "string", "format": "date-time" },
+        "requiredAction": { "type": "string" },
+        "notificationSent": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "log_process_historian",
+    "name": "log_process_historian",
+    "nameEs": "Registrar en Historiador de Proceso",
+    "type": "Edge",
+    "category": "control",
+    "descriptionEs": "Almacena datos de proceso en historiador local con compresión por desviación, listo para consulta y reporte.",
+    "descriptionEn": "Stores process data in local historian with deviation-based compression, ready for query and reporting.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "tagIds": { "type": "array", "items": { "type": "string" } },
+        "compressionMode": { "type": "string", "enum": ["raw", "swinging_door", "deadband"] },
+        "deadbandPercent": { "type": "number", "default": 0.1 }
+      },
+      "required": ["tagIds"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "recordsStored": { "type": "integer" },
+        "compressionRatio": { "type": "number" },
+        "storageUsedMB": { "type": "number" },
+        "oldestRecordTimestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  {
+    "id": "run_batch_sequence",
+    "name": "run_batch_sequence",
+    "nameEs": "Ejecutar Secuencia de Lote ISA-88",
+    "type": "Edge",
+    "category": "control",
+    "descriptionEs": "Ejecuta recetas de producción por lotes siguiendo el modelo de procedimientos ISA-88 con control de fase y transiciones.",
+    "descriptionEn": "Executes batch production recipes following the ISA-88 procedure model with phase control and transitions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "recipeId": { "type": "string" },
+        "batchId": { "type": "string" },
+        "unitId": { "type": "string" },
+        "parameters": { "type": "object" }
+      },
+      "required": ["recipeId", "batchId", "unitId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "batchId": { "type": "string" },
+        "currentPhase": { "type": "string" },
+        "status": { "type": "string", "enum": ["running", "paused", "complete", "aborted"] },
+        "progressPercent": { "type": "number" },
+        "elapsedMinutes": { "type": "number" },
+        "deviationsCount": { "type": "integer" }
+      }
+    }
+  },
+  {
+    "id": "acknowledge_alarm",
+    "name": "acknowledge_alarm",
+    "nameEs": "Reconocer Alarma",
+    "type": "Edge",
+    "category": "control",
+    "descriptionEs": "Permite al operador reconocer, shelving o suprimir alarmas con trazabilidad de acción según ISA-18.2.",
+    "descriptionEn": "Allows operator to acknowledge, shelve or suppress alarms with action traceability per ISA-18.2.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "alarmId": { "type": "string" },
+        "action": { "type": "string", "enum": ["acknowledge", "shelve", "suppress", "unshelve"] },
+        "operatorId": { "type": "string" },
+        "comment": { "type": "string" }
+      },
+      "required": ["alarmId", "action", "operatorId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "alarmId": { "type": "string" },
+        "previousState": { "type": "string" },
+        "newState": { "type": "string" },
+        "actionTimestamp": { "type": "string", "format": "date-time" },
+        "logged": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "analyze_control_loop_performance",
+    "name": "analyze_control_loop_performance",
+    "nameEs": "Analizar Desempeño de Lazo de Control",
+    "type": "Cloud",
+    "category": "control",
+    "descriptionEs": "Evalúa el desempeño de lazos PID: índice de variabilidad, tiempo en manual, saturación del controlador y sintonía óptima.",
+    "descriptionEn": "Evaluates PID loop performance: variability index, time in manual, controller saturation and optimal tuning.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "loopId": { "type": "string" },
+        "historianData": { "type": "array", "items": { "type": "object" } },
+        "periodHours": { "type": "integer", "default": 24 }
+      },
+      "required": ["loopId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "loopId": { "type": "string" },
+        "performanceIndex": { "type": "number", "description": "0-100" },
+        "timeInManualPercent": { "type": "number" },
+        "variabilityIndex": { "type": "number" },
+        "suggestedKp": { "type": "number" },
+        "suggestedKi": { "type": "number" },
+        "suggestedKd": { "type": "number" },
+        "classification": { "type": "string", "enum": ["excellent", "acceptable", "poor", "needs_retuning"] }
+      }
+    }
+  },
+
+  {
+    "id": "calculate_control_charts",
+    "name": "calculate_control_charts",
+    "nameEs": "Calcular Cartas de Control SPC",
+    "type": "Cloud",
+    "category": "quality",
+    "descriptionEs": "Genera cartas de control Xbar-R, Xbar-S, I-MR y p/np para monitoreo estadístico de proceso en tiempo real.",
+    "descriptionEn": "Generates Xbar-R, Xbar-S, I-MR and p/np control charts for real-time statistical process monitoring.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "characteristicId": { "type": "string" },
+        "chartType": { "type": "string", "enum": ["xbar_r", "xbar_s", "imr", "p", "np", "c", "u"] },
+        "measurements": { "type": "array", "items": { "type": "number" } },
+        "subgroupSize": { "type": "integer", "default": 5 }
+      },
+      "required": ["characteristicId", "chartType", "measurements"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "ucl": { "type": "number" },
+        "lcl": { "type": "number" },
+        "centerLine": { "type": "number" },
+        "plotPoints": { "type": "array", "items": { "type": "number" } },
+        "outOfControlPoints": { "type": "array", "items": { "type": "integer" } },
+        "inControl": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "detect_out_of_control_signals",
+    "name": "detect_out_of_control_signals",
+    "nameEs": "Detectar Señales Fuera de Control",
+    "type": "Cloud",
+    "category": "quality",
+    "descriptionEs": "Aplica reglas de Nelson y Western Electric para detectar patrones especiales de causa asignable en cartas de control.",
+    "descriptionEn": "Applies Nelson and Western Electric rules to detect special assignable cause patterns in control charts.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "chartId": { "type": "string" },
+        "plotPoints": { "type": "array", "items": { "type": "number" } },
+        "ucl": { "type": "number" },
+        "lcl": { "type": "number" },
+        "centerLine": { "type": "number" },
+        "rulesSet": { "type": "string", "enum": ["nelson", "western_electric", "both"], "default": "nelson" }
+      },
+      "required": ["chartId", "plotPoints", "ucl", "lcl", "centerLine"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "violationsDetected": { "type": "boolean" },
+        "violations": { "type": "array", "items": { "type": "object", "properties": {
+          "rule": { "type": "string" }, "points": { "type": "array", "items": { "type": "integer" } },
+          "description": { "type": "string" }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "manage_nonconformances",
+    "name": "manage_nonconformances",
+    "nameEs": "Gestionar No Conformidades",
+    "type": "Cloud",
+    "category": "quality",
+    "descriptionEs": "Registra, clasifica, asigna y da seguimiento a no conformidades internas y de cliente con flujo de aprobación.",
+    "descriptionEn": "Records, classifies, assigns and tracks internal and customer non-conformances with approval workflow.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "action": { "type": "string", "enum": ["create", "update", "close", "list"] },
+        "ncType": { "type": "string", "enum": ["internal", "customer", "supplier", "audit"] },
+        "severity": { "type": "string", "enum": ["minor", "major", "critical"] },
+        "description": { "type": "string" },
+        "affectedPartId": { "type": "string" }
+      },
+      "required": ["action"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "ncId": { "type": "string" },
+        "status": { "type": "string", "enum": ["open", "under_analysis", "containment", "corrective_action", "closed"] },
+        "assignedTo": { "type": "string" },
+        "dueDate": { "type": "string", "format": "date" },
+        "estimatedCost": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "generate_8d_report",
+    "name": "generate_8d_report",
+    "nameEs": "Generar Reporte 8D",
+    "type": "Cloud",
+    "category": "quality",
+    "descriptionEs": "Genera reporte 8D estructurado con equipo, descripción, contención, causa raíz (5 Whys/Ishikawa), acción correctiva y verificación.",
+    "descriptionEn": "Generates structured 8D report with team, description, containment, root cause (5 Whys/Ishikawa), corrective action and verification.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "ncId": { "type": "string" },
+        "teamMembers": { "type": "array", "items": { "type": "string" } },
+        "rootCauseMethod": { "type": "string", "enum": ["5_whys", "ishikawa", "fault_tree"] }
+      },
+      "required": ["ncId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "reportId": { "type": "string" },
+        "d3ContainmentActions": { "type": "array", "items": { "type": "string" } },
+        "d4RootCauses": { "type": "array", "items": { "type": "string" } },
+        "d5CorrectiveActions": { "type": "array", "items": { "type": "string" } },
+        "d8LessonsLearned": { "type": "string" },
+        "pdfUrl": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "calculate_cpk_ppk",
+    "name": "calculate_cpk_ppk",
+    "nameEs": "Calcular Cpk y Ppk",
+    "type": "Cloud",
+    "category": "quality",
+    "descriptionEs": "Calcula índices de capacidad de proceso Cp, Cpk (corto plazo) y Pp, Ppk (largo plazo) con histograma de distribución.",
+    "descriptionEn": "Calculates process capability indices Cp, Cpk (short term) and Pp, Ppk (long term) with distribution histogram.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "characteristicId": { "type": "string" },
+        "measurements": { "type": "array", "items": { "type": "number" } },
+        "usl": { "type": "number" },
+        "lsl": { "type": "number" }
+      },
+      "required": ["characteristicId", "measurements", "usl", "lsl"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "cp": { "type": "number" },
+        "cpk": { "type": "number" },
+        "pp": { "type": "number" },
+        "ppk": { "type": "number" },
+        "sigmaLevel": { "type": "number" },
+        "ppmDefects": { "type": "number" },
+        "status": { "type": "string", "enum": ["capable", "marginal", "not_capable"] }
+      }
+    }
+  },
+  {
+    "id": "manage_product_specs",
+    "name": "manage_product_specs",
+    "nameEs": "Gestionar Especificaciones de Producto",
+    "type": "Cloud",
+    "category": "quality",
+    "descriptionEs": "Administra el árbol de características críticas (CTQ), tolerancias, límites de especificación y documentos de control.",
+    "descriptionEn": "Manages the critical-to-quality (CTQ) characteristics tree, tolerances, specification limits and control documents.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "partId": { "type": "string" },
+        "action": { "type": "string", "enum": ["get", "create", "update"] },
+        "characteristics": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["partId", "action"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "partId": { "type": "string" },
+        "characteristics": { "type": "array", "items": { "type": "object", "properties": {
+          "id": { "type": "string" }, "name": { "type": "string" },
+          "usl": { "type": "number" }, "lsl": { "type": "number" },
+          "nominal": { "type": "number" }, "isCritical": { "type": "boolean" }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "run_msa_analysis",
+    "name": "run_msa_analysis",
+    "nameEs": "Ejecutar Análisis de Sistema de Medición (MSA)",
+    "type": "Cloud",
+    "category": "quality",
+    "descriptionEs": "Ejecuta estudios Gage R&R, linealidad y sesgo para validar que los sistemas de medición son adecuados para el proceso.",
+    "descriptionEn": "Executes Gage R&R, linearity and bias studies to validate that measurement systems are adequate for the process.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "gaugeId": { "type": "string" },
+        "studyType": { "type": "string", "enum": ["gage_rr", "linearity", "bias", "stability"] },
+        "measurements": { "type": "array", "items": { "type": "object" } },
+        "operators": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["gaugeId", "studyType", "measurements"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "gageRRPercent": { "type": "number", "description": "% contribution to total variation" },
+        "repeatability": { "type": "number" },
+        "reproducibility": { "type": "number" },
+        "ndc": { "type": "integer", "description": "Number of distinct categories" },
+        "verdict": { "type": "string", "enum": ["acceptable", "marginal", "unacceptable"] }
+      }
+    }
+  },
+  {
+    "id": "collect_quality_measurements",
+    "name": "collect_quality_measurements",
+    "nameEs": "Recolectar Mediciones de Calidad",
+    "type": "Edge",
+    "category": "quality",
+    "descriptionEs": "Captura mediciones dimensionales y de atributos directamente de instrumentos de medición (CMM, calibres, visión) en la línea.",
+    "descriptionEn": "Captures dimensional and attribute measurements directly from measuring instruments (CMM, gauges, vision) on the line.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "partId": { "type": "string" },
+        "inspectionPlanId": { "type": "string" },
+        "source": { "type": "string", "enum": ["manual_entry", "cmm", "gauge_interface", "vision_system"] },
+        "operatorId": { "type": "string" }
+      },
+      "required": ["partId", "inspectionPlanId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "partId": { "type": "string" },
+        "measurements": { "type": "array", "items": { "type": "object", "properties": {
+          "characteristicId": { "type": "string" }, "value": { "type": "number" },
+          "withinSpec": { "type": "boolean" }, "timestamp": { "type": "string" }
+        }}},
+        "passFailResult": { "type": "string", "enum": ["pass", "fail", "conditional"] },
+        "defectsFound": { "type": "integer" }
+      }
+    }
+  },
+
+  {
+    "id": "monitor_energy_meters",
+    "name": "monitor_energy_meters",
+    "nameEs": "Monitorear Medidores de Energía",
+    "type": "Edge",
+    "category": "energy",
+    "descriptionEs": "Lee medidores de energía eléctrica, gas, vapor y agua con resolución de 15 minutos para análisis energético.",
+    "descriptionEn": "Reads electrical energy, gas, steam and water meters at 15-minute resolution for energy analysis.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "meterIds": { "type": "array", "items": { "type": "string" } },
+        "energyType": { "type": "string", "enum": ["electricity", "gas", "steam", "water", "compressed_air"] },
+        "resolutionMinutes": { "type": "integer", "default": 15 }
+      },
+      "required": ["meterIds", "energyType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "readings": { "type": "array", "items": { "type": "object", "properties": {
+          "meterId": { "type": "string" }, "value": { "type": "number" },
+          "unit": { "type": "string" }, "timestamp": { "type": "string" }
+        }}},
+        "totalConsumption": { "type": "number" },
+        "peakDemand": { "type": "number" },
+        "powerFactor": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "calculate_energy_kpis",
+    "name": "calculate_energy_kpis",
+    "nameEs": "Calcular KPIs de Energía (EnPI)",
+    "type": "Cloud",
+    "category": "energy",
+    "descriptionEs": "Calcula indicadores de desempeño energético (EnPI) según ISO 50001: intensidad energética, consumo específico y línea base.",
+    "descriptionEn": "Calculates energy performance indicators (EnPI) per ISO 50001: energy intensity, specific consumption and baseline.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 30 },
+        "productionUnits": { "type": "number" },
+        "baselineYear": { "type": "integer" }
+      },
+      "required": ["plantId", "productionUnits"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "totalEnergyKWh": { "type": "number" },
+        "energyIntensity": { "type": "number", "description": "kWh per production unit" },
+        "vsBaselinePercent": { "type": "number" },
+        "energySavingsKWh": { "type": "number" },
+        "costSavings": { "type": "number" },
+        "enpiTrend": { "type": "string", "enum": ["improving", "stable", "degrading"] }
+      }
+    }
+  },
+  {
+    "id": "detect_energy_waste",
+    "name": "detect_energy_waste",
+    "nameEs": "Detectar Desperdicio Energético",
+    "type": "Cloud",
+    "category": "energy",
+    "descriptionEs": "Identifica consumos anómalos, equipos funcionando en vacío, consumo en horas no productivas y cargas fantasma.",
+    "descriptionEn": "Identifies anomalous consumption, idle-running equipment, non-productive hour consumption and phantom loads.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "analysisWindow": { "type": "string", "enum": ["day", "week", "month"] },
+        "productionCalendar": { "type": "object" }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "wasteOpportunities": { "type": "array", "items": { "type": "object", "properties": {
+          "type": { "type": "string" }, "meterId": { "type": "string" },
+          "estimatedWasteKWh": { "type": "number" }, "estimatedCostSavings": { "type": "number" },
+          "recommendation": { "type": "string" }
+        }}},
+        "totalWasteKWh": { "type": "number" },
+        "totalSavingsOpportunity": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "optimize_energy_loads",
+    "name": "optimize_energy_loads",
+    "nameEs": "Optimizar Cargas Energéticas",
+    "type": "Cloud",
+    "category": "energy",
+    "descriptionEs": "Despacha cargas eléctricas inteligentemente para reducir demanda máxima, aprovechar tarifas valle y minimizar costo energético.",
+    "descriptionEn": "Intelligently dispatches electrical loads to reduce peak demand, leverage off-peak rates and minimize energy cost.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "flexibleLoads": { "type": "array", "items": { "type": "object" } },
+        "tariffSchedule": { "type": "object" },
+        "productionConstraints": { "type": "object" }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "loadSchedule": { "type": "array", "items": { "type": "object" } },
+        "projectedPeakReductionKW": { "type": "number" },
+        "projectedCostSavings": { "type": "number" },
+        "implementationActions": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "calculate_carbon_footprint",
+    "name": "calculate_carbon_footprint",
+    "nameEs": "Calcular Huella de Carbono",
+    "type": "Cloud",
+    "category": "energy",
+    "descriptionEs": "Calcula emisiones de CO₂ equivalente por alcance 1, 2 y 3 según GHG Protocol e ISO 14064 para reportes de sustentabilidad.",
+    "descriptionEn": "Calculates CO₂ equivalent emissions by scope 1, 2 and 3 per GHG Protocol and ISO 14064 for sustainability reporting.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 365 },
+        "includeScope3": { "type": "boolean", "default": false },
+        "emissionFactorSource": { "type": "string", "enum": ["cfe_mexico", "iea", "custom"] }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "scope1tCO2e": { "type": "number" },
+        "scope2tCO2e": { "type": "number" },
+        "scope3tCO2e": { "type": "number" },
+        "totalTco2e": { "type": "number" },
+        "vsLastYearPercent": { "type": "number" },
+        "carbonIntensity": { "type": "number", "description": "tCO2e per production unit" }
+      }
+    }
+  },
+  {
+    "id": "generate_iso50001_report",
+    "name": "generate_iso50001_report",
+    "nameEs": "Generar Reporte ISO 50001",
+    "type": "Cloud",
+    "category": "energy",
+    "descriptionEs": "Genera reporte de revisión energética conforme a ISO 50001 con EnPI, línea base, objetivos y acciones de mejora.",
+    "descriptionEn": "Generates energy review report conforming to ISO 50001 with EnPI, baseline, objectives and improvement actions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "reportPeriod": { "type": "string" },
+        "includeActionPlan": { "type": "boolean", "default": true }
+      },
+      "required": ["plantId", "reportPeriod"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "reportId": { "type": "string" },
+        "complianceStatus": { "type": "string", "enum": ["compliant", "minor_gaps", "major_gaps"] },
+        "objectives": { "type": "array", "items": { "type": "string" } },
+        "actionPlan": { "type": "array", "items": { "type": "object" } },
+        "pdfUrl": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "benchmark_energy_performance",
+    "name": "benchmark_energy_performance",
+    "nameEs": "Benchmark de Desempeño Energético",
+    "type": "Cloud",
+    "category": "energy",
+    "descriptionEs": "Compara el desempeño energético de la planta contra benchmarks del sector y plantas similares para identificar brechas.",
+    "descriptionEn": "Compares plant energy performance against sector benchmarks and similar plants to identify gaps.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "sector": { "type": "string", "enum": ["automotive", "food_beverage", "chemical", "cement", "steel", "textile", "pharma"] },
+        "companySize": { "type": "string", "enum": ["small", "medium", "large"] }
+      },
+      "required": ["plantId", "sector"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "plantEnPI": { "type": "number" },
+        "sectorMedianEnPI": { "type": "number" },
+        "sectorBestPracticeEnPI": { "type": "number" },
+        "gapToMedianPercent": { "type": "number" },
+        "gapToBestPercent": { "type": "number" },
+        "improvementPotentialKWh": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "schedule_energy_audit",
+    "name": "schedule_energy_audit",
+    "nameEs": "Programar Auditoría Energética",
+    "type": "Cloud",
+    "category": "energy",
+    "descriptionEs": "Planifica y programa auditorías energéticas internas o externas con checklist ISO 50002 y asignación de auditores.",
+    "descriptionEn": "Plans and schedules internal or external energy audits with ISO 50002 checklist and auditor assignment.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "auditType": { "type": "string", "enum": ["internal", "external", "certification"] },
+        "targetDate": { "type": "string", "format": "date" },
+        "scope": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["plantId", "auditType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "auditId": { "type": "string" },
+        "scheduledDate": { "type": "string", "format": "date" },
+        "assignedAuditors": { "type": "array", "items": { "type": "string" } },
+        "checklistItems": { "type": "integer" },
+        "estimatedDurationDays": { "type": "integer" }
+      }
+    }
+  },
+
+  {
+    "id": "monitor_gas_sensors",
+    "name": "monitor_gas_sensors",
+    "nameEs": "Monitorear Sensores de Gas",
+    "type": "Edge",
+    "category": "safety",
+    "descriptionEs": "Monitorea sensores de gas tóxico, explosivo y confinado (H2S, CO, LEL, O2) con respuesta de emergencia autónoma en tiempo real.",
+    "descriptionEn": "Monitors toxic, explosive and confined gas sensors (H2S, CO, LEL, O2) with autonomous emergency response in real time.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sensorIds": { "type": "array", "items": { "type": "string" } },
+        "gasType": { "type": "string", "enum": ["H2S", "CO", "LEL", "O2_deficiency", "NH3", "Cl2", "SO2"] },
+        "alarmThresholds": { "type": "object", "properties": {
+          "warning": { "type": "number" }, "alarm": { "type": "number" }, "evacuation": { "type": "number" }
+        }}
+      },
+      "required": ["sensorIds", "gasType"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "readings": { "type": "array", "items": { "type": "object", "properties": {
+          "sensorId": { "type": "string" }, "value": { "type": "number" },
+          "unit": { "type": "string" }, "status": { "type": "string", "enum": ["normal", "warning", "alarm", "evacuation"] }
+        }}},
+        "emergencyActionTriggered": { "type": "boolean" },
+        "evacuationZones": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "report_safety_incident",
+    "name": "report_safety_incident",
+    "nameEs": "Reportar Incidente de Seguridad",
+    "type": "Cloud",
+    "category": "safety",
+    "descriptionEs": "Captura el reporte inicial de incidentes, accidentes, cuasi-accidentes y condiciones inseguras con clasificación OSHA/ISO 45001.",
+    "descriptionEn": "Captures initial report of incidents, accidents, near-misses and unsafe conditions with OSHA/ISO 45001 classification.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "incidentType": { "type": "string", "enum": ["accident", "near_miss", "unsafe_condition", "environmental", "property_damage"] },
+        "severity": { "type": "string", "enum": ["first_aid", "medical_treatment", "lost_time", "fatality", "property_damage"] },
+        "location": { "type": "string" },
+        "description": { "type": "string" },
+        "reportedBy": { "type": "string" }
+      },
+      "required": ["incidentType", "severity", "description", "reportedBy"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "incidentId": { "type": "string" },
+        "classification": { "type": "string" },
+        "notificationsSent": { "type": "array", "items": { "type": "string" } },
+        "immediateActions": { "type": "array", "items": { "type": "string" } },
+        "investigationRequired": { "type": "boolean" }
+      }
+    }
+  },
+  {
+    "id": "investigate_root_cause_hse",
+    "name": "investigate_root_cause_hse",
+    "nameEs": "Investigar Causa Raíz HSE",
+    "type": "Cloud",
+    "category": "safety",
+    "descriptionEs": "Ejecuta metodología de investigación de incidentes: árbol de causas, 5 Porqués y análisis de barreras para acciones preventivas.",
+    "descriptionEn": "Executes incident investigation methodology: cause tree, 5 Whys and barrier analysis for preventive actions.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "incidentId": { "type": "string" },
+        "methodology": { "type": "string", "enum": ["5_whys", "cause_tree", "bow_tie", "taproot"] },
+        "teamMembers": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["incidentId", "methodology"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "immediatesCauses": { "type": "array", "items": { "type": "string" } },
+        "basicCauses": { "type": "array", "items": { "type": "string" } },
+        "rootCauses": { "type": "array", "items": { "type": "string" } },
+        "correctiveActions": { "type": "array", "items": { "type": "object" } },
+        "similarIncidentRisk": { "type": "string", "enum": ["low", "medium", "high"] }
+      }
+    }
+  },
+  {
+    "id": "run_hazop_analysis",
+    "name": "run_hazop_analysis",
+    "nameEs": "Ejecutar Análisis HAZOP",
+    "type": "Cloud",
+    "category": "safety",
+    "descriptionEs": "Conduce análisis de peligros y operabilidad (HAZOP) en nodos de proceso identificando desviaciones y salvaguardas.",
+    "descriptionEn": "Conducts Hazard and Operability analysis (HAZOP) on process nodes identifying deviations and safeguards.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "processNodeId": { "type": "string" },
+        "guideWords": { "type": "array", "items": { "type": "string" }, "default": ["no", "more", "less", "as_well_as", "part_of", "reverse", "other_than"] },
+        "parameters": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["processNodeId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "deviations": { "type": "array", "items": { "type": "object", "properties": {
+          "guideWord": { "type": "string" }, "parameter": { "type": "string" },
+          "cause": { "type": "string" }, "consequence": { "type": "string" },
+          "safeguards": { "type": "array", "items": { "type": "string" } },
+          "riskRating": { "type": "string", "enum": ["acceptable", "ALARP", "unacceptable"] }
+        }}},
+        "totalDeviations": { "type": "integer" },
+        "unacceptableRisks": { "type": "integer" }
+      }
+    }
+  },
+  {
+    "id": "calculate_sil_level",
+    "name": "calculate_sil_level",
+    "nameEs": "Calcular Nivel SIL",
+    "type": "Cloud",
+    "category": "safety",
+    "descriptionEs": "Determina el nivel de integridad de seguridad (SIL 1-4) requerido para sistemas instrumentados de seguridad según IEC 61508/61511.",
+    "descriptionEn": "Determines the required Safety Integrity Level (SIL 1-4) for safety instrumented systems per IEC 61508/61511.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "hazardId": { "type": "string" },
+        "frequencyOfHazard": { "type": "number", "description": "events per year" },
+        "probabilityOfHarm": { "type": "number", "description": "0-1" },
+        "targetRiskFrequency": { "type": "number" }
+      },
+      "required": ["hazardId", "frequencyOfHazard", "probabilityOfHarm"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "silLevel": { "type": "integer", "enum": [1, 2, 3, 4] },
+        "riskReductionFactor": { "type": "number" },
+        "pfdAvg": { "type": "number", "description": "Probability of Failure on Demand avg" },
+        "requiresRedundancy": { "type": "boolean" },
+        "architectureRecommendation": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "manage_work_permits",
+    "name": "manage_work_permits",
+    "nameEs": "Gestionar Permisos de Trabajo",
+    "type": "Cloud",
+    "category": "safety",
+    "descriptionEs": "Gestiona el flujo completo de permisos de trabajo (PTW): espacio confinado, trabajo en caliente, energías peligrosas (LOTO).",
+    "descriptionEn": "Manages the complete work permit flow (PTW): confined space, hot work, hazardous energy (LOTO).",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "permitType": { "type": "string", "enum": ["hot_work", "confined_space", "loto", "working_at_height", "electrical"] },
+        "action": { "type": "string", "enum": ["request", "approve", "execute", "close", "cancel"] },
+        "location": { "type": "string" },
+        "requestedBy": { "type": "string" }
+      },
+      "required": ["permitType", "action", "location"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "permitId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "active", "closed", "cancelled"] },
+        "approvedBy": { "type": "string" },
+        "validUntil": { "type": "string", "format": "date-time" },
+        "precautions": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "track_safety_kpis",
+    "name": "track_safety_kpis",
+    "nameEs": "Rastrear KPIs de Seguridad",
+    "type": "Cloud",
+    "category": "safety",
+    "descriptionEs": "Monitorea indicadores de seguridad: TRIR, LTIR, días sin accidente, cierre de acciones correctivas y cultura de seguridad.",
+    "descriptionEn": "Monitors safety indicators: TRIR, LTIR, days without accident, corrective action closure and safety culture.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 30 },
+        "includeLeadingIndicators": { "type": "boolean", "default": true }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "daysWithoutAccident": { "type": "integer" },
+        "trir": { "type": "number", "description": "Total Recordable Incident Rate" },
+        "ltir": { "type": "number", "description": "Lost Time Incident Rate" },
+        "openCorrectiveActions": { "type": "integer" },
+        "safetyObservationsCount": { "type": "integer" },
+        "nearMissReportingRate": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "schedule_safety_drills",
+    "name": "schedule_safety_drills",
+    "nameEs": "Programar Simulacros de Seguridad",
+    "type": "Cloud",
+    "category": "safety",
+    "descriptionEs": "Planifica y registra simulacros de evacuación, derrame, incendio y emergencia médica con evaluación de desempeño.",
+    "descriptionEn": "Plans and records evacuation, spill, fire and medical emergency drills with performance evaluation.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "drillType": { "type": "string", "enum": ["evacuation", "fire", "chemical_spill", "medical_emergency", "earthquake"] },
+        "scheduledDate": { "type": "string", "format": "date" },
+        "isAnnounced": { "type": "boolean", "default": false }
+      },
+      "required": ["plantId", "drillType", "scheduledDate"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "drillId": { "type": "string" },
+        "scheduledDate": { "type": "string" },
+        "participantsRequired": { "type": "integer" },
+        "evaluationCriteria": { "type": "array", "items": { "type": "string" } },
+        "regulatoryComplianceCheck": { "type": "boolean" }
+      }
+    }
+  },
+
+  {
+    "id": "track_shipments",
+    "name": "track_shipments",
+    "nameEs": "Rastrear Envíos",
+    "type": "Cloud",
+    "category": "supply-chain",
+    "descriptionEs": "Rastreo en tiempo real de envíos multimodales (terrestre, aéreo, marítimo) con ETA dinámica y alertas de retraso.",
+    "descriptionEn": "Real-time tracking of multimodal shipments (land, air, sea) with dynamic ETA and delay alerts.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "shipmentIds": { "type": "array", "items": { "type": "string" } },
+        "transportMode": { "type": "string", "enum": ["land", "air", "sea", "intermodal"] },
+        "includeETA": { "type": "boolean", "default": true }
+      },
+      "required": ["shipmentIds"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "shipments": { "type": "array", "items": { "type": "object", "properties": {
+          "shipmentId": { "type": "string" }, "status": { "type": "string" },
+          "currentLocation": { "type": "string" }, "etaDate": { "type": "string" },
+          "delayDays": { "type": "number" }, "alerts": { "type": "array", "items": { "type": "string" } }
+        }}}
+      }
+    }
+  },
+  {
+    "id": "optimize_delivery_routes",
+    "name": "optimize_delivery_routes",
+    "nameEs": "Optimizar Rutas de Entrega",
+    "type": "Cloud",
+    "category": "supply-chain",
+    "descriptionEs": "Calcula rutas de entrega óptimas considerando costo, tiempo, capacidad de flota, ventanas de entrega y restricciones de tráfico.",
+    "descriptionEn": "Calculates optimal delivery routes considering cost, time, fleet capacity, delivery windows and traffic constraints.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "depotId": { "type": "string" },
+        "deliveryPoints": { "type": "array", "items": { "type": "object" } },
+        "fleetConfig": { "type": "object" },
+        "optimizationObjective": { "type": "string", "enum": ["minimize_cost", "minimize_time", "minimize_emissions"] }
+      },
+      "required": ["depotId", "deliveryPoints"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "routes": { "type": "array", "items": { "type": "object" } },
+        "totalDistanceKm": { "type": "number" },
+        "totalCost": { "type": "number" },
+        "estimatedDurationHours": { "type": "number" },
+        "co2Savings": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "predict_supply_disruptions",
+    "name": "predict_supply_disruptions",
+    "nameEs": "Predecir Disrupciones de Suministro",
+    "type": "Cloud",
+    "category": "supply-chain",
+    "descriptionEs": "Analiza señales de riesgo (clima, geopolítica, capacidad de proveedores) para predecir disrupciones y activar planes de contingencia.",
+    "descriptionEn": "Analyzes risk signals (weather, geopolitics, supplier capacity) to predict disruptions and activate contingency plans.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "supplierId": { "type": "string" },
+        "materialIds": { "type": "array", "items": { "type": "string" } },
+        "horizonDays": { "type": "integer", "default": 30 }
+      },
+      "required": ["supplierId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "disruptionRisk": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "riskFactors": { "type": "array", "items": { "type": "string" } },
+        "estimatedImpactDays": { "type": "number" },
+        "contingencyRecommendations": { "type": "array", "items": { "type": "string" } },
+        "alternativeSuppliers": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "manage_warehouse_wms",
+    "name": "manage_warehouse_wms",
+    "nameEs": "Gestionar Almacén WMS",
+    "type": "Cloud",
+    "category": "supply-chain",
+    "descriptionEs": "Gestiona operaciones de almacén: recepción, slotting dinámico, picking, cross-docking y despacho con trazabilidad FIFO/FEFO.",
+    "descriptionEn": "Manages warehouse operations: receiving, dynamic slotting, picking, cross-docking and dispatch with FIFO/FEFO traceability.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "warehouseId": { "type": "string" },
+        "operation": { "type": "string", "enum": ["receive", "putaway", "pick", "pack", "ship", "inventory_count"] },
+        "items": { "type": "array", "items": { "type": "object" } },
+        "priority": { "type": "string", "enum": ["normal", "urgent", "express"] }
+      },
+      "required": ["warehouseId", "operation"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "operationId": { "type": "string" },
+        "status": { "type": "string" },
+        "locationAssignments": { "type": "array", "items": { "type": "object" } },
+        "utilizationPercent": { "type": "number" },
+        "processedItems": { "type": "integer" }
+      }
+    }
+  },
+  {
+    "id": "calculate_scm_kpis",
+    "name": "calculate_scm_kpis",
+    "nameEs": "Calcular KPIs de Cadena de Suministro",
+    "type": "Cloud",
+    "category": "supply-chain",
+    "descriptionEs": "Genera métricas SCOR: OTIF, fill rate, días de inventario (DSI), rotación, lead time y costo logístico como % de ventas.",
+    "descriptionEn": "Generates SCOR metrics: OTIF, fill rate, days of supply (DSI), turnover, lead time and logistics cost as % of sales.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 30 },
+        "framework": { "type": "string", "enum": ["scor", "custom"], "default": "scor" }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "otifPercent": { "type": "number", "description": "On-Time In-Full" },
+        "fillRatePercent": { "type": "number" },
+        "inventoryDays": { "type": "number" },
+        "inventoryTurnover": { "type": "number" },
+        "avgLeadTimeDays": { "type": "number" },
+        "logisticsCostPercent": { "type": "number" }
+      }
+    }
+  },
+  {
+    "id": "manage_supplier_scorecard",
+    "name": "manage_supplier_scorecard",
+    "nameEs": "Gestionar Scorecard de Proveedores",
+    "type": "Cloud",
+    "category": "supply-chain",
+    "descriptionEs": "Evalúa y clasifica proveedores por calidad, entrega, precio, capacidad de respuesta y cumplimiento normativo con ranking automático.",
+    "descriptionEn": "Evaluates and classifies suppliers by quality, delivery, price, responsiveness and regulatory compliance with automatic ranking.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "supplierId": { "type": "string" },
+        "evaluationPeriodDays": { "type": "integer", "default": 90 },
+        "weights": { "type": "object", "properties": {
+          "quality": { "type": "number" }, "delivery": { "type": "number" },
+          "price": { "type": "number" }, "responsiveness": { "type": "number" }
+        }}
+      },
+      "required": ["supplierId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "supplierId": { "type": "string" },
+        "overallScore": { "type": "number", "description": "0-100" },
+        "classification": { "type": "string", "enum": ["preferred", "approved", "conditional", "disqualified"] },
+        "qualityPpm": { "type": "number" },
+        "onTimeDeliveryPercent": { "type": "number" },
+        "developmentActions": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  {
+    "id": "generate_delivery_report",
+    "name": "generate_delivery_report",
+    "nameEs": "Generar Reporte de Desempeño de Entrega",
+    "type": "Cloud",
+    "category": "supply-chain",
+    "descriptionEs": "Genera reporte ejecutivo de desempeño de entregas con análisis de retrasos, causas raíz y tendencias por ruta y cliente.",
+    "descriptionEn": "Generates executive delivery performance report with delay analysis, root causes and trends by route and customer.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "plantId": { "type": "string" },
+        "periodDays": { "type": "integer", "default": 30 },
+        "groupBy": { "type": "string", "enum": ["route", "customer", "carrier", "product"] }
+      },
+      "required": ["plantId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "reportId": { "type": "string" },
+        "totalDeliveries": { "type": "integer" },
+        "onTimePercent": { "type": "number" },
+        "avgDelayDays": { "type": "number" },
+        "topDelayReasons": { "type": "array", "items": { "type": "string" } },
+        "pdfUrl": { "type": "string" }
+      }
+    }
+  },
+  {
+    "id": "scan_incoming_material",
+    "name": "scan_incoming_material",
+    "nameEs": "Escanear Material Entrante",
+    "type": "Edge",
+    "category": "supply-chain",
+    "descriptionEs": "Digitaliza la recepción de materiales leyendo QR, código de barras o RFID para trazabilidad lote a lote desde el muelle.",
+    "descriptionEn": "Digitizes material receiving by reading QR, barcode or RFID for lot-to-lot traceability from the dock.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "scannerType": { "type": "string", "enum": ["qr", "barcode", "rfid", "manual"] },
+        "locationId": { "type": "string", "description": "Dock/gate identifier" },
+        "purchaseOrderId": { "type": "string" }
+      },
+      "required": ["scannerType", "locationId"]
+    },
+    "outputSchema": {
+      "type": "object",
+      "properties": {
+        "materialId": { "type": "string" },
+        "lotNumber": { "type": "string" },
+        "supplierId": { "type": "string" },
+        "quantityReceived": { "type": "number" },
+        "expirationDate": { "type": "string", "format": "date" },
+        "qualityHoldRequired": { "type": "boolean" },
+        "receivingTimestamp": { "type": "string", "format": "date-time" }
+      }
+    }
   }
 ]

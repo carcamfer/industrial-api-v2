@@ -22,6 +22,10 @@ block content
             span.stat-label &nbsp;Cloud
           span.stat-sep ·
           span.stat-item
+            span.stat-num= agents.filter(a => a.type === 'Edge').length
+            span.stat-label &nbsp;Edge
+          span.stat-sep ·
+          span.stat-item
             span.stat-num= agents.filter(a => a.type === 'Hybrid').length
             span.stat-label(data-es=" Híbridos" data-en=" Hybrid") &nbsp;Híbridos
 
@@ -31,6 +35,8 @@ block content
         button.filter-btn.active(data-filter="all" data-es="Todos" data-en="All") Todos
         button.filter-btn(data-filter="Cloud")
           span.badge.badge-cloud Cloud
+        button.filter-btn(data-filter="Edge")
+          span.badge.badge-edge Edge
         button.filter-btn(data-filter="Hybrid")
           span.badge.badge-hybrid(data-es="Híbrido" data-en="Hybrid") Híbrido
       input.search-input(type="text" placeholder="Buscar agente..." data-placeholder-es="Buscar agente..." data-placeholder-en="Search agent...")
@@ -68,7 +74,7 @@ block content
       svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
         polygon(points="13,2 3,14 12,14 11,22 21,10 12,10 13,2")
       span(data-es="Demo Industrial" data-en="Industrial Demo") Demo Industrial
-    p(style="color:var(--text-2);font-size:.9rem;margin-bottom:1.5rem;" data-es="Ejecuta 10 herramientas industriales y genera alarmas reales de distintos niveles de severidad para verlas en el reporte ISO." data-en="Run 10 industrial tools and generate real alarms at different severity levels to view them in the ISO report.") Ejecuta 10 herramientas industriales y genera alarmas reales de distintos niveles de severidad para verlas en el reporte ISO.
+    p(style="color:var(--text-2);font-size:.9rem;margin-bottom:1.5rem;" data-es="Ejecuta 12 herramientas industriales cubriendo 10 ISOs (ISO 9001, IATF 16949, IEC 61511, ISO 45001, ISO 28000, ISO 50001 y más) y genera alarmas reales para verlas en el reporte." data-en="Run 12 industrial tools covering 10 ISOs (ISO 9001, IATF 16949, IEC 61511, ISO 45001, ISO 28000, ISO 50001 and more) and generate real alarms to view in the report.") Ejecuta 12 herramientas industriales cubriendo 10 ISOs (ISO 9001, IATF 16949, IEC 61511, ISO 45001, ISO 28000, ISO 50001 y más) y genera alarmas reales para verlas en el reporte.
     .demo-controls
       button.btn.btn-primary#btn-run-demo
         svg(width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
@@ -92,25 +98,29 @@ block content
       var EVENTS_KEY  = 'iso_events';
 
       var DEMO_EVENTS = [
-        { module_id:'safety',      asset_id:'robot-01',     severity:'CRITICAL', event_type:'ALARM',   data:{value:91.2, incident_type:'equipment_contact', zone:'Zone-A'} },
-        { module_id:'vision',      asset_id:'conveyor-01',  severity:'CRITICAL', event_type:'ALARM',   data:{value:114.3, defect_rate:12.1, unit:'celsius'} },
-        { module_id:'maintenance', asset_id:'press-01',     severity:'CRITICAL', event_type:'ALARM',   data:{value:9.1, hours_since_maintenance:4700, oil_pressure:11.2} },
-        { module_id:'energy',      asset_id:'hvac-01',      severity:'HIGH',     event_type:'ALARM',   data:{value:391.5, power_factor:0.63, peak_demand:true} },
-        { module_id:'quality',     asset_id:'robot-01',     severity:'HIGH',     event_type:'ALARM',   data:{value:52.3, reject_count:13, batch_id:'BATCH-DEMO-001'} },
-        { module_id:'environment', asset_id:'sensor-env-01',severity:'HIGH',     event_type:'ALARM',   data:{value:1520.0, temperature:34.1, humidity:78.0, unit:'ppm_CO2'} },
-        { module_id:'maintenance', asset_id:'robot-02',     severity:'MEDIUM',   event_type:'WARNING', data:{value:4.8, hours_since_maintenance:2300, oil_pressure:44.0} },
-        { module_id:'energy',      asset_id:'press-01',     severity:'MEDIUM',   event_type:'WARNING', data:{value:295.0, power_factor:0.71, peak_demand:false} },
-        { module_id:'quality',     asset_id:'conveyor-01',  severity:'LOW',      event_type:'INFO',    data:{value:88.5, reject_count:2, batch_id:'BATCH-DEMO-002'} },
-        { module_id:'vision',      asset_id:'robot-02',     severity:'LOW',      event_type:'INFO',    data:{value:65.0, defect_rate:1.3, unit:'celsius'} },
+        { module_id:'safety',      asset_id:'robot-01',       severity:'CRITICAL', event_type:'ALARM',   data:{value:91.2, incident_type:'equipment_contact', zone:'Zone-A'} },
+        { module_id:'vision',      asset_id:'conveyor-01',    severity:'CRITICAL', event_type:'ALARM',   data:{value:114.3, defect_rate:12.1, unit:'celsius'} },
+        { module_id:'maintenance', asset_id:'press-01',       severity:'CRITICAL', event_type:'ALARM',   data:{value:9.1, hours_since_maintenance:4700, oil_pressure:11.2} },
+        { module_id:'control',     asset_id:'reactor-01',     severity:'CRITICAL', event_type:'ALARM',   data:{value:98.7, tag:'TIC-101', setpoint:85.0, deviation:13.7, sil_demand:true} },
+        { module_id:'energy',      asset_id:'hvac-01',        severity:'HIGH',     event_type:'ALARM',   data:{value:391.5, power_factor:0.63, peak_demand:true} },
+        { module_id:'quality',     asset_id:'robot-01',       severity:'HIGH',     event_type:'ALARM',   data:{value:52.3, reject_count:13, batch_id:'BATCH-DEMO-001'} },
+        { module_id:'environment', asset_id:'sensor-env-01',  severity:'HIGH',     event_type:'ALARM',   data:{value:1520.0, temperature:34.1, humidity:78.0, unit:'ppm_CO2'} },
+        { module_id:'supply_chain',asset_id:'supplier-mx-03', severity:'HIGH',     event_type:'ALARM',   data:{value:0, disruption_risk:'critical', delay_days:8, affected_materials:3} },
+        { module_id:'maintenance', asset_id:'robot-02',       severity:'MEDIUM',   event_type:'WARNING', data:{value:4.8, hours_since_maintenance:2300, oil_pressure:44.0} },
+        { module_id:'energy',      asset_id:'press-01',       severity:'MEDIUM',   event_type:'WARNING', data:{value:295.0, power_factor:0.71, peak_demand:false} },
+        { module_id:'quality',     asset_id:'conveyor-01',    severity:'LOW',      event_type:'INFO',    data:{value:88.5, reject_count:2, batch_id:'BATCH-DEMO-002'} },
+        { module_id:'supply_chain',asset_id:'warehouse-01',   severity:'LOW',      event_type:'INFO',    data:{value:94.2, otif_percent:94.2, fill_rate:98.1} },
       ];
 
       var TOOL_NAMES = {
-        safety:      'safety_zone_monitor',
-        vision:      'vision_defect_inspector',
-        maintenance: 'predictive_maintenance_scan',
-        energy:      'energy_consumption_tracker',
-        quality:     'quality_score_evaluator',
-        environment: 'env_emission_monitor',
+        safety:       'safety_zone_monitor',
+        vision:       'vision_defect_inspector',
+        maintenance:  'predictive_maintenance_scan',
+        energy:       'energy_consumption_tracker',
+        quality:      'quality_score_evaluator',
+        environment:  'env_emission_monitor',
+        control:      'scada_pid_loop_monitor',
+        supply_chain: 'supply_chain_risk_tracker',
       };
 
       var btn  = document.getElementById('btn-run-demo');
@@ -161,7 +171,7 @@ block content
                 '<span class="badge badge-medium">🔵 ' + counts.MEDIUM + ' Medias</span>' +
                 '<span class="badge badge-low">🟢 ' + counts.LOW + ' Bajas</span>' +
                 '</div>' +
-                '<p style="color:var(--text-2);font-size:.85rem">10 herramientas ejecutadas · Eventos guardados en sesión</p>';
+                '<p style="color:var(--text-2);font-size:.85rem">12 herramientas ejecutadas · 10 ISOs evaluadas · Eventos guardados en sesión</p>';
               btn.textContent = '✓ Demo ejecutado';
             }
           }, delay);

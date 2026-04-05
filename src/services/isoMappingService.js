@@ -2,14 +2,17 @@
 
 const ISO_MAPPINGS = {
   quality: [
-    { standard: 'ISO 9001:2015', clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Asegura que la producción se lleva a cabo bajo condiciones controladas.' },
-    { standard: 'ISO 9001:2015', clause: '8.7', title: 'Control de las salidas no conformes', description: 'Identifica y controla las salidas que no cumplen con los requisitos.' },
-    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Monitoreo continuo de la calidad del proceso y producto.' },
+    { standard: 'ISO 9001:2015',   clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Asegura que la producción se lleva a cabo bajo condiciones controladas.' },
+    { standard: 'ISO 9001:2015',   clause: '8.7', title: 'Control de las salidas no conformes', description: 'Identifica y controla las salidas que no cumplen con los requisitos.' },
+    { standard: 'ISO 9001:2015',   clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Monitoreo continuo de la calidad del proceso y producto.' },
+    { standard: 'IATF 16949:2016', clause: '8.5.1', title: 'Control de plan de control (manufacturing process)', description: 'Plan de control para procesos de manufactura con SPC y Cpk.' },
+    { standard: 'IATF 16949:2016', clause: '8.7.1', title: 'Control de producto no conforme — requerimientos específicos', description: 'Gestión de producto no conforme incluyendo material sospechoso y cuarentena.' },
   ],
   vision: [
-    { standard: 'ISO 9001:2015', clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Inspección visual automatizada para asegurar condiciones controladas.' },
-    { standard: 'ISO 9001:2015', clause: '8.7', title: 'Control de las salidas no conformes', description: 'Detección visual de defectos y productos no conformes.' },
-    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Medición continua de parámetros de calidad mediante visión artificial.' },
+    { standard: 'ISO 9001:2015',   clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Inspección visual automatizada para asegurar condiciones controladas.' },
+    { standard: 'ISO 9001:2015',   clause: '8.7', title: 'Control de las salidas no conformes', description: 'Detección visual de defectos y productos no conformes.' },
+    { standard: 'ISO 9001:2015',   clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Medición continua de parámetros de calidad mediante visión artificial.' },
+    { standard: 'IATF 16949:2016', clause: '8.5.1', title: 'Control de plan de control (manufacturing process)', description: 'Inspección automatizada como parte del plan de control de manufactura.' },
   ],
   maintenance: [
     { standard: 'ISO 55001:2014', clause: '6.2', title: 'Objetivos de gestión de activos y planificación para lograrlos', description: 'Define y persigue objetivos de mantenimiento para los activos físicos.' },
@@ -20,6 +23,8 @@ const ISO_MAPPINGS = {
     { standard: 'ISO 45001:2018', clause: '8.1', title: 'Planificación y control operacional', description: 'Controles operacionales para eliminar o reducir riesgos de SST.' },
     { standard: 'ISO 45001:2018', clause: '8.2', title: 'Preparación y respuesta ante emergencias', description: 'Procedimientos para responder ante situaciones de emergencia.' },
     { standard: 'ISO 45001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación del desempeño', description: 'Monitoreo continuo de indicadores de seguridad y salud en el trabajo.' },
+    { standard: 'IEC 61511:2016', clause: '5.2', title: 'Gestión de seguridad funcional', description: 'Gestión del ciclo de vida de seguridad para sistemas instrumentados de seguridad (SIS).' },
+    { standard: 'IEC 61511:2016', clause: '9',   title: 'Especificación de requerimientos de seguridad (SRS)', description: 'Especificación de requerimientos SIL para funciones instrumentadas de seguridad.' },
   ],
   environment: [
     { standard: 'ISO 14001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Control de operaciones con impacto ambiental significativo.' },
@@ -30,6 +35,16 @@ const ISO_MAPPINGS = {
     { standard: 'ISO 50001:2018', clause: '6.6', title: 'Planificación energética', description: 'Identificación de usos y consumos de energía significativos.' },
     { standard: 'ISO 50001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Monitoreo del desempeño energético y consumos.' },
     { standard: 'ISO 50001:2018', clause: '10.2', title: 'No conformidad y acción correctiva', description: 'Gestión de desviaciones en consumo energético y acciones correctivas.' },
+  ],
+  control: [
+    { standard: 'IEC 61511:2016', clause: '5.2', title: 'Gestión de seguridad funcional', description: 'Gestión del ciclo de vida de los sistemas instrumentados de seguridad en lazos de control.' },
+    { standard: 'IEC 61511:2016', clause: '11',  title: 'Diseño e ingeniería del SIS', description: 'Diseño del sistema instrumentado de seguridad conforme al SIL requerido.' },
+    { standard: 'IEC 61511:2016', clause: '16',  title: 'Operación y mantenimiento del SIS', description: 'Operación y mantenimiento del sistema instrumentado según el plan de seguridad.' },
+  ],
+  supply_chain: [
+    { standard: 'ISO 28000:2022', clause: '6.1', title: 'Acciones para abordar riesgos y oportunidades de la cadena de suministro', description: 'Identificación y gestión de riesgos de seguridad en la cadena de suministro.' },
+    { standard: 'ISO 28000:2022', clause: '8.1', title: 'Planificación y control operacional de la cadena de suministro', description: 'Control operacional de las actividades de la cadena de suministro.' },
+    { standard: 'ISO 28000:2022', clause: '8.3', title: 'Gestión de incidentes de seguridad en la cadena de suministro', description: 'Preparación y respuesta ante incidentes de seguridad logística.' },
   ],
 };
 
@@ -61,12 +76,14 @@ function buildRecommendation (module_id, severity, complianceStatus) {
   if (complianceStatus === 'COMPLIANT') return `El módulo "${module_id}" opera dentro de los parámetros normativos. Continuar con el monitoreo regular.`;
 
   const recs = {
-    quality:     { NON_COMPLIANT: 'Detener el lote afectado, iniciar revisión de no conformidades según ISO 9001:2015 §8.7 y notificar al responsable de calidad.', WARNING: 'Revisar parámetros de calidad del proceso. Documentar la desviación y evaluar acción correctiva preventiva.' },
-    vision:      { NON_COMPLIANT: 'Inspeccionar el sistema de visión artificial. Segregar productos sospechosos y abrir reporte de no conformidad (ISO 9001:2015 §8.7).', WARNING: 'Verificar calibración del sistema de visión. Documentar la anomalía para análisis de tendencias.' },
-    maintenance: { NON_COMPLIANT: 'Detener el activo afectado si hay riesgo de falla inminente. Ejecutar orden de trabajo correctivo urgente (ISO 55001:2014 §8.1).', WARNING: 'Programar mantenimiento preventivo anticipado. Revisar el plan de gestión del activo (ISO 55001:2014 §6.2).' },
-    safety:      { NON_COMPLIANT: 'ALERTA DE SEGURIDAD: Evacuar zona si es necesario. Activar protocolo de emergencia (ISO 45001:2018 §8.2). Notificar a responsable de SST inmediatamente.', WARNING: 'Reforzar controles operacionales en la zona afectada. Revisar evaluación de riesgos (ISO 45001:2018 §8.1).' },
-    environment: { NON_COMPLIANT: 'Activar plan de respuesta ambiental. Documentar el incidente y notificar a la autoridad ambiental si aplica (ISO 14001:2015 §10.2).', WARNING: 'Monitorear tendencia de parámetros ambientales. Revisar controles operacionales (ISO 14001:2015 §8.1).' },
-    energy:      { NON_COMPLIANT: 'Identificar y corregir la causa del consumo energético anómalo. Actualizar línea base energética (ISO 50001:2018 §10.2).', WARNING: 'Revisar el plan de uso de energía. Analizar indicadores de desempeño energético (ISO 50001:2018 §9.1).' },
+    quality:      { NON_COMPLIANT: 'Detener el lote afectado, iniciar revisión de no conformidades según ISO 9001:2015 §8.7 / IATF 16949 §8.7.1 y notificar al responsable de calidad.', WARNING: 'Revisar parámetros de calidad del proceso. Documentar la desviación y evaluar acción correctiva preventiva (IATF 16949 §8.5.1).' },
+    vision:       { NON_COMPLIANT: 'Inspeccionar el sistema de visión artificial. Segregar productos sospechosos y abrir reporte de no conformidad (ISO 9001:2015 §8.7 / IATF 16949 §8.7.1).', WARNING: 'Verificar calibración del sistema de visión. Documentar la anomalía para análisis de tendencias.' },
+    maintenance:  { NON_COMPLIANT: 'Detener el activo afectado si hay riesgo de falla inminente. Ejecutar orden de trabajo correctivo urgente (ISO 55001:2014 §8.1).', WARNING: 'Programar mantenimiento preventivo anticipado. Revisar el plan de gestión del activo (ISO 55001:2014 §6.2).' },
+    safety:       { NON_COMPLIANT: 'ALERTA DE SEGURIDAD: Evacuar zona si es necesario. Activar protocolo de emergencia (ISO 45001:2018 §8.2). Verificar estado del SIS conforme IEC 61511:2016 §16.', WARNING: 'Reforzar controles operacionales en la zona afectada. Revisar evaluación de riesgos (ISO 45001:2018 §8.1) y demanda de función SIS (IEC 61511:2016 §5.2).' },
+    environment:  { NON_COMPLIANT: 'Activar plan de respuesta ambiental. Documentar el incidente y notificar a la autoridad ambiental si aplica (ISO 14001:2015 §10.2).', WARNING: 'Monitorear tendencia de parámetros ambientales. Revisar controles operacionales (ISO 14001:2015 §8.1).' },
+    energy:       { NON_COMPLIANT: 'Identificar y corregir la causa del consumo energético anómalo. Actualizar línea base energética (ISO 50001:2018 §10.2).', WARNING: 'Revisar el plan de uso de energía. Analizar indicadores de desempeño energético (ISO 50001:2018 §9.1).' },
+    control:      { NON_COMPLIANT: 'ALARMA DE PROCESO CRÍTICA: Verificar estado del sistema instrumentado de seguridad (SIS). Revisar desvío de función SIL conforme IEC 61511:2016 §11. Notificar al ingeniero de seguridad funcional.', WARNING: 'Revisar desempeño del lazo de control afectado. Documentar desvío de proceso y evaluar demanda al SIS (IEC 61511:2016 §5.2).' },
+    supply_chain: { NON_COMPLIANT: 'Activar plan de contingencia de cadena de suministro. Notificar a gestión de proveedores y revisar acuerdo de seguridad (ISO 28000:2022 §8.3).', WARNING: 'Monitorear indicadores de riesgo del proveedor afectado. Revisar controles de cadena de suministro (ISO 28000:2022 §8.1).' },
   };
 
   return recs[module_id]?.[complianceStatus] ?? `Revisar el módulo "${module_id}" y tomar acción correctiva según el nivel de severidad ${severity}.`;

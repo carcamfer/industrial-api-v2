@@ -33,13 +33,16 @@ export function generateAuditReport (events) {
 
   // Pre-populate all 7 known ISO standards so they always appear in the report
   const ALL_STANDARDS = [
-    { key: 'ISO 9001:2015',  clauses: [{ clause:'8.5', title:'Control de producción' }, { clause:'8.7', title:'Control de salidas no conformes' }, { clause:'9.1', title:'Seguimiento y evaluación' }] },
-    { key: 'ISO 27001:2022', clauses: [{ clause:'A.12', title:'Seguridad operacional' }] },
-    { key: 'ISO 55001:2014', clauses: [{ clause:'6.2', title:'Objetivos de gestión de activos' }, { clause:'8.1', title:'Planificación y control operacional' }, { clause:'9.1', title:'Monitoreo y evaluación' }] },
-    { key: 'ISO 45001:2018', clauses: [{ clause:'8.1', title:'Planificación y control operacional' }, { clause:'8.2', title:'Preparación ante emergencias' }, { clause:'9.1', title:'Seguimiento del desempeño SST' }] },
-    { key: 'ISO 14001:2015', clauses: [{ clause:'8.1', title:'Control operacional ambiental' }, { clause:'9.1', title:'Seguimiento ambiental' }, { clause:'10.2', title:'No conformidad ambiental' }] },
-    { key: 'ISO 50001:2018', clauses: [{ clause:'6.6', title:'Planificación energética' }, { clause:'9.1', title:'Seguimiento energético' }, { clause:'10.2', title:'No conformidad energética' }] },
-    { key: 'ISO 22301:2019', clauses: [{ clause:'8.4', title:'Procedimientos de continuidad' }] },
+    { key: 'ISO 9001:2015',    clauses: [{ clause:'8.5', title:'Control de producción' }, { clause:'8.7', title:'Control de salidas no conformes' }, { clause:'9.1', title:'Seguimiento y evaluación' }] },
+    { key: 'IATF 16949:2016',  clauses: [{ clause:'8.5.1', title:'Control de plan de control (manufacturing)' }, { clause:'8.7.1', title:'Control de producto no conforme — requerimientos específicos' }] },
+    { key: 'ISO 27001:2022',   clauses: [{ clause:'A.12', title:'Seguridad operacional' }] },
+    { key: 'ISO 55001:2014',   clauses: [{ clause:'6.2', title:'Objetivos de gestión de activos' }, { clause:'8.1', title:'Planificación y control operacional' }, { clause:'9.1', title:'Monitoreo y evaluación' }] },
+    { key: 'ISO 45001:2018',   clauses: [{ clause:'8.1', title:'Planificación y control operacional' }, { clause:'8.2', title:'Preparación ante emergencias' }, { clause:'9.1', title:'Seguimiento del desempeño SST' }] },
+    { key: 'IEC 61511:2016',   clauses: [{ clause:'5.2', title:'Gestión de seguridad funcional' }, { clause:'9', title:'Especificación de requerimientos SIL' }, { clause:'11', title:'Diseño e ingeniería del SIS' }, { clause:'16', title:'Operación y mantenimiento del SIS' }] },
+    { key: 'ISO 14001:2015',   clauses: [{ clause:'8.1', title:'Control operacional ambiental' }, { clause:'9.1', title:'Seguimiento ambiental' }, { clause:'10.2', title:'No conformidad ambiental' }] },
+    { key: 'ISO 50001:2018',   clauses: [{ clause:'6.6', title:'Planificación energética' }, { clause:'9.1', title:'Seguimiento energético' }, { clause:'10.2', title:'No conformidad energética' }] },
+    { key: 'ISO 28000:2022',   clauses: [{ clause:'6.1', title:'Riesgos y oportunidades en cadena de suministro' }, { clause:'8.1', title:'Control operacional de la cadena de suministro' }, { clause:'8.3', title:'Gestión de incidentes de seguridad logística' }] },
+    { key: 'ISO 22301:2019',   clauses: [{ clause:'8.4', title:'Procedimientos de continuidad' }] },
   ];
   const byStandard = {};
   for (const std of ALL_STANDARDS) {
