@@ -2,7 +2,7 @@ import {
   getAllAgents, getAgentById, resolveToolsForAgent,
   getAllTools, getToolById, getRules, getEventStandard, getAgentsByToolId, getRulesForTool
 } from '../services/agentDataService.js';
-import { buildScript, buildToolDemo } from '../services/agentDemoService.js';
+import { buildScript, buildToolDemo, deriveToolAlarm } from '../services/agentDemoService.js';
 
 // ── View controllers ──────────────────────────────────────────
 
@@ -36,12 +36,16 @@ export function renderAgentDetail(req, res, next) {
 export function renderToolDetail(req, res, next) {
   const tool = getToolById(req.params.id);
   if (!tool) { const err = new Error('Tool no encontrada'); err.status = 404; return next(err); }
+  const usedByAgents = getAgentsByToolId(tool.id);
+  const agentAlarm = usedByAgents[0]?.isoAlarms?.[0] || null;
+  const toolIsoAlarm = deriveToolAlarm(tool.id, agentAlarm);
   res.render('agentes-tool', {
     pageTitle: tool.nameEs,
     currentPage: 'agentes',
     tool,
-    usedByAgents: getAgentsByToolId(tool.id),
-    commRules: getRulesForTool(tool.id)
+    usedByAgents,
+    commRules: getRulesForTool(tool.id),
+    toolIsoAlarm,
   });
 }
 
