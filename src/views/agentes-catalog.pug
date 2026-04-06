@@ -98,18 +98,55 @@ block content
       var EVENTS_KEY  = 'iso_events';
 
       var DEMO_EVENTS = [
-        { module_id:'safety',      asset_id:'robot-01',       severity:'CRITICAL', event_type:'ALARM',   data:{value:91.2, incident_type:'equipment_contact', zone:'Zone-A'} },
-        { module_id:'vision',      asset_id:'conveyor-01',    severity:'CRITICAL', event_type:'ALARM',   data:{value:114.3, defect_rate:12.1, unit:'celsius'} },
-        { module_id:'maintenance', asset_id:'press-01',       severity:'CRITICAL', event_type:'ALARM',   data:{value:9.1, hours_since_maintenance:4700, oil_pressure:11.2} },
-        { module_id:'control',     asset_id:'reactor-01',     severity:'CRITICAL', event_type:'ALARM',   data:{value:98.7, tag:'TIC-101', setpoint:85.0, deviation:13.7, sil_demand:true} },
-        { module_id:'energy',      asset_id:'hvac-01',        severity:'HIGH',     event_type:'ALARM',   data:{value:391.5, power_factor:0.63, peak_demand:true} },
-        { module_id:'quality',     asset_id:'robot-01',       severity:'HIGH',     event_type:'ALARM',   data:{value:52.3, reject_count:13, batch_id:'BATCH-DEMO-001'} },
-        { module_id:'environment', asset_id:'sensor-env-01',  severity:'HIGH',     event_type:'ALARM',   data:{value:1520.0, temperature:34.1, humidity:78.0, unit:'ppm_CO2'} },
-        { module_id:'supply_chain',asset_id:'supplier-mx-03', severity:'HIGH',     event_type:'ALARM',   data:{value:0, disruption_risk:'critical', delay_days:8, affected_materials:3} },
-        { module_id:'maintenance', asset_id:'robot-02',       severity:'MEDIUM',   event_type:'WARNING', data:{value:4.8, hours_since_maintenance:2300, oil_pressure:44.0} },
-        { module_id:'energy',      asset_id:'press-01',       severity:'MEDIUM',   event_type:'WARNING', data:{value:295.0, power_factor:0.71, peak_demand:false} },
-        { module_id:'quality',     asset_id:'conveyor-01',    severity:'LOW',      event_type:'INFO',    data:{value:88.5, reject_count:2, batch_id:'BATCH-DEMO-002'} },
-        { module_id:'supply_chain',asset_id:'warehouse-01',   severity:'LOW',      event_type:'INFO',    data:{value:94.2, otif_percent:94.2, fill_rate:98.1} },
+        // ── Seguridad Industrial (safety_zone_monitor) ──
+        { module_id:'safety',       asset_id:'zone-A',         severity:'CRITICAL', event_type:'ALARM',   tool:'monitor_gas_sensors',              data:{value:91.2, gas:'H2S', ppm:82.1, zone:'Zone-A', threshold:10} },
+        { module_id:'safety',       asset_id:'robot-01',       severity:'HIGH',     event_type:'ALARM',   tool:'report_safety_incident',           data:{value:1, incident_type:'equipment_contact', injured:false, zone:'Zone-B'} },
+        { module_id:'safety',       asset_id:'furnace-01',     severity:'MEDIUM',   event_type:'WARNING', tool:'calculate_sil_level',              data:{value:2.1, sil_required:3, sil_actual:2, gap:1} },
+        // ── Visión Artificial (vision_defect_inspector) ──
+        { module_id:'vision',       asset_id:'conveyor-01',    severity:'CRITICAL', event_type:'ALARM',   tool:'inspect_product_quality',          data:{value:114.3, defect_rate:12.1, batch_id:'BATCH-A03', threshold:2.0} },
+        { module_id:'vision',       asset_id:'station-02',     severity:'HIGH',     event_type:'ALARM',   tool:'detect_safety_violations',         data:{value:1, violation:'no_helmet', worker_id:'W-031', zone:'Zone-C'} },
+        { module_id:'vision',       asset_id:'conveyor-03',    severity:'MEDIUM',   event_type:'WARNING', tool:'count_items_on_conveyor',          data:{value:47, expected:60, delta:-13, line:'L3'} },
+        // ── Mantenimiento & CMMS (predictive_maintenance_scan) ──
+        { module_id:'maintenance',  asset_id:'press-01',       severity:'CRITICAL', event_type:'ALARM',   tool:'schedule_preventive_maintenance',  data:{value:9.1, hours_since_maintenance:4700, oil_pressure:11.2, overdue_days:12} },
+        { module_id:'maintenance',  asset_id:'motor-07',       severity:'HIGH',     event_type:'ALARM',   tool:'analyze_failure_modes',            data:{value:8.7, vibration_mm_s:8.7, temp_c:94, fmea_risk:'RPN-312'} },
+        { module_id:'maintenance',  asset_id:'robot-02',       severity:'MEDIUM',   event_type:'WARNING', tool:'manage_work_orders',               data:{value:4.8, open_orders:8, overdue_orders:3, mttr_h:6.2} },
+        // ── Control & SCADA (scada_pid_loop_monitor) ──
+        { module_id:'control',      asset_id:'reactor-01',     severity:'CRITICAL', event_type:'ALARM',   tool:'execute_pid_control',              data:{value:98.7, tag:'TIC-101', setpoint:85.0, deviation:13.7, sil_demand:true} },
+        { module_id:'control',      asset_id:'tank-03',        severity:'HIGH',     event_type:'ALARM',   tool:'monitor_scada_tags',               data:{value:97.3, tag:'FIC-220', hi_hi_limit:95.0, current:97.3} },
+        { module_id:'control',      asset_id:'compressor-01',  severity:'MEDIUM',   event_type:'WARNING', tool:'trigger_process_alarm',            data:{value:74.5, tag:'PIC-088', setpoint:70.0, deviation:4.5} },
+        // ── Energía (energy_consumption_tracker) ──
+        { module_id:'energy',       asset_id:'hvac-01',        severity:'HIGH',     event_type:'ALARM',   tool:'detect_energy_waste',              data:{value:391.5, power_factor:0.63, peak_demand:true, waste_kwh:47.2} },
+        { module_id:'energy',       asset_id:'plant-main',     severity:'MEDIUM',   event_type:'WARNING', tool:'calculate_energy_kpis',            data:{value:1.18, enpi_target:1.0, deviation_pct:18, period:'Q1-2026'} },
+        // ── Medio Ambiente (env_emission_monitor) ──
+        { module_id:'environment',  asset_id:'sensor-env-01',  severity:'HIGH',     event_type:'ALARM',   tool:'calculate_carbon_footprint',       data:{value:1520.0, co2_ppm:1520, limit_ppm:1000, excess_pct:52} },
+        { module_id:'environment',  asset_id:'stack-01',       severity:'MEDIUM',   event_type:'WARNING', tool:'monitor_energy_meters',            data:{value:34.1, temp_c:34.1, humidity:78.0, nox_ppm:180, limit_ppm:200} },
+        // ── Calidad & SPC (quality_score_evaluator) ──
+        { module_id:'quality',      asset_id:'robot-01',       severity:'HIGH',     event_type:'ALARM',   tool:'detect_out_of_control_signals',    data:{value:52.3, reject_count:13, ooc_rule:'Rule-1-3sigma', batch_id:'BATCH-B01'} },
+        { module_id:'quality',      asset_id:'line-02',        severity:'MEDIUM',   event_type:'WARNING', tool:'manage_nonconformances',           data:{value:5, open_ncrs:5, critical_ncrs:1, batch_id:'BATCH-B02'} },
+        { module_id:'quality',      asset_id:'conveyor-01',    severity:'LOW',      event_type:'INFO',    tool:'calculate_cpk_ppk',               data:{value:0.82, cpk:0.82, ppk:0.79, target_cpk:1.33} },
+        // ── Cadena de Suministro (supply_chain_risk_tracker) ──
+        { module_id:'supply_chain', asset_id:'supplier-mx-03', severity:'HIGH',     event_type:'ALARM',   tool:'predict_supply_disruptions',       data:{value:0, disruption_risk:'critical', delay_days:8, affected_materials:3} },
+        { module_id:'supply_chain', asset_id:'shipment-447',   severity:'MEDIUM',   event_type:'WARNING', tool:'track_shipments',                  data:{value:8, delay_days:8, origin:'Monterrey', status:'delayed'} },
+        { module_id:'supply_chain', asset_id:'warehouse-01',   severity:'LOW',      event_type:'INFO',    tool:'calculate_scm_kpis',              data:{value:78.4, otif_pct:78.4, target_pct:95, fill_rate:91.2} },
+        // ── ERP & Gestión (erp_kpi_alert) ──
+        { module_id:'erp',          asset_id:'sku-A201',       severity:'CRITICAL', event_type:'ALARM',   tool:'optimize_stock_levels',            data:{value:0, stock_units:0, reorder_point:150, stockout_risk:true} },
+        { module_id:'erp',          asset_id:'plant-erp',      severity:'HIGH',     event_type:'ALARM',   tool:'predict_demand',                   data:{value:34.2, demand_increase_pct:34.2, period:'May-2026', confidence:0.91} },
+        { module_id:'erp',          asset_id:'po-batch-06',    severity:'LOW',      event_type:'INFO',    tool:'generate_purchase_order',          data:{value:1, po_count:3, total_mxn:482000, supplier_count:2} },
+        // ── Ciberseguridad (cybersec_threat_detector) ──
+        { module_id:'cybersecurity',asset_id:'ot-network',     severity:'CRITICAL', event_type:'ALARM',   tool:'detect_network_anomalies_local',   data:{value:1, attempts:47, src_ip:'192.168.10.54', protocol:'modbus', blocked:true} },
+        { module_id:'cybersecurity',asset_id:'hmi-02',         severity:'HIGH',     event_type:'ALARM',   tool:'analyze_network_risk',             data:{value:8.9, cvss_score:8.9, cve:'CVE-2025-1234', patch_available:true} },
+        // ── AI & ML (aiml_failure_predictor) ──
+        { module_id:'ai_ml',        asset_id:'press-03',       severity:'CRITICAL', event_type:'ALARM',   tool:'predict_machine_failure',          data:{value:0.94, failure_prob:0.94, estimated_hours:31, model:'XGBoost-v3'} },
+        { module_id:'ai_ml',        asset_id:'mixer-01',       severity:'HIGH',     event_type:'ALARM',   tool:'detect_process_deviation',         data:{value:3.2, sigma_drift:3.2, param:'viscosity', baseline:45.0, current:51.4} },
+        // ── Infraestructura & Edge (edge_health_monitor) ──
+        { module_id:'infrastructure',asset_id:'edge-node-03',  severity:'HIGH',     event_type:'ALARM',   tool:'orchestrate_edge_nodes',           data:{value:0, node_status:'offline', uptime_h:0, last_seen_min:14} },
+        { module_id:'infrastructure',asset_id:'sensor-array-1',severity:'MEDIUM',   event_type:'WARNING', tool:'collect_sensor_data',              data:{value:14, timeout_sensors:14, total_sensors:48, data_loss_pct:29} },
+        // ── Producción Avanzada (production_oee_tracker) ──
+        { module_id:'production',   asset_id:'station-04',     severity:'HIGH',     event_type:'ALARM',   tool:'simulate_bottlenecks',             data:{value:87.3, utilization_pct:87.3, queue_units:34, throughput_loss_pct:22} },
+        { module_id:'production',   asset_id:'line-01',        severity:'MEDIUM',   event_type:'WARNING', tool:'identify_idle_time_patterns',      data:{value:23.1, idle_pct:23.1, target_pct:5, oee:0.61} },
+        // ── Digital Twin (digital_twin_deviation) ──
+        { module_id:'digital_twin', asset_id:'twin-plant-01',  severity:'HIGH',     event_type:'ALARM',   tool:'simulate_operations',              data:{value:15.3, deviation_pct:15.3, param:'throughput', planned:1200, actual:1016} },
+        { module_id:'digital_twin', asset_id:'twin-line-02',   severity:'MEDIUM',   event_type:'WARNING', tool:'feed_real_time_data_to_twin',      data:{value:12, sync_gap_min:12, last_sync:'12 min ago', drift_pct:8.1} },
       ];
 
       var TOOL_NAMES = !{toolNamesJson};
@@ -149,14 +186,18 @@ block content
             var entry = document.createElement('div');
             entry.className = 'log-entry';
             var t = new Date().toLocaleTimeString('es-MX');
+            var toolLabel = (ev.tool || '').replace(/_/g, ' ');
             entry.innerHTML =
               '<span class="log-time">' + t + '</span>' +
               '<span class="log-module">' + resolvedAlarm + '</span>' +
               '<span class="log-severity-' + ev.severity + '">' + ev.severity + '</span>' +
-              '&nbsp;&nbsp;<span class="log-asset">' + ev.asset_id + ' · ' + ev.event_type + '</span>';
+              '&nbsp;&nbsp;<span class="log-asset">' + ev.asset_id + '</span>' +
+              (toolLabel ? '&nbsp;<span style="color:var(--text-2);font-size:.75rem">→ ' + toolLabel + '</span>' : '');
             log.insertBefore(entry, log.firstChild);
 
             if (i === DEMO_EVENTS.length - 1) {
+              var total = DEMO_EVENTS.length;
+              var modules = new Set(DEMO_EVENTS.map(function(e){ return e.module_id; })).size;
               summary.innerHTML =
                 '<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem">' +
                 '<span class="badge badge-critical">🔴 ' + counts.CRITICAL + ' Críticas</span>' +
@@ -164,7 +205,7 @@ block content
                 '<span class="badge badge-medium">🔵 ' + counts.MEDIUM + ' Medias</span>' +
                 '<span class="badge badge-low">🟢 ' + counts.LOW + ' Bajas</span>' +
                 '</div>' +
-                '<p style="color:var(--text-2);font-size:.85rem">12 herramientas ejecutadas · 10 ISOs evaluadas · Eventos guardados en sesión</p>';
+                '<p style="color:var(--text-2);font-size:.85rem">' + total + ' eventos generados · ' + modules + ' agentes activos · 10 ISOs evaluadas · Guardados en sesión</p>';
               btn.textContent = '✓ Demo ejecutado';
             }
           }, delay);
