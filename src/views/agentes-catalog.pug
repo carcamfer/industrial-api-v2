@@ -175,4 +175,146 @@ block content
       });
     })();
 
+  section.agent-section
+    h2.section-title
+      svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+        circle(cx="12" cy="12" r="3")
+        path(d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83")
+      span Un Ecosistema Vivo y Conectado
+    p.section-sub Los módulos se comunican entre sí para toma de decisiones inteligente
+    #eco-catalog-box(style="position:relative;width:100%;height:clamp(320px,55vh,520px);margin-top:1.5rem")
+      svg#eco-catalog-svg(style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible")
+      .eco-node#eco-gateway(style="left:2%;top:10%;border-color:#60A5FA;color:#93C5FD")
+        .eco-icon 🔌
+        | Gateway OT-IT
+      .eco-node#eco-vision(style="left:2%;top:36%;border-color:#A78BFA;color:#C4B5FD")
+        .eco-icon 👁️
+        | Visión Artificial
+      .eco-node#eco-fallas(style="left:2%;top:62%;border-color:#F59E0B;color:#FCD34D")
+        .eco-icon 📳
+        | Fallas Mecánicas
+      .eco-node#eco-energia(style="left:2%;top:82%;border-color:#22D3EE;color:#67E8F9")
+        .eco-icon ⚡
+        | Energía con AI
+      .eco-node#eco-digitwin(style="left:23%;top:5%;border-color:#FBBF24;color:#FDE68A")
+        .eco-icon 🪞
+        | Digital Twin
+      .eco-node#eco-conteo(style="left:23%;top:78%;border-color:#A78BFA;color:#C4B5FD")
+        .eco-icon 🔢
+        | Conteo en Banda
+      #eco-nucleo(style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(80px,9vw,115px);height:clamp(80px,9vw,115px);border-radius:50%;background:radial-gradient(circle,#1D4ED8,#1E3A8A);border:3px solid #60A5FA;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:700;color:#BFDBFE;text-align:center;font-size:clamp(7px,.75vw,11px);box-shadow:0 0 30px rgba(37,99,235,.6),0 0 60px rgba(37,99,235,.3);animation:eco-glow 2s ease infinite;z-index:10;padding:6px") 🧠
+        br
+        | NÚCLEO
+        br
+        | CENTRAL
+      .eco-node#eco-scrap(style="right:23%;top:5%;border-color:#F87171;color:#FCA5A5")
+        .eco-icon 🗑️
+        | Scrap & Calidad
+      .eco-node#eco-erp(style="right:23%;top:78%;border-color:#34D399;color:#6EE7B7")
+        .eco-icon 🏢
+        | SAP / ERP
+      .eco-node#eco-analitica(style="right:2%;top:10%;border-color:#22D3EE;color:#67E8F9")
+        .eco-icon 📈
+        | Analítica & KPIs
+      .eco-node#eco-inventario(style="right:2%;top:36%;border-color:#34D399;color:#6EE7B7")
+        .eco-icon 📦
+        | Inventario Inteligente
+      .eco-node#eco-produccion(style="right:2%;top:62%;border-color:#F87171;color:#FCA5A5")
+        .eco-icon 📊
+        | Prod. Real vs Plan
+      .eco-node#eco-crm(style="right:2%;top:82%;border-color:#FBBF24;color:#FDE68A")
+        .eco-icon 🤝
+        | CRM Industrial
+      #eco-fdot(style="position:absolute;width:13px;height:13px;border-radius:50%;background:#A78BFA;box-shadow:0 0 10px #A78BFA;display:none;z-index:20;transition:left .7s ease,top .7s ease,background .3s;pointer-events:none")
+
+  style.
+    .eco-node{position:absolute;border-radius:10px;background:rgba(10,20,40,.95);border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:clamp(7px,.65vw,11px);font-weight:600;text-align:center;padding:.5rem .6rem;cursor:default;z-index:5;transition:transform .25s;width:clamp(75px,8.5vw,120px);line-height:1.3}
+    .eco-node:hover{transform:scale(1.06)}
+    .eco-icon{font-size:clamp(14px,1.4vw,22px);margin-bottom:.2rem}
+    #eco-catalog-svg .eco-line{stroke-dasharray:8 5;animation:eco-dash 2s linear infinite;fill:none;stroke-width:1.5;opacity:.5}
+    @keyframes eco-dash{from{stroke-dashoffset:26}to{stroke-dashoffset:0}}
+    @keyframes eco-glow{0%,100%{box-shadow:0 0 28px rgba(37,99,235,.5)}50%{box-shadow:0 0 55px rgba(37,99,235,.9)}}
+    .section-sub{color:var(--text-2);font-size:.9rem;margin-top:.25rem}
+
+  script.
+    (function() {
+      function ecoCenter(el) {
+        var box = el.getBoundingClientRect();
+        var pb = document.getElementById('eco-catalog-box').getBoundingClientRect();
+        return { x: box.left - pb.left + box.width/2, y: box.top - pb.top + box.height/2 };
+      }
+      function ecoDrawLines() {
+        var svg = document.getElementById('eco-catalog-svg');
+        if (!svg) return;
+        svg.innerHTML = '';
+        var nucleus = document.getElementById('eco-nucleo');
+        if (!nucleus) return;
+        var nc = ecoCenter(nucleus);
+        var nodes = ['eco-gateway','eco-vision','eco-fallas','eco-energia','eco-digitwin','eco-conteo','eco-scrap','eco-erp','eco-analitica','eco-inventario','eco-produccion','eco-crm'];
+        var colors = ['#60A5FA','#A78BFA','#F59E0B','#22D3EE','#FBBF24','#A78BFA','#F87171','#34D399','#22D3EE','#34D399','#F87171','#FBBF24'];
+        var crossPairs = [
+          ['eco-gateway','eco-digitwin','#60A5FA'],
+          ['eco-vision','eco-conteo','#A78BFA'],
+          ['eco-vision','eco-scrap','#A78BFA'],
+          ['eco-analitica','eco-erp','#22D3EE'],
+          ['eco-produccion','eco-scrap','#F87171'],
+          ['eco-inventario','eco-erp','#34D399'],
+          ['eco-fallas','eco-produccion','#F59E0B'],
+          ['eco-energia','eco-analitica','#22D3EE']
+        ];
+        crossPairs.forEach(function(pair) {
+          var el1 = document.getElementById(pair[0]);
+          var el2 = document.getElementById(pair[1]);
+          if (!el1 || !el2) return;
+          var c1 = ecoCenter(el1), c2 = ecoCenter(el2);
+          var ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+          ln.setAttribute('x1',c1.x); ln.setAttribute('y1',c1.y);
+          ln.setAttribute('x2',c2.x); ln.setAttribute('y2',c2.y);
+          ln.setAttribute('stroke',pair[2]);
+          ln.setAttribute('class','eco-line');
+          ln.setAttribute('style','opacity:0.2');
+          svg.appendChild(ln);
+        });
+        nodes.forEach(function(id, i) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          var ec = ecoCenter(el);
+          var line = document.createElementNS('http://www.w3.org/2000/svg','line');
+          line.setAttribute('x1',ec.x); line.setAttribute('y1',ec.y);
+          line.setAttribute('x2',nc.x); line.setAttribute('y2',nc.y);
+          line.setAttribute('stroke',colors[i]);
+          line.setAttribute('class','eco-line');
+          svg.appendChild(line);
+        });
+      }
+      var ecoNodeIds = ['eco-gateway','eco-vision','eco-fallas','eco-energia','eco-digitwin','eco-conteo','eco-scrap','eco-erp','eco-analitica','eco-inventario','eco-produccion','eco-crm'];
+      var ecoDotColors = ['#60A5FA','#A78BFA','#F59E0B','#22D3EE','#FBBF24','#A78BFA','#F87171','#34D399','#22D3EE','#34D399','#F87171','#FBBF24'];
+      var ecoDotIdx = 0, ecoDotPhase = 0;
+      function ecoMoveDot() {
+        var fdot = document.getElementById('eco-fdot');
+        var box = document.getElementById('eco-catalog-box');
+        if (!fdot || !box) return;
+        fdot.style.display = 'block';
+        var nodeEl = document.getElementById(ecoNodeIds[ecoDotIdx]);
+        var nucleus = document.getElementById('eco-nucleo');
+        if (!nodeEl || !nucleus) return;
+        var nc = ecoCenter(nucleus), ec = ecoCenter(nodeEl);
+        var target = ecoDotPhase === 0 ? nc : ec;
+        fdot.style.background = ecoDotColors[ecoDotIdx];
+        fdot.style.boxShadow = '0 0 10px ' + ecoDotColors[ecoDotIdx];
+        fdot.style.left = (target.x - 6.5) + 'px';
+        fdot.style.top = (target.y - 6.5) + 'px';
+        if (ecoDotPhase === 0) { ecoDotPhase = 1; }
+        else { ecoDotPhase = 0; ecoDotIdx = (ecoDotIdx + 1) % ecoNodeIds.length; }
+      }
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          ecoDrawLines();
+          ecoMoveDot();
+          setInterval(ecoMoveDot, 900);
+        }, 400);
+      });
+      window.addEventListener('resize', ecoDrawLines);
+    })();
+
   script(src="/public/agents-catalog.js" defer)
