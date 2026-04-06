@@ -200,15 +200,12 @@ export function getClientMappings () {
     control: 'scada_pid_loop_monitor', supply_chain: 'supply_chain_risk_tracker',
   };
 
-  // Only export primary alarm-name keys (not alias nulls)
+  // Export all primary alarm keys + alias keys
   const clientMappings = {};
   for (const [key, val] of Object.entries(ISO_MAPPINGS)) {
-    if (val !== null && !Object.values(aliasMap).every(v => v !== key) === false) {
-      // include both primary keys and aliases that resolve
-      clientMappings[key] = val;
-    }
+    if (val !== null) clientMappings[key] = val;
   }
-  // Also include all alias keys pointing to the resolved arrays
+  // Also include alias keys pointing to the resolved arrays
   for (const [alias, primary] of Object.entries(aliasMap)) {
     clientMappings[alias] = ISO_MAPPINGS[primary];
   }
