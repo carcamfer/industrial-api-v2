@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { getAgentById, getToolById, getRules } from './agentDataService.js';
+import { getAgentById, getToolById, getRules, getAgentsByToolId } from './agentDataService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,12 +22,12 @@ const SEVERITY_MAP = {
   energy: 'low', productivity: 'low', configuration: 'low', system: 'low'
 };
 
-function buildStandardEvent(tool, agentCategory, outputData, eventType) {
+function buildStandardEvent(tool, agentCategory, outputData, eventType, isoAlarm) {
   return {
     event_id: `evt-demo-${Math.random().toString(36).slice(2, 10)}`,
     timestamp: new Date().toISOString(),
     platform_version: '1.0',
-    module: { id: tool.id, version: '1.0.0' },
+    module: { id: isoAlarm || tool.id, version: '1.0.0' },
     asset: {
       asset_id: 'asset-demo-01',
       asset_type: tool.category === 'vision' ? 'camera' : tool.category === 'ai-ml' ? 'motor' : tool.category === 'production' ? 'workstation' : 'sensor',
@@ -91,7 +91,9 @@ export function buildToolDemo(toolId) {
   const hasNegativeSignal = boolOutputs.some(([k, v]) => v && (k.includes('anomaly') || k.includes('defect') || k.includes('violation') || k.includes('overrun') || k.includes('idle')));
   const status = hasNegativeSignal ? 'warn' : 'ok';
   const eventType = outgoingRules[0]?.event?.toLowerCase().replace(/-/g, '_') || tool.id;
-  const standardEvent = buildStandardEvent(tool, null, outputData, eventType);
+  const parentAgents = getAgentsByToolId(toolId);
+  const isoAlarm = parentAgents[0]?.isoAlarms?.[0] || null;
+  const standardEvent = buildStandardEvent(tool, null, outputData, eventType, isoAlarm);
   return {
     toolId: tool.id, toolName: tool.name, toolNameEs: tool.nameEs,
     toolType: tool.type, toolCategory: tool.category, status,
@@ -117,7 +119,8 @@ export function buildScript(agentId) {
     const hasNegativeSignal = boolOutputs.some(([k, v]) => v && (k.includes('anomaly') || k.includes('defect') || k.includes('violation') || k.includes('overrun') || k.includes('idle')));
     const status = hasNegativeSignal ? 'warn' : 'ok';
     const eventType = outgoingRules[0]?.event?.toLowerCase().replace(/-/g, '_') || tool.id;
-    const standardEvent = buildStandardEvent(tool, agent.category, outputData, eventType);
+    const isoAlarm = agent.isoAlarms?.[0] || null;
+    const standardEvent = buildStandardEvent(tool, agent.category, outputData, eventType, isoAlarm);
     steps.push({
       step: stepNum++, toolId: tool.id, toolName: tool.name, toolNameEs: tool.nameEs,
       toolType: tool.type, event: outgoingRules[0]?.event || `${tool.id.toUpperCase()}_EXECUTED`,

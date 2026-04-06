@@ -2283,6 +2283,65 @@ footer a:hover { text-decoration:underline; }
   line-height:1.4;
 }
 
+/* ── ISO Alarm block (agent detail) ─────────────────────── */
+.iso-alarm-block {
+  background: rgba(110,231,183,.07);
+  border: 1px solid rgba(110,231,183,.28);
+  border-left: 3px solid rgba(110,231,183,.7);
+  border-radius: .6rem;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+.iso-alarm-intro {
+  font-size: .82rem;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.iso-alarm-list {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+.iso-alarm-item {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+}
+.iso-alarm-dot {
+  color: #6ee7b7;
+  font-size: .65rem;
+  line-height: 1;
+}
+.iso-alarm-name {
+  font-size: .9rem;
+  font-weight: 700;
+  color: #6ee7b7;
+  background: rgba(110,231,183,.12);
+  padding: .15rem .5rem;
+  border-radius: .3rem;
+  letter-spacing: .01em;
+}
+.iso-alarm-label {
+  font-size: .78rem;
+  color: var(--text-2);
+}
+.iso-alarm-dev-note {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .78rem;
+  color: var(--text-2);
+  border-top: 1px solid rgba(110,231,183,.15);
+  padding-top: .65rem;
+  flex-wrap: wrap;
+}
+.iso-alarm-dev-note svg {
+  opacity: .55;
+  flex-shrink: 0;
+}
+
 /* ── Agent Chatbot ───────────────────────────────────────── */
 .agent-chat-panel {
   background:var(--card);

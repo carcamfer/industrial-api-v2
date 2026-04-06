@@ -220,11 +220,13 @@
 
   function saveIsoEvent(standardEvent) {
     if (!standardEvent) return;
+    var isoAlarms = window.TOOL_ISO_ALARMS || [];
+    var moduleId = isoAlarms.length > 0 ? isoAlarms[0] : standardEvent.module.id;
     var events = JSON.parse(localStorage.getItem('iso_events') || '[]');
     events.unshift({
       timestamp: standardEvent.timestamp,
       severity: (standardEvent.event.severity || 'low').toUpperCase(),
-      module_id: standardEvent.module.id,
+      module_id: moduleId,
       asset_id: standardEvent.asset.asset_id,
       event_type: standardEvent.event.type,
       category: standardEvent.event.category,

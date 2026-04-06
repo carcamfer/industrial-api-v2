@@ -51,6 +51,33 @@ block content
         p.agent-desc-text
           span(data-es=agent.fullDescriptionEs data-en=agent.fullDescriptionEn)= agent.fullDescriptionEs
 
+    if agent.isoAlarms && agent.isoAlarms.length > 0
+      section.agent-section
+        h2.section-title
+          svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")
+            path(d="M22 11.08V12a10 10 0 11-5.93-9.14")
+            polyline(points="22,4 12,14.01 9,11.01")
+          span(data-es="Alarma ISO que emite este agente" data-en="ISO Alarm emitted by this agent") Alarma ISO que emite este agente
+        .iso-alarm-block
+          .iso-alarm-intro
+            span(data-es="Este agente envía las siguientes alarmas al Simulador ISO. El desarrollador debe usar estos nombres exactos como " data-en="This agent sends the following alarms to the ISO Simulator. The developer must use these exact names as the ") Este agente envía las siguientes alarmas al Simulador ISO. El desarrollador debe usar estos nombres exactos como
+            code module.id
+            span(data-es=" del evento estándar." data-en=" in the standard event.") del evento estándar.
+          .iso-alarm-list
+            each alarm in agent.isoAlarms
+              .iso-alarm-item
+                span.iso-alarm-dot ●
+                code.iso-alarm-name= alarm
+                span.iso-alarm-label(data-es=" → se visualiza en el Dashboard ISO y Reporte de Auditoría" data-en=" → visible in ISO Dashboard and Audit Report") → se visualiza en el Dashboard ISO y Reporte de Auditoría
+          .iso-alarm-dev-note
+            svg(width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+              circle(cx="12" cy="12" r="10")
+              line(x1="12" y1="8" x2="12" y2="12")
+              line(x1="12" y1="16" x2="12.01" y2="16")
+            span(data-es="Para desarrolladores: el campo " data-en="For developers: the field ") Para desarrolladores: el campo
+            code standardEvent.module.id
+            span(data-es=" debe ser uno de los valores listados arriba. La UI del Simulador filtra y agrupa por este nombre." data-en=" must be one of the values listed above. The Simulator UI filters and groups by this name.") debe ser uno de los valores listados arriba. La UI del Simulador filtra y agrupa por este nombre.
+
     section.agent-section
       h2.section-title
         svg(width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2")

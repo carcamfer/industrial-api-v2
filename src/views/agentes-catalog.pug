@@ -112,16 +112,7 @@ block content
         { module_id:'supply_chain',asset_id:'warehouse-01',   severity:'LOW',      event_type:'INFO',    data:{value:94.2, otif_percent:94.2, fill_rate:98.1} },
       ];
 
-      var TOOL_NAMES = {
-        safety:       'safety_zone_monitor',
-        vision:       'vision_defect_inspector',
-        maintenance:  'predictive_maintenance_scan',
-        energy:       'energy_consumption_tracker',
-        quality:      'quality_score_evaluator',
-        environment:  'env_emission_monitor',
-        control:      'scada_pid_loop_monitor',
-        supply_chain: 'supply_chain_risk_tracker',
-      };
+      var TOOL_NAMES = !{toolNamesJson};
 
       var btn  = document.getElementById('btn-run-demo');
       var results = document.getElementById('demo-results');
@@ -143,10 +134,12 @@ block content
 
         DEMO_EVENTS.forEach(function(tpl, i) {
           setTimeout(function() {
+            var resolvedAlarm = TOOL_NAMES[tpl.module_id] || tpl.module_id;
             var ev = Object.assign({}, tpl, {
               event_id:  'demo-' + ts + '-' + i,
               timestamp: new Date().toISOString(),
               plant_id:  'PLT-01',
+              module_id: resolvedAlarm,
             });
             var events = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
             events.unshift(ev);
@@ -158,7 +151,7 @@ block content
             var t = new Date().toLocaleTimeString('es-MX');
             entry.innerHTML =
               '<span class="log-time">' + t + '</span>' +
-              '<span class="log-module">' + (TOOL_NAMES[ev.module_id] || ev.module_id) + '</span>' +
+              '<span class="log-module">' + resolvedAlarm + '</span>' +
               '<span class="log-severity-' + ev.severity + '">' + ev.severity + '</span>' +
               '&nbsp;&nbsp;<span class="log-asset">' + ev.asset_id + ' · ' + ev.event_type + '</span>';
             log.insertBefore(entry, log.firstChild);

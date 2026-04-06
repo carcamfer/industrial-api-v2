@@ -7,10 +7,18 @@ import { buildScript, buildToolDemo } from '../services/agentDemoService.js';
 // ── View controllers ──────────────────────────────────────────
 
 export function renderCatalog(req, res) {
+  const agents = getAllAgents();
+  const toolNamesMap = {};
+  for (const a of agents) {
+    if (a.moduleIds && a.isoAlarms) {
+      a.moduleIds.forEach((mid, i) => { toolNamesMap[mid] = a.isoAlarms[i] || a.isoAlarms[0]; });
+    }
+  }
   res.render('agentes-catalog', {
     pageTitle: 'Agentes Industriales',
     currentPage: 'agentes',
-    agents: getAllAgents()
+    agents,
+    toolNamesJson: JSON.stringify(toolNamesMap)
   });
 }
 
