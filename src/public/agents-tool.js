@@ -295,3 +295,80 @@
   }
 
 })();
+
+// ── Floating chat widget ───────────────────────────────────
+(function () {
+  var fab    = document.getElementById('tool-chat-fab');
+  var panel  = document.getElementById('tool-chat-panel');
+  var close  = document.getElementById('tool-chat-close');
+  var msgs   = document.getElementById('tool-chat-msgs');
+  var input  = document.getElementById('tool-chat-input');
+  var send   = document.getElementById('tool-chat-send');
+  var quick  = document.getElementById('tool-chat-quick');
+  var cform  = document.getElementById('tool-contact-form');
+  if (!fab || !panel) return;
+
+  var moduleName = window.TOOL_NAME_ES || window.TOOL_ID || 'Tool';
+  var history = [];
+
+  fab.addEventListener('click', function () { panel.classList.toggle('open'); });
+  close.addEventListener('click', function () { panel.classList.remove('open'); });
+
+  function addBubble(text, who) {
+    var b = document.createElement('div');
+    b.className = 'tool-chat-bubble ' + who;
+    b.textContent = text;
+    msgs.appendChild(b);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function doSend() {
+    var q = input.value.trim();
+    if (!q) return;
+    addBubble(q, 'user');
+    history.push({ role: 'user', content: q });
+    input.value = '';
+    send.disabled = true;
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ module: moduleName, messages: history })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      var reply = d.reply || 'Error al procesar.';
+      addBubble(reply, 'bot');
+      history.push({ role: 'assistant', content: reply });
+    })
+    .catch(function () { addBubble('Error de conexión.', 'bot'); })
+    .finally(function () { send.disabled = false; });
+  }
+
+  send.addEventListener('click', doSend);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') doSend(); });
+
+  document.querySelectorAll('.tool-qa-btn.show-contact').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var type = btn.dataset.type;
+      quick.style.display = 'none';
+      cform.style.display = 'block';
+      cform.innerHTML =
+        '<form id="tool-cform">' +
+        '<input class="tool-cf-input" name="name" placeholder="Nombre" required>' +
+        '<input class="tool-cf-input" name="company" placeholder="Empresa" required>' +
+        '<input class="tool-cf-input" name="email" type="email" placeholder="Email" required>' +
+        '<input class="tool-cf-input" name="phone" placeholder="Teléfono">' +
+        (type === 'llamada' ? '<input class="tool-cf-input" name="preferredTime" placeholder="Horario preferido">' : '') +
+        '<button class="tool-cf-submit" type="submit">' + (type === 'llamada' ? 'Solicitar llamada' : 'Enviar correo') + '</button>' +
+        '</form>';
+      document.getElementById('tool-cform').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var fd = new FormData(e.target);
+        var body = { type: type, module: moduleName };
+        fd.forEach(function (v, k) { body[k] = v; });
+        fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          .then(function () { cform.innerHTML = '<p style="color:#6ee7b7;padding:.5rem">✓ ' + (type === 'llamada' ? 'Solicitud enviada.' : 'Correo enviado.') + '</p>'; });
+      });
+    });
+  });
+})();

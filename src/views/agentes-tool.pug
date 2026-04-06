@@ -281,7 +281,29 @@ block content
               span(data-es=agent.nameEs data-en=agent.name)= agent.nameEs
               span.badge.badge-sm(class='badge-' + agent.type.toLowerCase())= agent.type
 
+  //- Chat flotante
+  #tool-chat-fab(title="Consultar sobre esta tool")
+    svg(width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5")
+      path(d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z")
+  #tool-chat-panel
+    #tool-chat-header
+      span#tool-chat-title= tool.nameEs
+      button#tool-chat-close ✕
+    #tool-chat-msgs
+      .tool-chat-bubble.bot
+        | Hola, soy el asistente de &nbsp;
+        strong= tool.nameEs
+        | . ¿En qué puedo ayudarte?
+    #tool-chat-quick
+      button.tool-qa-btn.show-contact(data-type="llamada") 📅 Agendar llamada
+      button.tool-qa-btn.show-contact(data-type="correo") ✉️ Enviar correo
+    #tool-contact-form(style="display:none")
+    #tool-chat-input-row
+      input#tool-chat-input(type="text" placeholder="Escribe tu pregunta…")
+      button#tool-chat-send Enviar
+
   script.
     window.TOOL_ID = !{JSON.stringify(tool.id)};
+    window.TOOL_NAME_ES = !{JSON.stringify(tool.nameEs)};
     window.TOOL_ISO_ALARMS = !{JSON.stringify(agentIsoAlarms)};
   script(src="/public/agents-tool.js" defer)
