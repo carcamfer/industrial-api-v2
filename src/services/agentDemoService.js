@@ -158,7 +158,7 @@ export function buildToolDemo(toolId) {
   const eventType = outgoingRules[0]?.event?.toLowerCase().replace(/-/g, '_') || tool.id;
   const parentAgents = getAgentsByToolId(toolId);
   const agentAlarm = parentAgents[0]?.isoAlarms?.[0] || null;
-  const isoAlarm = deriveToolAlarm(toolId, agentAlarm);
+  const isoAlarm = tool.isoEvent || deriveToolAlarm(toolId, agentAlarm);
   const standardEvent = buildStandardEvent(tool, null, outputData, eventType, isoAlarm);
   return {
     toolId: tool.id, toolName: tool.name, toolNameEs: tool.nameEs,
@@ -186,7 +186,7 @@ export function buildScript(agentId) {
     const status = hasNegativeSignal ? 'warn' : 'ok';
     const eventType = outgoingRules[0]?.event?.toLowerCase().replace(/-/g, '_') || tool.id;
     const agentAlarm = agent.isoAlarms?.[0] || null;
-    const isoAlarm = deriveToolAlarm(tool.id, agentAlarm);
+    const isoAlarm = tool.isoEvent || deriveToolAlarm(tool.id, agentAlarm);
     const standardEvent = buildStandardEvent(tool, agent.category, outputData, eventType, isoAlarm);
     steps.push({
       step: stepNum++, toolId: tool.id, toolName: tool.name, toolNameEs: tool.nameEs,

@@ -10,23 +10,57 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "warehouseId": { "type": "string" },
-        "skuIds": { "type": "array", "items": { "type": "string" } },
-        "includeAlerts": { "type": "boolean", "default": true }
+        "warehouseId": {
+          "type": "string"
+        },
+        "skuIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "includeAlerts": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["warehouseId"]
+      "required": [
+        "warehouseId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "items": { "type": "array", "items": { "type": "object", "properties": {
-          "skuId": { "type": "string" }, "quantity": { "type": "number" },
-          "minStock": { "type": "number" }, "alert": { "type": "boolean" }
-        }}},
-        "totalAlerts": { "type": "integer" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "skuId": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "number"
+              },
+              "minStock": {
+                "type": "number"
+              },
+              "alert": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "totalAlerts": {
+          "type": "integer"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "inventory_status_report"
   },
   {
     "id": "predict_demand",
@@ -39,23 +73,48 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "skuId": { "type": "string" },
-        "horizonDays": { "type": "integer", "default": 30 },
-        "includeSeasonality": { "type": "boolean", "default": true }
+        "skuId": {
+          "type": "string"
+        },
+        "horizonDays": {
+          "type": "integer",
+          "default": 30
+        },
+        "includeSeasonality": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["skuId"]
+      "required": [
+        "skuId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "skuId": { "type": "string" },
-        "predictedUnits": { "type": "number" },
-        "confidenceInterval": { "type": "object", "properties": {
-          "low": { "type": "number" }, "high": { "type": "number" }
-        }},
-        "seasonalityFactor": { "type": "number" }
+        "skuId": {
+          "type": "string"
+        },
+        "predictedUnits": {
+          "type": "number"
+        },
+        "confidenceInterval": {
+          "type": "object",
+          "properties": {
+            "low": {
+              "type": "number"
+            },
+            "high": {
+              "type": "number"
+            }
+          }
+        },
+        "seasonalityFactor": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "demand_prediction_alert"
   },
   {
     "id": "optimize_stock_levels",
@@ -68,21 +127,38 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "skuId": { "type": "string" },
-        "leadTimeDays": { "type": "number" },
-        "holdingCostPercent": { "type": "number" }
+        "skuId": {
+          "type": "string"
+        },
+        "leadTimeDays": {
+          "type": "number"
+        },
+        "holdingCostPercent": {
+          "type": "number"
+        }
       },
-      "required": ["skuId"]
+      "required": [
+        "skuId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "skuId": { "type": "string" },
-        "recommendedMinStock": { "type": "number" },
-        "reorderPoint": { "type": "number" },
-        "economicOrderQty": { "type": "number" }
+        "skuId": {
+          "type": "string"
+        },
+        "recommendedMinStock": {
+          "type": "number"
+        },
+        "reorderPoint": {
+          "type": "number"
+        },
+        "economicOrderQty": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "stock_optimization_result"
   },
   {
     "id": "recommend_purchase_orders",
@@ -95,21 +171,46 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "warehouseId": { "type": "string" },
-        "maxBudget": { "type": "number" }
+        "warehouseId": {
+          "type": "string"
+        },
+        "maxBudget": {
+          "type": "number"
+        }
       },
-      "required": ["warehouseId"]
+      "required": [
+        "warehouseId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "orders": { "type": "array", "items": { "type": "object", "properties": {
-          "skuId": { "type": "string" }, "quantity": { "type": "number" },
-          "supplierId": { "type": "string" }, "estimatedCost": { "type": "number" }
-        }}},
-        "totalCost": { "type": "number" }
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "skuId": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "number"
+              },
+              "supplierId": {
+                "type": "string"
+              },
+              "estimatedCost": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "totalCost": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "purchase_order_recommendation"
   },
   {
     "id": "generate_purchase_order",
@@ -122,20 +223,45 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "supplierId": { "type": "string" },
-        "items": { "type": "array", "items": { "type": "object" } },
-        "deliveryDate": { "type": "string", "format": "date" }
+        "supplierId": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "deliveryDate": {
+          "type": "string",
+          "format": "date"
+        }
       },
-      "required": ["supplierId", "items"]
+      "required": [
+        "supplierId",
+        "items"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "orderId": { "type": "string" },
-        "status": { "type": "string", "enum": ["created", "sent", "confirmed"] },
-        "totalAmount": { "type": "number" }
+        "orderId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "created",
+            "sent",
+            "confirmed"
+          ]
+        },
+        "totalAmount": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "purchase_order_generated"
   },
   {
     "id": "evaluate_suppliers",
@@ -148,20 +274,52 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "supplierIds": { "type": "array", "items": { "type": "string" } },
-        "criteria": { "type": "array", "items": { "type": "string", "enum": ["price", "quality", "lead_time", "compliance"] } }
+        "supplierIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "price",
+              "quality",
+              "lead_time",
+              "compliance"
+            ]
+          }
+        }
       },
-      "required": ["supplierIds"]
+      "required": [
+        "supplierIds"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "rankings": { "type": "array", "items": { "type": "object", "properties": {
-          "supplierId": { "type": "string" }, "score": { "type": "number" },
-          "recommendation": { "type": "string" }
-        }}}
+        "rankings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "supplierId": {
+                "type": "string"
+              },
+              "score": {
+                "type": "number"
+              },
+              "recommendation": {
+                "type": "string"
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "supplier_evaluation_result"
   },
   {
     "id": "analyze_lead_times",
@@ -174,20 +332,44 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "supplierId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 90 }
+        "supplierId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 90
+        }
       },
-      "required": ["supplierId"]
+      "required": [
+        "supplierId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "avgLeadTimeDays": { "type": "number" },
-        "stdDev": { "type": "number" },
-        "anomalies": { "type": "array", "items": { "type": "object" } },
-        "trend": { "type": "string", "enum": ["improving", "stable", "worsening"] }
+        "avgLeadTimeDays": {
+          "type": "number"
+        },
+        "stdDev": {
+          "type": "number"
+        },
+        "anomalies": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "trend": {
+          "type": "string",
+          "enum": [
+            "improving",
+            "stable",
+            "worsening"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "lead_time_analysis"
   },
   {
     "id": "compare_planned_vs_actual",
@@ -200,20 +382,52 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "module": { "type": "string", "enum": ["production", "purchasing", "costs"] },
-        "periodStart": { "type": "string", "format": "date" },
-        "periodEnd": { "type": "string", "format": "date" }
+        "module": {
+          "type": "string",
+          "enum": [
+            "production",
+            "purchasing",
+            "costs"
+          ]
+        },
+        "periodStart": {
+          "type": "string",
+          "format": "date"
+        },
+        "periodEnd": {
+          "type": "string",
+          "format": "date"
+        }
       },
-      "required": ["module", "periodStart", "periodEnd"]
+      "required": [
+        "module",
+        "periodStart",
+        "periodEnd"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "deviationPercent": { "type": "number" },
-        "status": { "type": "string", "enum": ["on_track", "deviation", "critical"] },
-        "details": { "type": "array", "items": { "type": "object" } }
+        "deviationPercent": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "on_track",
+            "deviation",
+            "critical"
+          ]
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "production_variance_report"
   },
   {
     "id": "detect_production_deviation",
@@ -226,19 +440,41 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "lineId": { "type": "string" },
-        "shiftDate": { "type": "string", "format": "date" }
+        "lineId": {
+          "type": "string"
+        },
+        "shiftDate": {
+          "type": "string",
+          "format": "date"
+        }
       },
-      "required": ["lineId", "shiftDate"]
+      "required": [
+        "lineId",
+        "shiftDate"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "deviationPercent": { "type": "number" },
-        "rootCause": { "type": "string", "enum": ["machine_failure", "material_shortage", "quality_issue", "operator_error", "schedule_change"] },
-        "impactUnits": { "type": "integer" }
+        "deviationPercent": {
+          "type": "number"
+        },
+        "rootCause": {
+          "type": "string",
+          "enum": [
+            "machine_failure",
+            "material_shortage",
+            "quality_issue",
+            "operator_error",
+            "schedule_change"
+          ]
+        },
+        "impactUnits": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "production_deviation_alert"
   },
   {
     "id": "predict_production_delays",
@@ -251,19 +487,38 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "orderId": { "type": "string" },
-        "dueDate": { "type": "string", "format": "date" }
+        "orderId": {
+          "type": "string"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date"
+        }
       },
-      "required": ["orderId"]
+      "required": [
+        "orderId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "delayProbability": { "type": "number", "minimum": 0, "maximum": 1 },
-        "estimatedDelayHours": { "type": "number" },
-        "riskFactors": { "type": "array", "items": { "type": "string" } }
+        "delayProbability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "estimatedDelayHours": {
+          "type": "number"
+        },
+        "riskFactors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "production_delay_forecast"
   },
   {
     "id": "optimize_production_schedule",
@@ -276,19 +531,40 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "horizon": { "type": "string", "enum": ["day", "week", "month"] }
+        "plantId": {
+          "type": "string"
+        },
+        "horizon": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month"
+          ]
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "schedule": { "type": "array", "items": { "type": "object" } },
-        "utilizationPercent": { "type": "number" },
-        "onTimeDeliveryForecast": { "type": "number" }
+        "schedule": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "utilizationPercent": {
+          "type": "number"
+        },
+        "onTimeDeliveryForecast": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "schedule_optimization_result"
   },
   {
     "id": "track_project_progress",
@@ -301,20 +577,40 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "projectId": { "type": "string" }
+        "projectId": {
+          "type": "string"
+        }
       },
-      "required": ["projectId"]
+      "required": [
+        "projectId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "completionPercent": { "type": "number" },
-        "milestonesCompleted": { "type": "integer" },
-        "milestonesTotal": { "type": "integer" },
-        "budgetUsedPercent": { "type": "number" },
-        "status": { "type": "string", "enum": ["on_track", "at_risk", "delayed"] }
+        "completionPercent": {
+          "type": "number"
+        },
+        "milestonesCompleted": {
+          "type": "integer"
+        },
+        "milestonesTotal": {
+          "type": "integer"
+        },
+        "budgetUsedPercent": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "on_track",
+            "at_risk",
+            "delayed"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "project_progress_update"
   },
   {
     "id": "estimate_project_costs",
@@ -327,19 +623,38 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "projectId": { "type": "string" },
-        "includeContingency": { "type": "boolean", "default": true }
+        "projectId": {
+          "type": "string"
+        },
+        "includeContingency": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["projectId"]
+      "required": [
+        "projectId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "estimatedCost": { "type": "number" },
-        "contingencyPercent": { "type": "number" },
-        "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] }
+        "estimatedCost": {
+          "type": "number"
+        },
+        "contingencyPercent": {
+          "type": "number"
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "project_cost_estimate"
   },
   {
     "id": "detect_budget_overrun",
@@ -352,19 +667,37 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "costCenterId": { "type": "string" },
-        "alertThreshold": { "type": "number", "default": 0.1, "description": "Fraction over budget" }
+        "costCenterId": {
+          "type": "string"
+        },
+        "alertThreshold": {
+          "type": "number",
+          "default": 0.1,
+          "description": "Fraction over budget"
+        }
       },
-      "required": ["costCenterId"]
+      "required": [
+        "costCenterId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "overrunDetected": { "type": "boolean" },
-        "overrunPercent": { "type": "number" },
-        "affectedCategories": { "type": "array", "items": { "type": "string" } }
+        "overrunDetected": {
+          "type": "boolean"
+        },
+        "overrunPercent": {
+          "type": "number"
+        },
+        "affectedCategories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "budget_overrun_alert"
   },
   {
     "id": "categorize_expenses",
@@ -377,20 +710,40 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "transactions": { "type": "array", "items": { "type": "object" } }
+        "transactions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       },
-      "required": ["transactions"]
+      "required": [
+        "transactions"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "categorized": { "type": "array", "items": { "type": "object", "properties": {
-          "transactionId": { "type": "string" },
-          "category": { "type": "string" },
-          "confidence": { "type": "number" }
-        }}}
+        "categorized": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "transactionId": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number"
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "expense_categorization"
   },
   {
     "id": "optimize_operational_costs",
@@ -403,18 +756,33 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "targetReductionPercent": { "type": "number", "default": 10 }
+        "plantId": {
+          "type": "string"
+        },
+        "targetReductionPercent": {
+          "type": "number",
+          "default": 10
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "opportunities": { "type": "array", "items": { "type": "object" } },
-        "estimatedSavingsMonthly": { "type": "number" }
+        "opportunities": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "estimatedSavingsMonthly": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "cost_optimization_result"
   },
   {
     "id": "generate_kpis",
@@ -427,20 +795,49 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "period": { "type": "string", "enum": ["daily", "weekly", "monthly"] }
+        "plantId": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly"
+          ]
+        }
       },
-      "required": ["plantId", "period"]
+      "required": [
+        "plantId",
+        "period"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "kpis": { "type": "array", "items": { "type": "object", "properties": {
-          "name": { "type": "string" }, "value": { "type": "number" },
-          "unit": { "type": "string" }, "trend": { "type": "string" }
-        }}}
+        "kpis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "trend": {
+                "type": "string"
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "kpi_report_generated"
   },
   {
     "id": "forecast_revenue",
@@ -453,19 +850,36 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "businessUnit": { "type": "string" },
-        "horizonMonths": { "type": "integer", "default": 3 }
+        "businessUnit": {
+          "type": "string"
+        },
+        "horizonMonths": {
+          "type": "integer",
+          "default": 3
+        }
       },
-      "required": ["businessUnit"]
+      "required": [
+        "businessUnit"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "forecastedRevenue": { "type": "number" },
-        "confidencePercent": { "type": "number" },
-        "byMonth": { "type": "array", "items": { "type": "object" } }
+        "forecastedRevenue": {
+          "type": "number"
+        },
+        "confidencePercent": {
+          "type": "number"
+        },
+        "byMonth": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "revenue_forecast_alert"
   },
   {
     "id": "detect_business_anomalies",
@@ -478,18 +892,41 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "metrics": { "type": "array", "items": { "type": "string" } },
-        "sensitivityLevel": { "type": "string", "enum": ["low", "medium", "high"], "default": "medium" }
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sensitivityLevel": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "default": "medium"
+        }
       },
-      "required": ["metrics"]
+      "required": [
+        "metrics"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "anomalies": { "type": "array", "items": { "type": "object" } },
-        "criticalCount": { "type": "integer" }
+        "anomalies": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "criticalCount": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "business_anomaly_detected"
   },
   {
     "id": "score_leads",
@@ -502,19 +939,43 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "leadIds": { "type": "array", "items": { "type": "string" } }
+        "leadIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["leadIds"]
+      "required": [
+        "leadIds"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "scores": { "type": "array", "items": { "type": "object", "properties": {
-          "leadId": { "type": "string" }, "score": { "type": "number" },
-          "closeProbability": { "type": "number" }, "potentialValue": { "type": "number" }
-        }}}
+        "scores": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "leadId": {
+                "type": "string"
+              },
+              "score": {
+                "type": "number"
+              },
+              "closeProbability": {
+                "type": "number"
+              },
+              "potentialValue": {
+                "type": "number"
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "lead_scoring_result"
   },
   {
     "id": "predict_sales",
@@ -527,20 +988,36 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "productId": { "type": "string" },
-        "channel": { "type": "string" },
-        "horizonDays": { "type": "integer", "default": 30 }
+        "productId": {
+          "type": "string"
+        },
+        "channel": {
+          "type": "string"
+        },
+        "horizonDays": {
+          "type": "integer",
+          "default": 30
+        }
       },
-      "required": ["productId"]
+      "required": [
+        "productId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "predictedUnits": { "type": "number" },
-        "predictedRevenue": { "type": "number" },
-        "accuracy": { "type": "number" }
+        "predictedUnits": {
+          "type": "number"
+        },
+        "predictedRevenue": {
+          "type": "number"
+        },
+        "accuracy": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "sales_prediction_alert"
   },
   {
     "id": "automate_followups",
@@ -553,19 +1030,44 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "targetType": { "type": "string", "enum": ["lead", "supplier", "order"] },
-        "targetIds": { "type": "array", "items": { "type": "string" } }
+        "targetType": {
+          "type": "string",
+          "enum": [
+            "lead",
+            "supplier",
+            "order"
+          ]
+        },
+        "targetIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["targetType", "targetIds"]
+      "required": [
+        "targetType",
+        "targetIds"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "sent": { "type": "integer" },
-        "failed": { "type": "integer" },
-        "scheduledIds": { "type": "array", "items": { "type": "string" } }
+        "sent": {
+          "type": "integer"
+        },
+        "failed": {
+          "type": "integer"
+        },
+        "scheduledIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "followup_automation_event"
   },
   {
     "id": "sync_erp_data_local",
@@ -578,20 +1080,46 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "erpType": { "type": "string", "enum": ["sap", "odoo", "dynamics", "custom"] },
-        "lastSyncTimestamp": { "type": "string", "format": "date-time" },
-        "tables": { "type": "array", "items": { "type": "string" } }
+        "erpType": {
+          "type": "string",
+          "enum": [
+            "sap",
+            "odoo",
+            "dynamics",
+            "custom"
+          ]
+        },
+        "lastSyncTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["erpType"]
+      "required": [
+        "erpType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "recordsSynced": { "type": "integer" },
-        "syncTimestamp": { "type": "string", "format": "date-time" },
-        "errors": { "type": "integer" }
+        "recordsSynced": {
+          "type": "integer"
+        },
+        "syncTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "errors": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "erp_sync_event"
   },
   {
     "id": "push_orders_to_erp",
@@ -604,19 +1132,39 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "orders": { "type": "array", "items": { "type": "object" } },
-        "erpType": { "type": "string" }
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "erpType": {
+          "type": "string"
+        }
       },
-      "required": ["orders", "erpType"]
+      "required": [
+        "orders",
+        "erpType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "inserted": { "type": "integer" },
-        "failed": { "type": "integer" },
-        "erpOrderIds": { "type": "array", "items": { "type": "string" } }
+        "inserted": {
+          "type": "integer"
+        },
+        "failed": {
+          "type": "integer"
+        },
+        "erpOrderIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "erp_order_pushed"
   },
   {
     "id": "analyze_network_risk",
@@ -629,19 +1177,44 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "networkId": { "type": "string" },
-        "includeExternalThreatFeed": { "type": "boolean", "default": true }
+        "networkId": {
+          "type": "string"
+        },
+        "includeExternalThreatFeed": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["networkId"]
+      "required": [
+        "networkId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "riskScore": { "type": "number", "minimum": 0, "maximum": 100 },
-        "riskLevel": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
-        "topThreats": { "type": "array", "items": { "type": "object" } }
+        "riskScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "topThreats": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "net_risk_assessment"
   },
   {
     "id": "detect_anomaly_patterns",
@@ -654,19 +1227,43 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "trafficLogs": { "type": "array", "items": { "type": "object" } },
-        "baselineWindowHours": { "type": "integer", "default": 168 }
+        "trafficLogs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "baselineWindowHours": {
+          "type": "integer",
+          "default": 168
+        }
       },
-      "required": ["trafficLogs"]
+      "required": [
+        "trafficLogs"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "patternsFound": { "type": "integer" },
-        "attackType": { "type": "string", "enum": ["lateral_movement", "c2_communication", "data_exfiltration", "ransomware_precursor", "none"] },
-        "confidence": { "type": "number" }
+        "patternsFound": {
+          "type": "integer"
+        },
+        "attackType": {
+          "type": "string",
+          "enum": [
+            "lateral_movement",
+            "c2_communication",
+            "data_exfiltration",
+            "ransomware_precursor",
+            "none"
+          ]
+        },
+        "confidence": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "anomaly_pattern_alert"
   },
   {
     "id": "simulate_attack_scenarios",
@@ -679,19 +1276,41 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "networkTopology": { "type": "object" },
-        "attackTypes": { "type": "array", "items": { "type": "string" } }
+        "networkTopology": {
+          "type": "object"
+        },
+        "attackTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["networkTopology"]
+      "required": [
+        "networkTopology"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "vulnerableAssets": { "type": "array", "items": { "type": "string" } },
-        "criticalPaths": { "type": "array", "items": { "type": "object" } },
-        "riskReduction": { "type": "number" }
+        "vulnerableAssets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "criticalPaths": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "riskReduction": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "attack_simulation_report"
   },
   {
     "id": "generate_security_strategy",
@@ -704,19 +1323,46 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "riskProfile": { "type": "object" },
-        "complianceFrameworks": { "type": "array", "items": { "type": "string", "enum": ["IEC62443", "NIST", "ISO27001"] } }
+        "riskProfile": {
+          "type": "object"
+        },
+        "complianceFrameworks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "IEC62443",
+              "NIST",
+              "ISO27001"
+            ]
+          }
+        }
       },
-      "required": ["riskProfile"]
+      "required": [
+        "riskProfile"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "strategyId": { "type": "string" },
-        "recommendations": { "type": "array", "items": { "type": "object" } },
-        "priorityActions": { "type": "array", "items": { "type": "string" } }
+        "strategyId": {
+          "type": "string"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "priorityActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "security_strategy_update"
   },
   {
     "id": "detect_network_anomalies_local",
@@ -729,20 +1375,47 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "interfaceId": { "type": "string" },
-        "sensitivityLevel": { "type": "string", "enum": ["low", "medium", "high"], "default": "high" }
+        "interfaceId": {
+          "type": "string"
+        },
+        "sensitivityLevel": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "default": "high"
+        }
       },
-      "required": ["interfaceId"]
+      "required": [
+        "interfaceId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "anomalyDetected": { "type": "boolean" },
-        "sourceIp": { "type": "string" },
-        "anomalyType": { "type": "string" },
-        "severity": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] }
+        "anomalyDetected": {
+          "type": "boolean"
+        },
+        "sourceIp": {
+          "type": "string"
+        },
+        "anomalyType": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "local_network_anomaly"
   },
   {
     "id": "block_ip",
@@ -755,20 +1428,37 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "ipAddress": { "type": "string" },
-        "duration": { "type": "integer", "description": "Duration in seconds, 0 = permanent" },
-        "reason": { "type": "string" }
+        "ipAddress": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer",
+          "description": "Duration in seconds, 0 = permanent"
+        },
+        "reason": {
+          "type": "string"
+        }
       },
-      "required": ["ipAddress"]
+      "required": [
+        "ipAddress"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "blocked": { "type": "boolean" },
-        "ruleId": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "blocked": {
+          "type": "boolean"
+        },
+        "ruleId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "ip_block_action"
   },
   {
     "id": "segment_network",
@@ -781,19 +1471,38 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "targetZone": { "type": "string" },
-        "segmentationPolicy": { "type": "string", "enum": ["isolate", "restrict", "monitor"] }
+        "targetZone": {
+          "type": "string"
+        },
+        "segmentationPolicy": {
+          "type": "string",
+          "enum": [
+            "isolate",
+            "restrict",
+            "monitor"
+          ]
+        }
       },
-      "required": ["targetZone", "segmentationPolicy"]
+      "required": [
+        "targetZone",
+        "segmentationPolicy"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "segmented": { "type": "boolean" },
-        "affectedDevices": { "type": "integer" },
-        "policyApplied": { "type": "string" }
+        "segmented": {
+          "type": "boolean"
+        },
+        "affectedDevices": {
+          "type": "integer"
+        },
+        "policyApplied": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "network_segmentation_event"
   },
   {
     "id": "apply_segmentation",
@@ -806,19 +1515,36 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "rules": { "type": "array", "items": { "type": "object" } },
-        "deviceId": { "type": "string" }
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "deviceId": {
+          "type": "string"
+        }
       },
-      "required": ["rules", "deviceId"]
+      "required": [
+        "rules",
+        "deviceId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "applied": { "type": "boolean" },
-        "rulesCount": { "type": "integer" },
-        "rollbackAvailable": { "type": "boolean" }
+        "applied": {
+          "type": "boolean"
+        },
+        "rulesCount": {
+          "type": "integer"
+        },
+        "rollbackAvailable": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "segmentation_applied"
   },
   {
     "id": "monitor_ot_network",
@@ -831,19 +1557,37 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "networkSegment": { "type": "string" },
-        "captureMode": { "type": "string", "enum": ["passive", "active"], "default": "passive" }
+        "networkSegment": {
+          "type": "string"
+        },
+        "captureMode": {
+          "type": "string",
+          "enum": [
+            "passive",
+            "active"
+          ],
+          "default": "passive"
+        }
       },
-      "required": ["networkSegment"]
+      "required": [
+        "networkSegment"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "packetsAnalyzed": { "type": "integer" },
-        "suspiciousFlows": { "type": "integer" },
-        "newDevicesDetected": { "type": "integer" }
+        "packetsAnalyzed": {
+          "type": "integer"
+        },
+        "suspiciousFlows": {
+          "type": "integer"
+        },
+        "newDevicesDetected": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "ot_network_monitor_alert"
   },
   {
     "id": "isolate_device",
@@ -856,20 +1600,41 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "deviceId": { "type": "string" },
-        "isolationType": { "type": "string", "enum": ["full", "partial", "monitoring_only"] }
+        "deviceId": {
+          "type": "string"
+        },
+        "isolationType": {
+          "type": "string",
+          "enum": [
+            "full",
+            "partial",
+            "monitoring_only"
+          ]
+        }
       },
-      "required": ["deviceId"]
+      "required": [
+        "deviceId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "isolated": { "type": "boolean" },
-        "deviceId": { "type": "string" },
-        "isolationType": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "isolated": {
+          "type": "boolean"
+        },
+        "deviceId": {
+          "type": "string"
+        },
+        "isolationType": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "device_isolation_action"
   },
   {
     "id": "inspect_gateway_traffic",
@@ -882,19 +1647,37 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "gatewayId": { "type": "string" },
-        "inspectionDepth": { "type": "string", "enum": ["shallow", "deep"], "default": "deep" }
+        "gatewayId": {
+          "type": "string"
+        },
+        "inspectionDepth": {
+          "type": "string",
+          "enum": [
+            "shallow",
+            "deep"
+          ],
+          "default": "deep"
+        }
       },
-      "required": ["gatewayId"]
+      "required": [
+        "gatewayId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "packetsInspected": { "type": "integer" },
-        "maliciousPayloads": { "type": "integer" },
-        "blockedConnections": { "type": "integer" }
+        "packetsInspected": {
+          "type": "integer"
+        },
+        "maliciousPayloads": {
+          "type": "integer"
+        },
+        "blockedConnections": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "gateway_traffic_inspection"
   },
   {
     "id": "inspect_product_quality",
@@ -907,22 +1690,51 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "cameraId": { "type": "string" },
-        "productType": { "type": "string" },
-        "confidenceThreshold": { "type": "number", "default": 0.85 }
+        "cameraId": {
+          "type": "string"
+        },
+        "productType": {
+          "type": "string"
+        },
+        "confidenceThreshold": {
+          "type": "number",
+          "default": 0.85
+        }
       },
-      "required": ["cameraId", "productType"]
+      "required": [
+        "cameraId",
+        "productType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "defectFound": { "type": "boolean" },
-        "defectType": { "type": "string", "enum": ["scratch", "dent", "crack", "discoloration", "deformation", "none"] },
-        "confidence": { "type": "number" },
-        "frameId": { "type": "string" },
-        "boundingBox": { "type": "object" }
+        "defectFound": {
+          "type": "boolean"
+        },
+        "defectType": {
+          "type": "string",
+          "enum": [
+            "scratch",
+            "dent",
+            "crack",
+            "discoloration",
+            "deformation",
+            "none"
+          ]
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "frameId": {
+          "type": "string"
+        },
+        "boundingBox": {
+          "type": "object"
+        }
       }
-    }
+    },
+    "isoEvent": "product_quality_inspection"
   },
   {
     "id": "count_items_on_conveyor",
@@ -935,19 +1747,34 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "cameraId": { "type": "string" },
-        "countingLine": { "type": "object", "description": "Line definition {x1,y1,x2,y2}" }
+        "cameraId": {
+          "type": "string"
+        },
+        "countingLine": {
+          "type": "object",
+          "description": "Line definition {x1,y1,x2,y2}"
+        }
       },
-      "required": ["cameraId"]
+      "required": [
+        "cameraId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "countTotal": { "type": "integer" },
-        "countPerMinute": { "type": "number" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "countTotal": {
+          "type": "integer"
+        },
+        "countPerMinute": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "conveyor_count_event"
   },
   {
     "id": "detect_safety_violations",
@@ -960,20 +1787,45 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "cameraId": { "type": "string" },
-        "checkItems": { "type": "array", "items": { "type": "string", "enum": ["helmet", "vest", "goggles", "gloves", "zone_restricted"] } }
+        "cameraId": {
+          "type": "string"
+        },
+        "checkItems": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "helmet",
+              "vest",
+              "goggles",
+              "gloves",
+              "zone_restricted"
+            ]
+          }
+        }
       },
-      "required": ["cameraId"]
+      "required": [
+        "cameraId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "violationDetected": { "type": "boolean" },
-        "violationType": { "type": "string" },
-        "personId": { "type": "string" },
-        "zoneId": { "type": "string" }
+        "violationDetected": {
+          "type": "boolean"
+        },
+        "violationType": {
+          "type": "string"
+        },
+        "personId": {
+          "type": "string"
+        },
+        "zoneId": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "safety_violation_detected"
   },
   {
     "id": "monitor_worker_posture",
@@ -986,19 +1838,42 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "cameraId": { "type": "string" },
-        "workerId": { "type": "string" }
+        "cameraId": {
+          "type": "string"
+        },
+        "workerId": {
+          "type": "string"
+        }
       },
-      "required": ["cameraId"]
+      "required": [
+        "cameraId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "postureScore": { "type": "number", "minimum": 0, "maximum": 100 },
-        "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
-        "recommendations": { "type": "array", "items": { "type": "string" } }
+        "postureScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "riskLevel": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "worker_posture_alert"
   },
   {
     "id": "capture_video_stream",
@@ -1011,22 +1886,49 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "cameraId": { "type": "string" },
-        "fps": { "type": "integer", "default": 30 },
-        "resolution": { "type": "string", "enum": ["640x480", "1280x720", "1920x1080"], "default": "1920x1080" }
+        "cameraId": {
+          "type": "string"
+        },
+        "fps": {
+          "type": "integer",
+          "default": 30
+        },
+        "resolution": {
+          "type": "string",
+          "enum": [
+            "640x480",
+            "1280x720",
+            "1920x1080"
+          ],
+          "default": "1920x1080"
+        }
       },
-      "required": ["cameraId"]
+      "required": [
+        "cameraId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "frameId": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" },
-        "width": { "type": "integer" },
-        "height": { "type": "integer" },
-        "sizeKb": { "type": "number" }
+        "frameId": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "width": {
+          "type": "integer"
+        },
+        "height": {
+          "type": "integer"
+        },
+        "sizeKb": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "video_stream_capture"
   },
   {
     "id": "train_vision_model",
@@ -1039,21 +1941,39 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "datasetId": { "type": "string" },
-        "baseModelId": { "type": "string" },
-        "epochs": { "type": "integer", "default": 50 }
+        "datasetId": {
+          "type": "string"
+        },
+        "baseModelId": {
+          "type": "string"
+        },
+        "epochs": {
+          "type": "integer",
+          "default": 50
+        }
       },
-      "required": ["datasetId"]
+      "required": [
+        "datasetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "modelId": { "type": "string" },
-        "accuracy": { "type": "number" },
-        "mAP": { "type": "number" },
-        "trainingTimeMinutes": { "type": "number" }
+        "modelId": {
+          "type": "string"
+        },
+        "accuracy": {
+          "type": "number"
+        },
+        "mAP": {
+          "type": "number"
+        },
+        "trainingTimeMinutes": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "vision_model_trained"
   },
   {
     "id": "improve_detection_model",
@@ -1066,19 +1986,32 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "modelId": { "type": "string" },
-        "newSamplesCount": { "type": "integer" }
+        "modelId": {
+          "type": "string"
+        },
+        "newSamplesCount": {
+          "type": "integer"
+        }
       },
-      "required": ["modelId"]
+      "required": [
+        "modelId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "newModelId": { "type": "string" },
-        "accuracyImprovement": { "type": "number" },
-        "deployReady": { "type": "boolean" }
+        "newModelId": {
+          "type": "string"
+        },
+        "accuracyImprovement": {
+          "type": "number"
+        },
+        "deployReady": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "detection_model_improved"
   },
   {
     "id": "analyze_visual_patterns",
@@ -1091,19 +2024,44 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "productType": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 30 }
+        "productType": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 30
+        }
       },
-      "required": ["productType"]
+      "required": [
+        "productType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "topDefects": { "type": "array", "items": { "type": "object" } },
-        "defectTrend": { "type": "string", "enum": ["improving", "stable", "worsening"] },
-        "suggestedRootCauses": { "type": "array", "items": { "type": "string" } }
+        "topDefects": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "defectTrend": {
+          "type": "string",
+          "enum": [
+            "improving",
+            "stable",
+            "worsening"
+          ]
+        },
+        "suggestedRootCauses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "visual_pattern_analysis"
   },
   {
     "id": "predict_demand_industrial",
@@ -1116,18 +2074,33 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "componentId": { "type": "string" },
-        "includeExternalSignals": { "type": "boolean", "default": true }
+        "componentId": {
+          "type": "string"
+        },
+        "includeExternalSignals": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["componentId"]
+      "required": [
+        "componentId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "demandForecast": { "type": "array", "items": { "type": "object" } },
-        "modelAccuracy": { "type": "number" }
+        "demandForecast": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "modelAccuracy": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "demand_forecast_alert"
   },
   {
     "id": "optimize_production_sequence",
@@ -1140,18 +2113,39 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "jobs": { "type": "array", "items": { "type": "object" } },
-        "machines": { "type": "array", "items": { "type": "object" } }
+        "jobs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "machines": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       },
-      "required": ["jobs", "machines"]
+      "required": [
+        "jobs",
+        "machines"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "optimizedSequence": { "type": "array", "items": { "type": "object" } },
-        "makespanReduction": { "type": "number" }
+        "optimizedSequence": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "makespanReduction": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "sequence_optimization_result"
   },
   {
     "id": "detect_process_deviation",
@@ -1164,19 +2158,38 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "processId": { "type": "string" },
-        "parameters": { "type": "array", "items": { "type": "string" } }
+        "processId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["processId"]
+      "required": [
+        "processId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "deviationDetected": { "type": "boolean" },
-        "outOfControlParameters": { "type": "array", "items": { "type": "string" } },
-        "cpkValue": { "type": "number" }
+        "deviationDetected": {
+          "type": "boolean"
+        },
+        "outOfControlParameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "cpkValue": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "process_deviation_detected"
   },
   {
     "id": "predict_machine_failure",
@@ -1189,21 +2202,53 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "sensorReadings": { "type": "array", "items": { "type": "object" } },
-        "horizonHours": { "type": "integer", "default": 72 }
+        "assetId": {
+          "type": "string"
+        },
+        "sensorReadings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "horizonHours": {
+          "type": "integer",
+          "default": 72
+        }
       },
-      "required": ["assetId", "sensorReadings"]
+      "required": [
+        "assetId",
+        "sensorReadings"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "failureProbability": { "type": "number", "minimum": 0, "maximum": 1 },
-        "estimatedTimeToFailureHours": { "type": "number" },
-        "failureType": { "type": "string", "enum": ["bearing", "motor", "gearbox", "belt", "seal", "none"] },
-        "recommendedAction": { "type": "string" }
+        "failureProbability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "estimatedTimeToFailureHours": {
+          "type": "number"
+        },
+        "failureType": {
+          "type": "string",
+          "enum": [
+            "bearing",
+            "motor",
+            "gearbox",
+            "belt",
+            "seal",
+            "none"
+          ]
+        },
+        "recommendedAction": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "machine_failure_prediction"
   },
   {
     "id": "analyze_vibration_patterns",
@@ -1216,21 +2261,49 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "vibrationData": { "type": "array", "items": { "type": "number" } },
-        "samplingRateHz": { "type": "number" }
+        "assetId": {
+          "type": "string"
+        },
+        "vibrationData": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "samplingRateHz": {
+          "type": "number"
+        }
       },
-      "required": ["assetId", "vibrationData", "samplingRateHz"]
+      "required": [
+        "assetId",
+        "vibrationData",
+        "samplingRateHz"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "dominantFrequency": { "type": "number" },
-        "rmsValue": { "type": "number" },
-        "failureSignature": { "type": "string" },
-        "severity": { "type": "string", "enum": ["normal", "watch", "alert", "danger"] }
+        "dominantFrequency": {
+          "type": "number"
+        },
+        "rmsValue": {
+          "type": "number"
+        },
+        "failureSignature": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "watch",
+            "alert",
+            "danger"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "vibration_pattern_alert"
   },
   {
     "id": "optimize_energy_usage",
@@ -1243,19 +2316,38 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetIds": { "type": "array", "items": { "type": "string" } },
-        "tariffPlan": { "type": "string" }
+        "assetIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tariffPlan": {
+          "type": "string"
+        }
       },
-      "required": ["assetIds"]
+      "required": [
+        "assetIds"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "recommendations": { "type": "array", "items": { "type": "object" } },
-        "estimatedSavingsKwh": { "type": "number" },
-        "estimatedSavingsCurrency": { "type": "number" }
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "estimatedSavingsKwh": {
+          "type": "number"
+        },
+        "estimatedSavingsCurrency": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "energy_usage_optimized"
   },
   {
     "id": "identify_bottlenecks",
@@ -1268,21 +2360,48 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "lineId": { "type": "string" },
-        "analysisWindow": { "type": "string", "enum": ["shift", "day", "week"] }
+        "lineId": {
+          "type": "string"
+        },
+        "analysisWindow": {
+          "type": "string",
+          "enum": [
+            "shift",
+            "day",
+            "week"
+          ]
+        }
       },
-      "required": ["lineId"]
+      "required": [
+        "lineId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "bottlenecks": { "type": "array", "items": { "type": "object", "properties": {
-          "stationId": { "type": "string" }, "utilizationPercent": { "type": "number" },
-          "lostUnits": { "type": "integer" }
-        }}},
-        "theoreticalCapacityIncrease": { "type": "number" }
+        "bottlenecks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stationId": {
+                "type": "string"
+              },
+              "utilizationPercent": {
+                "type": "number"
+              },
+              "lostUnits": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        "theoreticalCapacityIncrease": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "bottleneck_identified"
   },
   {
     "id": "generate_digital_twin_model",
@@ -1295,20 +2414,35 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "historicalDatasetId": { "type": "string" },
-        "cadFileUrl": { "type": "string" }
+        "assetId": {
+          "type": "string"
+        },
+        "historicalDatasetId": {
+          "type": "string"
+        },
+        "cadFileUrl": {
+          "type": "string"
+        }
       },
-      "required": ["assetId"]
+      "required": [
+        "assetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "modelId": { "type": "string" },
-        "modelAccuracy": { "type": "number" },
-        "simulationReady": { "type": "boolean" }
+        "modelId": {
+          "type": "string"
+        },
+        "modelAccuracy": {
+          "type": "number"
+        },
+        "simulationReady": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "twin_model_generated"
   },
   {
     "id": "collect_vibration_data",
@@ -1321,21 +2455,44 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "sensorId": { "type": "string" },
-        "samplingRateHz": { "type": "number", "default": 10000 },
-        "durationMs": { "type": "integer", "default": 500 }
+        "sensorId": {
+          "type": "string"
+        },
+        "samplingRateHz": {
+          "type": "number",
+          "default": 10000
+        },
+        "durationMs": {
+          "type": "integer",
+          "default": 500
+        }
       },
-      "required": ["sensorId"]
+      "required": [
+        "sensorId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "sensorId": { "type": "string" },
-        "samples": { "type": "array", "items": { "type": "number" } },
-        "samplingRateHz": { "type": "number" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "sensorId": {
+          "type": "string"
+        },
+        "samples": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "samplingRateHz": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "vibration_data_collected"
   },
   {
     "id": "collect_process_signals",
@@ -1348,21 +2505,57 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "deviceId": { "type": "string" },
-        "protocol": { "type": "string", "enum": ["opc-ua", "modbus-tcp", "modbus-rtu", "mqtt"] },
-        "tags": { "type": "array", "items": { "type": "string" } }
+        "deviceId": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "opc-ua",
+            "modbus-tcp",
+            "modbus-rtu",
+            "mqtt"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["deviceId", "protocol", "tags"]
+      "required": [
+        "deviceId",
+        "protocol",
+        "tags"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "readings": { "type": "array", "items": { "type": "object", "properties": {
-          "tag": { "type": "string" }, "value": { "type": "number" },
-          "unit": { "type": "string" }, "timestamp": { "type": "string" }
-        }}}
+        "readings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tag": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string"
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "process_signal_collected"
   },
   {
     "id": "run_local_inference",
@@ -1375,20 +2568,47 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "modelId": { "type": "string" },
-        "inputTensor": { "type": "array", "items": { "type": "number" } },
-        "modelFormat": { "type": "string", "enum": ["onnx", "tflite", "torchscript"] }
+        "modelId": {
+          "type": "string"
+        },
+        "inputTensor": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "modelFormat": {
+          "type": "string",
+          "enum": [
+            "onnx",
+            "tflite",
+            "torchscript"
+          ]
+        }
       },
-      "required": ["modelId", "inputTensor"]
+      "required": [
+        "modelId",
+        "inputTensor"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "prediction": { "type": "array", "items": { "type": "number" } },
-        "inferenceTimeMs": { "type": "number" },
-        "modelVersion": { "type": "string" }
+        "prediction": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "inferenceTimeMs": {
+          "type": "number"
+        },
+        "modelVersion": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "local_inference_result"
   },
   {
     "id": "detect_real_time_anomalies",
@@ -1401,21 +2621,46 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "signalId": { "type": "string" },
-        "value": { "type": "number" },
-        "windowSize": { "type": "integer", "default": 100 }
+        "signalId": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        },
+        "windowSize": {
+          "type": "integer",
+          "default": 100
+        }
       },
-      "required": ["signalId", "value"]
+      "required": [
+        "signalId",
+        "value"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "anomalyDetected": { "type": "boolean" },
-        "zscore": { "type": "number" },
-        "adaptiveThreshold": { "type": "number" },
-        "severity": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] }
+        "anomalyDetected": {
+          "type": "boolean"
+        },
+        "zscore": {
+          "type": "number"
+        },
+        "adaptiveThreshold": {
+          "type": "number"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "realtime_anomaly_detected"
   },
   {
     "id": "orchestrate_edge_nodes",
@@ -1428,19 +2673,40 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "clusterName": { "type": "string" },
-        "nodes": { "type": "array", "items": { "type": "string" } }
+        "clusterName": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["clusterName"]
+      "required": [
+        "clusterName"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "activeNodes": { "type": "integer" },
-        "totalNodes": { "type": "integer" },
-        "clusterHealth": { "type": "string", "enum": ["healthy", "degraded", "critical"] }
+        "activeNodes": {
+          "type": "integer"
+        },
+        "totalNodes": {
+          "type": "integer"
+        },
+        "clusterHealth": {
+          "type": "string",
+          "enum": [
+            "healthy",
+            "degraded",
+            "critical"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "edge_orchestration_event"
   },
   {
     "id": "manage_edge_devices",
@@ -1453,19 +2719,42 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "operation": { "type": "string", "enum": ["list", "provision", "decommission", "reboot"] },
-        "deviceId": { "type": "string" }
+        "operation": {
+          "type": "string",
+          "enum": [
+            "list",
+            "provision",
+            "decommission",
+            "reboot"
+          ]
+        },
+        "deviceId": {
+          "type": "string"
+        }
       },
-      "required": ["operation"]
+      "required": [
+        "operation"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "devices": { "type": "array", "items": { "type": "object" } },
-        "operationResult": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "devices": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "operationResult": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "edge_device_management"
   },
   {
     "id": "collect_sensor_data",
@@ -1478,19 +2767,40 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "sensorIds": { "type": "array", "items": { "type": "string" } },
-        "intervalMs": { "type": "integer", "default": 1000 }
+        "sensorIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intervalMs": {
+          "type": "integer",
+          "default": 1000
+        }
       },
-      "required": ["sensorIds"]
+      "required": [
+        "sensorIds"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "readings": { "type": "array", "items": { "type": "object" } },
-        "bufferedCount": { "type": "integer" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "readings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "bufferedCount": {
+          "type": "integer"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "sensor_data_collected"
   },
   {
     "id": "digitize_analog_signals",
@@ -1503,23 +2813,52 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "channelId": { "type": "string" },
-        "signalType": { "type": "string", "enum": ["4-20mA", "0-10V", "0-5V", "thermocouple"] },
-        "engineeringMin": { "type": "number" },
-        "engineeringMax": { "type": "number" }
+        "channelId": {
+          "type": "string"
+        },
+        "signalType": {
+          "type": "string",
+          "enum": [
+            "4-20mA",
+            "0-10V",
+            "0-5V",
+            "thermocouple"
+          ]
+        },
+        "engineeringMin": {
+          "type": "number"
+        },
+        "engineeringMax": {
+          "type": "number"
+        }
       },
-      "required": ["channelId", "signalType"]
+      "required": [
+        "channelId",
+        "signalType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "channelId": { "type": "string" },
-        "rawValue": { "type": "number" },
-        "engineeringValue": { "type": "number" },
-        "unit": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "channelId": {
+          "type": "string"
+        },
+        "rawValue": {
+          "type": "number"
+        },
+        "engineeringValue": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "analog_digitization_event"
   },
   {
     "id": "monitor_energy_consumption",
@@ -1532,22 +2871,43 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "meterId": { "type": "string" },
-        "readInterval": { "type": "integer", "default": 60 }
+        "meterId": {
+          "type": "string"
+        },
+        "readInterval": {
+          "type": "integer",
+          "default": 60
+        }
       },
-      "required": ["meterId"]
+      "required": [
+        "meterId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "kw": { "type": "number" },
-        "kwh": { "type": "number" },
-        "powerFactor": { "type": "number" },
-        "voltage": { "type": "number" },
-        "current": { "type": "number" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "kw": {
+          "type": "number"
+        },
+        "kwh": {
+          "type": "number"
+        },
+        "powerFactor": {
+          "type": "number"
+        },
+        "voltage": {
+          "type": "number"
+        },
+        "current": {
+          "type": "number"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "energy_consumption_monitored"
   },
   {
     "id": "execute_local_control_action",
@@ -1560,23 +2920,49 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "deviceId": { "type": "string" },
-        "tag": { "type": "string" },
+        "deviceId": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
         "value": {},
-        "protocol": { "type": "string", "enum": ["opc-ua", "modbus-tcp", "modbus-rtu"] }
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "opc-ua",
+            "modbus-tcp",
+            "modbus-rtu"
+          ]
+        }
       },
-      "required": ["deviceId", "tag", "value", "protocol"]
+      "required": [
+        "deviceId",
+        "tag",
+        "value",
+        "protocol"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "success": { "type": "boolean" },
-        "deviceId": { "type": "string" },
-        "tag": { "type": "string" },
+        "success": {
+          "type": "boolean"
+        },
+        "deviceId": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
         "writtenValue": {},
-        "timestamp": { "type": "string", "format": "date-time" }
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "local_control_action"
   },
   {
     "id": "deploy_edge_configuration",
@@ -1589,20 +2975,44 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "configId": { "type": "string" },
-        "targetDevices": { "type": "array", "items": { "type": "string" } },
-        "strategy": { "type": "string", "enum": ["all_at_once", "rolling", "canary"] }
+        "configId": {
+          "type": "string"
+        },
+        "targetDevices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "all_at_once",
+            "rolling",
+            "canary"
+          ]
+        }
       },
-      "required": ["configId", "targetDevices"]
+      "required": [
+        "configId",
+        "targetDevices"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "deployed": { "type": "integer" },
-        "failed": { "type": "integer" },
-        "rollbackAvailable": { "type": "boolean" }
+        "deployed": {
+          "type": "integer"
+        },
+        "failed": {
+          "type": "integer"
+        },
+        "rollbackAvailable": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "edge_config_deployed"
   },
   {
     "id": "update_edge_agents",
@@ -1615,20 +3025,36 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "agentId": { "type": "string" },
-        "targetVersion": { "type": "string" },
-        "deviceFilter": { "type": "object" }
+        "agentId": {
+          "type": "string"
+        },
+        "targetVersion": {
+          "type": "string"
+        },
+        "deviceFilter": {
+          "type": "object"
+        }
       },
-      "required": ["agentId", "targetVersion"]
+      "required": [
+        "agentId",
+        "targetVersion"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "updatedDevices": { "type": "integer" },
-        "failedDevices": { "type": "integer" },
-        "updateJobId": { "type": "string" }
+        "updatedDevices": {
+          "type": "integer"
+        },
+        "failedDevices": {
+          "type": "integer"
+        },
+        "updateJobId": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "edge_agent_updated"
   },
   {
     "id": "monitor_edge_health",
@@ -1641,20 +3067,39 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "fleetId": { "type": "string" },
-        "alertThresholds": { "type": "object" }
+        "fleetId": {
+          "type": "string"
+        },
+        "alertThresholds": {
+          "type": "object"
+        }
       },
-      "required": ["fleetId"]
+      "required": [
+        "fleetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "healthySince": { "type": "string", "format": "date-time" },
-        "nodesOnline": { "type": "integer" },
-        "nodesOffline": { "type": "integer" },
-        "alerts": { "type": "array", "items": { "type": "object" } }
+        "healthySince": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nodesOnline": {
+          "type": "integer"
+        },
+        "nodesOffline": {
+          "type": "integer"
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "edge_health_status"
   },
   {
     "id": "manage_device_registry",
@@ -1667,19 +3112,41 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "operation": { "type": "string", "enum": ["list", "register", "update", "deregister"] },
-        "deviceData": { "type": "object" }
+        "operation": {
+          "type": "string",
+          "enum": [
+            "list",
+            "register",
+            "update",
+            "deregister"
+          ]
+        },
+        "deviceData": {
+          "type": "object"
+        }
       },
-      "required": ["operation"]
+      "required": [
+        "operation"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "devices": { "type": "array", "items": { "type": "object" } },
-        "totalDevices": { "type": "integer" },
-        "operationResult": { "type": "string" }
+        "devices": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "totalDevices": {
+          "type": "integer"
+        },
+        "operationResult": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "device_registry_update"
   },
   {
     "id": "simulate_bottlenecks",
@@ -1692,19 +3159,33 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "lineId": { "type": "string" },
-        "scenario": { "type": "object" }
+        "lineId": {
+          "type": "string"
+        },
+        "scenario": {
+          "type": "object"
+        }
       },
-      "required": ["lineId", "scenario"]
+      "required": [
+        "lineId",
+        "scenario"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "throughputChange": { "type": "number" },
-        "oeeDelta": { "type": "number" },
-        "recommendation": { "type": "string" }
+        "throughputChange": {
+          "type": "number"
+        },
+        "oeeDelta": {
+          "type": "number"
+        },
+        "recommendation": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "bottleneck_simulation"
   },
   {
     "id": "optimize_production_flow",
@@ -1717,19 +3198,39 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "lineId": { "type": "string" },
-        "productionOrders": { "type": "array", "items": { "type": "object" } }
+        "lineId": {
+          "type": "string"
+        },
+        "productionOrders": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       },
-      "required": ["lineId", "productionOrders"]
+      "required": [
+        "lineId",
+        "productionOrders"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "optimizedFlow": { "type": "array", "items": { "type": "object" } },
-        "estimatedOEE": { "type": "number" },
-        "wipReduction": { "type": "number" }
+        "optimizedFlow": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "estimatedOEE": {
+          "type": "number"
+        },
+        "wipReduction": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "production_flow_optimized"
   },
   {
     "id": "plan_production_automatically",
@@ -1742,20 +3243,47 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "horizon": { "type": "string", "enum": ["day", "week", "month"] },
-        "demandForecast": { "type": "array", "items": { "type": "object" } }
+        "plantId": {
+          "type": "string"
+        },
+        "horizon": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month"
+          ]
+        },
+        "demandForecast": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       },
-      "required": ["plantId", "horizon"]
+      "required": [
+        "plantId",
+        "horizon"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "productionPlan": { "type": "array", "items": { "type": "object" } },
-        "resourceUtilization": { "type": "object" },
-        "onTimeDeliveryRate": { "type": "number" }
+        "productionPlan": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "resourceUtilization": {
+          "type": "object"
+        },
+        "onTimeDeliveryRate": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "production_plan_generated"
   },
   {
     "id": "identify_idle_time_patterns",
@@ -1768,19 +3296,39 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "lineId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 30 }
+        "lineId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 30
+        }
       },
-      "required": ["lineId"]
+      "required": [
+        "lineId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "patterns": { "type": "array", "items": { "type": "object" } },
-        "topCauses": { "type": "array", "items": { "type": "string" } },
-        "totalIdleTimeHours": { "type": "number" }
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "topCauses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "totalIdleTimeHours": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "idle_time_pattern_alert"
   },
   {
     "id": "collect_production_data",
@@ -1793,20 +3341,42 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "machineId": { "type": "string" },
-        "protocol": { "type": "string", "enum": ["opc-ua", "modbus", "mqtt", "s7"] }
+        "machineId": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "opc-ua",
+            "modbus",
+            "mqtt",
+            "s7"
+          ]
+        }
       },
-      "required": ["machineId", "protocol"]
+      "required": [
+        "machineId",
+        "protocol"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "partsProduced": { "type": "integer" },
-        "cycleTimeMs": { "type": "number" },
-        "stoppages": { "type": "integer" },
-        "shiftId": { "type": "string" }
+        "partsProduced": {
+          "type": "integer"
+        },
+        "cycleTimeMs": {
+          "type": "number"
+        },
+        "stoppages": {
+          "type": "integer"
+        },
+        "shiftId": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "production_data_collected"
   },
   {
     "id": "track_machine_state",
@@ -1819,19 +3389,40 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "machineId": { "type": "string" }
+        "machineId": {
+          "type": "string"
+        }
       },
-      "required": ["machineId"]
+      "required": [
+        "machineId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "machineId": { "type": "string" },
-        "state": { "type": "string", "enum": ["producing", "idle", "setup", "fault", "maintenance"] },
-        "stateStartedAt": { "type": "string", "format": "date-time" },
-        "stateDurationMs": { "type": "number" }
+        "machineId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "producing",
+            "idle",
+            "setup",
+            "fault",
+            "maintenance"
+          ]
+        },
+        "stateStartedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stateDurationMs": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "machine_state_change"
   },
   {
     "id": "detect_idle_time",
@@ -1844,19 +3435,40 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "machineId": { "type": "string" },
-        "minIdleSeconds": { "type": "integer", "default": 60 }
+        "machineId": {
+          "type": "string"
+        },
+        "minIdleSeconds": {
+          "type": "integer",
+          "default": 60
+        }
       },
-      "required": ["machineId"]
+      "required": [
+        "machineId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "idleDetected": { "type": "boolean" },
-        "idleDurationSeconds": { "type": "number" },
-        "cause": { "type": "string", "enum": ["material_shortage", "machine_fault", "operator_absent", "planned_stop", "unknown"] }
+        "idleDetected": {
+          "type": "boolean"
+        },
+        "idleDurationSeconds": {
+          "type": "number"
+        },
+        "cause": {
+          "type": "string",
+          "enum": [
+            "material_shortage",
+            "machine_fault",
+            "operator_absent",
+            "planned_stop",
+            "unknown"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "idle_time_detected"
   },
   {
     "id": "execute_production_adjustment",
@@ -1869,19 +3481,37 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "machineId": { "type": "string" },
-        "adjustments": { "type": "array", "items": { "type": "object" } }
+        "machineId": {
+          "type": "string"
+        },
+        "adjustments": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       },
-      "required": ["machineId", "adjustments"]
+      "required": [
+        "machineId",
+        "adjustments"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "applied": { "type": "boolean" },
-        "adjustmentsCount": { "type": "integer" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "applied": {
+          "type": "boolean"
+        },
+        "adjustmentsCount": {
+          "type": "integer"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "production_adjustment_applied"
   },
   {
     "id": "generate_digital_twin",
@@ -1894,19 +3524,44 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "assetType": { "type": "string", "enum": ["machine", "line", "plant", "process"] }
+        "assetId": {
+          "type": "string"
+        },
+        "assetType": {
+          "type": "string",
+          "enum": [
+            "machine",
+            "line",
+            "plant",
+            "process"
+          ]
+        }
       },
-      "required": ["assetId", "assetType"]
+      "required": [
+        "assetId",
+        "assetType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "twinId": { "type": "string" },
-        "syncStatus": { "type": "string", "enum": ["live", "delayed", "offline"] },
-        "fidelityScore": { "type": "number" }
+        "twinId": {
+          "type": "string"
+        },
+        "syncStatus": {
+          "type": "string",
+          "enum": [
+            "live",
+            "delayed",
+            "offline"
+          ]
+        },
+        "fidelityScore": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "digital_twin_created"
   },
   {
     "id": "simulate_operations",
@@ -1919,20 +3574,43 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "twinId": { "type": "string" },
-        "scenarios": { "type": "array", "items": { "type": "object" } },
-        "horizonHours": { "type": "integer", "default": 24 }
+        "twinId": {
+          "type": "string"
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "horizonHours": {
+          "type": "integer",
+          "default": 24
+        }
       },
-      "required": ["twinId", "scenarios"]
+      "required": [
+        "twinId",
+        "scenarios"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "results": { "type": "array", "items": { "type": "object" } },
-        "bestScenarioId": { "type": "string" },
-        "projectedImprovement": { "type": "number" }
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "bestScenarioId": {
+          "type": "string"
+        },
+        "projectedImprovement": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "twin_simulation_result"
   },
   {
     "id": "optimize_system_performance",
@@ -1945,19 +3623,42 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "twinId": { "type": "string" },
-        "optimizationObjective": { "type": "string", "enum": ["throughput", "quality", "energy", "cost"] }
+        "twinId": {
+          "type": "string"
+        },
+        "optimizationObjective": {
+          "type": "string",
+          "enum": [
+            "throughput",
+            "quality",
+            "energy",
+            "cost"
+          ]
+        }
       },
-      "required": ["twinId", "optimizationObjective"]
+      "required": [
+        "twinId",
+        "optimizationObjective"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "optimizationId": { "type": "string" },
-        "recommendations": { "type": "array", "items": { "type": "object" } },
-        "expectedImprovementPercent": { "type": "number" }
+        "optimizationId": {
+          "type": "string"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "expectedImprovementPercent": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "system_performance_optimized"
   },
   {
     "id": "feed_real_time_data_to_twin",
@@ -1970,22 +3671,46 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "twinId": { "type": "string" },
-        "sensorReadings": { "type": "array", "items": { "type": "object" } },
-        "batchSize": { "type": "integer", "default": 100 }
+        "twinId": {
+          "type": "string"
+        },
+        "sensorReadings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "batchSize": {
+          "type": "integer",
+          "default": 100
+        }
       },
-      "required": ["twinId", "sensorReadings"]
+      "required": [
+        "twinId",
+        "sensorReadings"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "recordsSent": { "type": "integer" },
-        "twinSyncLatencyMs": { "type": "number" },
-        "twinSyncStatus": { "type": "string", "enum": ["live", "buffering", "error"] }
+        "recordsSent": {
+          "type": "integer"
+        },
+        "twinSyncLatencyMs": {
+          "type": "number"
+        },
+        "twinSyncStatus": {
+          "type": "string",
+          "enum": [
+            "live",
+            "buffering",
+            "error"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "twin_data_feed_event"
   },
-
   {
     "id": "manage_work_orders",
     "name": "manage_work_orders",
@@ -1997,22 +3722,60 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "action": { "type": "string", "enum": ["create", "update", "close", "list"] },
-        "assetId": { "type": "string" },
-        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
-        "description": { "type": "string" }
+        "action": {
+          "type": "string",
+          "enum": [
+            "create",
+            "update",
+            "close",
+            "list"
+          ]
+        },
+        "assetId": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "description": {
+          "type": "string"
+        }
       },
-      "required": ["action", "assetId"]
+      "required": [
+        "action",
+        "assetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "workOrderId": { "type": "string" },
-        "status": { "type": "string", "enum": ["open", "in_progress", "waiting_parts", "closed"] },
-        "assignedTechnician": { "type": "string" },
-        "estimatedCompletionHours": { "type": "number" }
+        "workOrderId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "open",
+            "in_progress",
+            "waiting_parts",
+            "closed"
+          ]
+        },
+        "assignedTechnician": {
+          "type": "string"
+        },
+        "estimatedCompletionHours": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "work_order_event"
   },
   {
     "id": "schedule_preventive_maintenance",
@@ -2025,23 +3788,55 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "horizonDays": { "type": "integer", "default": 90 },
-        "availabilityTarget": { "type": "number", "description": "0-1, e.g. 0.95 for 95%" }
+        "assetId": {
+          "type": "string"
+        },
+        "horizonDays": {
+          "type": "integer",
+          "default": 90
+        },
+        "availabilityTarget": {
+          "type": "number",
+          "description": "0-1, e.g. 0.95 for 95%"
+        }
       },
-      "required": ["assetId"]
+      "required": [
+        "assetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "scheduledTasks": { "type": "array", "items": { "type": "object", "properties": {
-          "taskId": { "type": "string" }, "dueDate": { "type": "string", "format": "date" },
-          "estimatedHours": { "type": "number" }, "taskType": { "type": "string" }
-        }}},
-        "predictedAvailability": { "type": "number" },
-        "estimatedCost": { "type": "number" }
+        "scheduledTasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string"
+              },
+              "dueDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "estimatedHours": {
+                "type": "number"
+              },
+              "taskType": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "predictedAvailability": {
+          "type": "number"
+        },
+        "estimatedCost": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "preventive_maint_scheduled"
   },
   {
     "id": "calculate_mtbf_mttr",
@@ -2054,22 +3849,48 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 365 },
-        "includeHistorical": { "type": "boolean", "default": true }
+        "assetId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 365
+        },
+        "includeHistorical": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["assetId"]
+      "required": [
+        "assetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "mtbfHours": { "type": "number" },
-        "mttrHours": { "type": "number" },
-        "availability": { "type": "number" },
-        "failureCount": { "type": "integer" },
-        "trend": { "type": "string", "enum": ["improving", "stable", "degrading"] }
+        "mtbfHours": {
+          "type": "number"
+        },
+        "mttrHours": {
+          "type": "number"
+        },
+        "availability": {
+          "type": "number"
+        },
+        "failureCount": {
+          "type": "integer"
+        },
+        "trend": {
+          "type": "string",
+          "enum": [
+            "improving",
+            "stable",
+            "degrading"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "reliability_metrics_alert"
   },
   {
     "id": "analyze_failure_modes",
@@ -2082,24 +3903,64 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "analysisType": { "type": "string", "enum": ["fmea", "rcm", "both"] },
-        "includeHistoricalFailures": { "type": "boolean", "default": true }
+        "assetId": {
+          "type": "string"
+        },
+        "analysisType": {
+          "type": "string",
+          "enum": [
+            "fmea",
+            "rcm",
+            "both"
+          ]
+        },
+        "includeHistoricalFailures": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["assetId"]
+      "required": [
+        "assetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "failureModes": { "type": "array", "items": { "type": "object", "properties": {
-          "mode": { "type": "string" }, "rpn": { "type": "number" },
-          "severity": { "type": "integer" }, "occurrence": { "type": "integer" },
-          "detectability": { "type": "integer" }, "recommendedAction": { "type": "string" }
-        }}},
-        "criticalItems": { "type": "integer" },
-        "maintenanceStrategy": { "type": "string" }
+        "failureModes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "type": "string"
+              },
+              "rpn": {
+                "type": "number"
+              },
+              "severity": {
+                "type": "integer"
+              },
+              "occurrence": {
+                "type": "integer"
+              },
+              "detectability": {
+                "type": "integer"
+              },
+              "recommendedAction": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "criticalItems": {
+          "type": "integer"
+        },
+        "maintenanceStrategy": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "fmea_analysis_result"
   },
   {
     "id": "manage_spare_parts",
@@ -2112,23 +3973,51 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "partId": { "type": "string" },
-        "action": { "type": "string", "enum": ["query", "reserve", "consume", "reorder"] },
-        "quantity": { "type": "number" }
+        "partId": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "query",
+            "reserve",
+            "consume",
+            "reorder"
+          ]
+        },
+        "quantity": {
+          "type": "number"
+        }
       },
-      "required": ["partId", "action"]
+      "required": [
+        "partId",
+        "action"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "partId": { "type": "string" },
-        "currentStock": { "type": "number" },
-        "minStock": { "type": "number" },
-        "reorderPoint": { "type": "number" },
-        "estimatedCost": { "type": "number" },
-        "alert": { "type": "boolean" }
+        "partId": {
+          "type": "string"
+        },
+        "currentStock": {
+          "type": "number"
+        },
+        "minStock": {
+          "type": "number"
+        },
+        "reorderPoint": {
+          "type": "number"
+        },
+        "estimatedCost": {
+          "type": "number"
+        },
+        "alert": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "spare_parts_status"
   },
   {
     "id": "track_asset_lifecycle",
@@ -2141,23 +4030,53 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "includeMaintenanceHistory": { "type": "boolean", "default": true },
-        "includeFinancials": { "type": "boolean", "default": false }
+        "assetId": {
+          "type": "string"
+        },
+        "includeMaintenanceHistory": {
+          "type": "boolean",
+          "default": true
+        },
+        "includeFinancials": {
+          "type": "boolean",
+          "default": false
+        }
       },
-      "required": ["assetId"]
+      "required": [
+        "assetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "ageYears": { "type": "number" },
-        "remainingUsefulLifeYears": { "type": "number" },
-        "totalMaintenanceCost": { "type": "number" },
-        "currentConditionScore": { "type": "number", "description": "0-100" },
-        "lifecycleStage": { "type": "string", "enum": ["new", "operating", "aging", "end_of_life"] }
+        "assetId": {
+          "type": "string"
+        },
+        "ageYears": {
+          "type": "number"
+        },
+        "remainingUsefulLifeYears": {
+          "type": "number"
+        },
+        "totalMaintenanceCost": {
+          "type": "number"
+        },
+        "currentConditionScore": {
+          "type": "number",
+          "description": "0-100"
+        },
+        "lifecycleStage": {
+          "type": "string",
+          "enum": [
+            "new",
+            "operating",
+            "aging",
+            "end_of_life"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "asset_lifecycle_event"
   },
   {
     "id": "execute_condition_monitoring",
@@ -2170,24 +4089,73 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "sensors": { "type": "array", "items": { "type": "string", "enum": ["vibration", "temperature", "current", "pressure", "acoustics"] } },
-        "samplingRateHz": { "type": "number", "default": 100 }
+        "assetId": {
+          "type": "string"
+        },
+        "sensors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "vibration",
+              "temperature",
+              "current",
+              "pressure",
+              "acoustics"
+            ]
+          }
+        },
+        "samplingRateHz": {
+          "type": "number",
+          "default": 100
+        }
       },
-      "required": ["assetId"]
+      "required": [
+        "assetId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "assetId": { "type": "string" },
-        "conditionIndex": { "type": "number", "description": "0-100, 100=perfect" },
-        "alerts": { "type": "array", "items": { "type": "object", "properties": {
-          "sensor": { "type": "string" }, "value": { "type": "number" },
-          "threshold": { "type": "number" }, "severity": { "type": "string" }
-        }}},
-        "recommendedAction": { "type": "string", "enum": ["none", "monitor", "inspect", "repair_now"] }
+        "assetId": {
+          "type": "string"
+        },
+        "conditionIndex": {
+          "type": "number",
+          "description": "0-100, 100=perfect"
+        },
+        "alerts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sensor": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "threshold": {
+                "type": "number"
+              },
+              "severity": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "recommendedAction": {
+          "type": "string",
+          "enum": [
+            "none",
+            "monitor",
+            "inspect",
+            "repair_now"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "condition_monitoring_alert"
   },
   {
     "id": "generate_maintenance_kpis",
@@ -2200,24 +4168,52 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 30 },
-        "groupBy": { "type": "string", "enum": ["asset", "area", "line", "plant"] }
+        "plantId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 30
+        },
+        "groupBy": {
+          "type": "string",
+          "enum": [
+            "asset",
+            "area",
+            "line",
+            "plant"
+          ]
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "overallAvailability": { "type": "number" },
-        "pmCompliancePercent": { "type": "number" },
-        "maintenanceCostTotal": { "type": "number" },
-        "reactiveVsPreventiveRatio": { "type": "number" },
-        "topFailingAssets": { "type": "array", "items": { "type": "string" } }
+        "overallAvailability": {
+          "type": "number"
+        },
+        "pmCompliancePercent": {
+          "type": "number"
+        },
+        "maintenanceCostTotal": {
+          "type": "number"
+        },
+        "reactiveVsPreventiveRatio": {
+          "type": "number"
+        },
+        "topFailingAssets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "maintenance_kpi_report"
   },
-
   {
     "id": "monitor_scada_tags",
     "name": "monitor_scada_tags",
@@ -2229,21 +4225,64 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "tagIds": { "type": "array", "items": { "type": "string" } },
-        "protocol": { "type": "string", "enum": ["opc-ua", "modbus-tcp", "modbus-rtu", "dnp3"] },
-        "scanRateMs": { "type": "integer", "default": 500 }
+        "tagIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "opc-ua",
+            "modbus-tcp",
+            "modbus-rtu",
+            "dnp3"
+          ]
+        },
+        "scanRateMs": {
+          "type": "integer",
+          "default": 500
+        }
       },
-      "required": ["tagIds", "protocol"]
+      "required": [
+        "tagIds",
+        "protocol"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "tags": { "type": "array", "items": { "type": "object", "properties": {
-          "tagId": { "type": "string" }, "value": {}, "quality": { "type": "string", "enum": ["good", "bad", "uncertain"] },
-          "timestamp": { "type": "string", "format": "date-time" }, "unit": { "type": "string" }
-        }}}
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tagId": {
+                "type": "string"
+              },
+              "value": {},
+              "quality": {
+                "type": "string",
+                "enum": [
+                  "good",
+                  "bad",
+                  "uncertain"
+                ]
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "unit": {
+                "type": "string"
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "scada_tag_alarm"
   },
   {
     "id": "execute_pid_control",
@@ -2256,26 +4295,60 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "loopId": { "type": "string" },
-        "setpoint": { "type": "number" },
-        "Kp": { "type": "number" },
-        "Ki": { "type": "number" },
-        "Kd": { "type": "number" },
-        "mode": { "type": "string", "enum": ["auto", "manual", "cascade"] }
+        "loopId": {
+          "type": "string"
+        },
+        "setpoint": {
+          "type": "number"
+        },
+        "Kp": {
+          "type": "number"
+        },
+        "Ki": {
+          "type": "number"
+        },
+        "Kd": {
+          "type": "number"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "manual",
+            "cascade"
+          ]
+        }
       },
-      "required": ["loopId", "setpoint"]
+      "required": [
+        "loopId",
+        "setpoint"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "loopId": { "type": "string" },
-        "processVariable": { "type": "number" },
-        "controlOutput": { "type": "number", "description": "0-100%" },
-        "error": { "type": "number" },
-        "mode": { "type": "string" },
-        "isSteadyState": { "type": "boolean" }
+        "loopId": {
+          "type": "string"
+        },
+        "processVariable": {
+          "type": "number"
+        },
+        "controlOutput": {
+          "type": "number",
+          "description": "0-100%"
+        },
+        "error": {
+          "type": "number"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "isSteadyState": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "pid_control_action"
   },
   {
     "id": "manage_setpoints",
@@ -2288,23 +4361,49 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "tagId": { "type": "string" },
-        "action": { "type": "string", "enum": ["read", "write"] },
-        "value": { "type": "number" },
-        "operatorId": { "type": "string" }
+        "tagId": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "operatorId": {
+          "type": "string"
+        }
       },
-      "required": ["tagId", "action"]
+      "required": [
+        "tagId",
+        "action"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "tagId": { "type": "string" },
-        "previousValue": { "type": "number" },
-        "newValue": { "type": "number" },
-        "withinLimits": { "type": "boolean" },
-        "changeLogged": { "type": "boolean" }
+        "tagId": {
+          "type": "string"
+        },
+        "previousValue": {
+          "type": "number"
+        },
+        "newValue": {
+          "type": "number"
+        },
+        "withinLimits": {
+          "type": "boolean"
+        },
+        "changeLogged": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "setpoint_change_event"
   },
   {
     "id": "trigger_process_alarm",
@@ -2317,23 +4416,61 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "tagId": { "type": "string" },
-        "alarmType": { "type": "string", "enum": ["HIHI", "HI", "LO", "LOLO", "deviation", "rate_of_change"] },
-        "value": { "type": "number" },
-        "threshold": { "type": "number" }
+        "tagId": {
+          "type": "string"
+        },
+        "alarmType": {
+          "type": "string",
+          "enum": [
+            "HIHI",
+            "HI",
+            "LO",
+            "LOLO",
+            "deviation",
+            "rate_of_change"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "threshold": {
+          "type": "number"
+        }
       },
-      "required": ["tagId", "alarmType", "value"]
+      "required": [
+        "tagId",
+        "alarmType",
+        "value"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "alarmId": { "type": "string" },
-        "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
-        "activatedAt": { "type": "string", "format": "date-time" },
-        "requiredAction": { "type": "string" },
-        "notificationSent": { "type": "boolean" }
+        "alarmId": {
+          "type": "string"
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "activatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "requiredAction": {
+          "type": "string"
+        },
+        "notificationSent": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "process_alarm_triggered"
   },
   {
     "id": "log_process_historian",
@@ -2346,21 +4483,48 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "tagIds": { "type": "array", "items": { "type": "string" } },
-        "compressionMode": { "type": "string", "enum": ["raw", "swinging_door", "deadband"] },
-        "deadbandPercent": { "type": "number", "default": 0.1 }
+        "tagIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "compressionMode": {
+          "type": "string",
+          "enum": [
+            "raw",
+            "swinging_door",
+            "deadband"
+          ]
+        },
+        "deadbandPercent": {
+          "type": "number",
+          "default": 0.1
+        }
       },
-      "required": ["tagIds"]
+      "required": [
+        "tagIds"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "recordsStored": { "type": "integer" },
-        "compressionRatio": { "type": "number" },
-        "storageUsedMB": { "type": "number" },
-        "oldestRecordTimestamp": { "type": "string", "format": "date-time" }
+        "recordsStored": {
+          "type": "integer"
+        },
+        "compressionRatio": {
+          "type": "number"
+        },
+        "storageUsedMB": {
+          "type": "number"
+        },
+        "oldestRecordTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "historian_log_entry"
   },
   {
     "id": "run_batch_sequence",
@@ -2373,24 +4537,55 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "recipeId": { "type": "string" },
-        "batchId": { "type": "string" },
-        "unitId": { "type": "string" },
-        "parameters": { "type": "object" }
+        "recipeId": {
+          "type": "string"
+        },
+        "batchId": {
+          "type": "string"
+        },
+        "unitId": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
+        }
       },
-      "required": ["recipeId", "batchId", "unitId"]
+      "required": [
+        "recipeId",
+        "batchId",
+        "unitId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "batchId": { "type": "string" },
-        "currentPhase": { "type": "string" },
-        "status": { "type": "string", "enum": ["running", "paused", "complete", "aborted"] },
-        "progressPercent": { "type": "number" },
-        "elapsedMinutes": { "type": "number" },
-        "deviationsCount": { "type": "integer" }
+        "batchId": {
+          "type": "string"
+        },
+        "currentPhase": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "running",
+            "paused",
+            "complete",
+            "aborted"
+          ]
+        },
+        "progressPercent": {
+          "type": "number"
+        },
+        "elapsedMinutes": {
+          "type": "number"
+        },
+        "deviationsCount": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "batch_sequence_event"
   },
   {
     "id": "acknowledge_alarm",
@@ -2403,23 +4598,53 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "alarmId": { "type": "string" },
-        "action": { "type": "string", "enum": ["acknowledge", "shelve", "suppress", "unshelve"] },
-        "operatorId": { "type": "string" },
-        "comment": { "type": "string" }
+        "alarmId": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "acknowledge",
+            "shelve",
+            "suppress",
+            "unshelve"
+          ]
+        },
+        "operatorId": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        }
       },
-      "required": ["alarmId", "action", "operatorId"]
+      "required": [
+        "alarmId",
+        "action",
+        "operatorId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "alarmId": { "type": "string" },
-        "previousState": { "type": "string" },
-        "newState": { "type": "string" },
-        "actionTimestamp": { "type": "string", "format": "date-time" },
-        "logged": { "type": "boolean" }
+        "alarmId": {
+          "type": "string"
+        },
+        "previousState": {
+          "type": "string"
+        },
+        "newState": {
+          "type": "string"
+        },
+        "actionTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "logged": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "alarm_acknowledged"
   },
   {
     "id": "analyze_control_loop_performance",
@@ -2432,27 +4657,62 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "loopId": { "type": "string" },
-        "historianData": { "type": "array", "items": { "type": "object" } },
-        "periodHours": { "type": "integer", "default": 24 }
+        "loopId": {
+          "type": "string"
+        },
+        "historianData": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "periodHours": {
+          "type": "integer",
+          "default": 24
+        }
       },
-      "required": ["loopId"]
+      "required": [
+        "loopId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "loopId": { "type": "string" },
-        "performanceIndex": { "type": "number", "description": "0-100" },
-        "timeInManualPercent": { "type": "number" },
-        "variabilityIndex": { "type": "number" },
-        "suggestedKp": { "type": "number" },
-        "suggestedKi": { "type": "number" },
-        "suggestedKd": { "type": "number" },
-        "classification": { "type": "string", "enum": ["excellent", "acceptable", "poor", "needs_retuning"] }
+        "loopId": {
+          "type": "string"
+        },
+        "performanceIndex": {
+          "type": "number",
+          "description": "0-100"
+        },
+        "timeInManualPercent": {
+          "type": "number"
+        },
+        "variabilityIndex": {
+          "type": "number"
+        },
+        "suggestedKp": {
+          "type": "number"
+        },
+        "suggestedKi": {
+          "type": "number"
+        },
+        "suggestedKd": {
+          "type": "number"
+        },
+        "classification": {
+          "type": "string",
+          "enum": [
+            "excellent",
+            "acceptable",
+            "poor",
+            "needs_retuning"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "control_loop_analysis"
   },
-
   {
     "id": "calculate_control_charts",
     "name": "calculate_control_charts",
@@ -2464,24 +4724,68 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "characteristicId": { "type": "string" },
-        "chartType": { "type": "string", "enum": ["xbar_r", "xbar_s", "imr", "p", "np", "c", "u"] },
-        "measurements": { "type": "array", "items": { "type": "number" } },
-        "subgroupSize": { "type": "integer", "default": 5 }
+        "characteristicId": {
+          "type": "string"
+        },
+        "chartType": {
+          "type": "string",
+          "enum": [
+            "xbar_r",
+            "xbar_s",
+            "imr",
+            "p",
+            "np",
+            "c",
+            "u"
+          ]
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "subgroupSize": {
+          "type": "integer",
+          "default": 5
+        }
       },
-      "required": ["characteristicId", "chartType", "measurements"]
+      "required": [
+        "characteristicId",
+        "chartType",
+        "measurements"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "ucl": { "type": "number" },
-        "lcl": { "type": "number" },
-        "centerLine": { "type": "number" },
-        "plotPoints": { "type": "array", "items": { "type": "number" } },
-        "outOfControlPoints": { "type": "array", "items": { "type": "integer" } },
-        "inControl": { "type": "boolean" }
+        "ucl": {
+          "type": "number"
+        },
+        "lcl": {
+          "type": "number"
+        },
+        "centerLine": {
+          "type": "number"
+        },
+        "plotPoints": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "outOfControlPoints": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "inControl": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "control_chart_generated"
   },
   {
     "id": "detect_out_of_control_signals",
@@ -2494,25 +4798,71 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "chartId": { "type": "string" },
-        "plotPoints": { "type": "array", "items": { "type": "number" } },
-        "ucl": { "type": "number" },
-        "lcl": { "type": "number" },
-        "centerLine": { "type": "number" },
-        "rulesSet": { "type": "string", "enum": ["nelson", "western_electric", "both"], "default": "nelson" }
+        "chartId": {
+          "type": "string"
+        },
+        "plotPoints": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "ucl": {
+          "type": "number"
+        },
+        "lcl": {
+          "type": "number"
+        },
+        "centerLine": {
+          "type": "number"
+        },
+        "rulesSet": {
+          "type": "string",
+          "enum": [
+            "nelson",
+            "western_electric",
+            "both"
+          ],
+          "default": "nelson"
+        }
       },
-      "required": ["chartId", "plotPoints", "ucl", "lcl", "centerLine"]
+      "required": [
+        "chartId",
+        "plotPoints",
+        "ucl",
+        "lcl",
+        "centerLine"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "violationsDetected": { "type": "boolean" },
-        "violations": { "type": "array", "items": { "type": "object", "properties": {
-          "rule": { "type": "string" }, "points": { "type": "array", "items": { "type": "integer" } },
-          "description": { "type": "string" }
-        }}}
+        "violationsDetected": {
+          "type": "boolean"
+        },
+        "violations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rule": {
+                "type": "string"
+              },
+              "points": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "out_of_control_signal"
   },
   {
     "id": "manage_nonconformances",
@@ -2525,24 +4875,72 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "action": { "type": "string", "enum": ["create", "update", "close", "list"] },
-        "ncType": { "type": "string", "enum": ["internal", "customer", "supplier", "audit"] },
-        "severity": { "type": "string", "enum": ["minor", "major", "critical"] },
-        "description": { "type": "string" },
-        "affectedPartId": { "type": "string" }
+        "action": {
+          "type": "string",
+          "enum": [
+            "create",
+            "update",
+            "close",
+            "list"
+          ]
+        },
+        "ncType": {
+          "type": "string",
+          "enum": [
+            "internal",
+            "customer",
+            "supplier",
+            "audit"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "minor",
+            "major",
+            "critical"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "affectedPartId": {
+          "type": "string"
+        }
       },
-      "required": ["action"]
+      "required": [
+        "action"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "ncId": { "type": "string" },
-        "status": { "type": "string", "enum": ["open", "under_analysis", "containment", "corrective_action", "closed"] },
-        "assignedTo": { "type": "string" },
-        "dueDate": { "type": "string", "format": "date" },
-        "estimatedCost": { "type": "number" }
+        "ncId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "open",
+            "under_analysis",
+            "containment",
+            "corrective_action",
+            "closed"
+          ]
+        },
+        "assignedTo": {
+          "type": "string"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "estimatedCost": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "nonconformance_registered"
   },
   {
     "id": "generate_8d_report",
@@ -2555,23 +4953,61 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "ncId": { "type": "string" },
-        "teamMembers": { "type": "array", "items": { "type": "string" } },
-        "rootCauseMethod": { "type": "string", "enum": ["5_whys", "ishikawa", "fault_tree"] }
+        "ncId": {
+          "type": "string"
+        },
+        "teamMembers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rootCauseMethod": {
+          "type": "string",
+          "enum": [
+            "5_whys",
+            "ishikawa",
+            "fault_tree"
+          ]
+        }
       },
-      "required": ["ncId"]
+      "required": [
+        "ncId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "reportId": { "type": "string" },
-        "d3ContainmentActions": { "type": "array", "items": { "type": "string" } },
-        "d4RootCauses": { "type": "array", "items": { "type": "string" } },
-        "d5CorrectiveActions": { "type": "array", "items": { "type": "string" } },
-        "d8LessonsLearned": { "type": "string" },
-        "pdfUrl": { "type": "string" }
+        "reportId": {
+          "type": "string"
+        },
+        "d3ContainmentActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "d4RootCauses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "d5CorrectiveActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "d8LessonsLearned": {
+          "type": "string"
+        },
+        "pdfUrl": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "8d_report_issued"
   },
   {
     "id": "calculate_cpk_ppk",
@@ -2584,25 +5020,61 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "characteristicId": { "type": "string" },
-        "measurements": { "type": "array", "items": { "type": "number" } },
-        "usl": { "type": "number" },
-        "lsl": { "type": "number" }
+        "characteristicId": {
+          "type": "string"
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "usl": {
+          "type": "number"
+        },
+        "lsl": {
+          "type": "number"
+        }
       },
-      "required": ["characteristicId", "measurements", "usl", "lsl"]
+      "required": [
+        "characteristicId",
+        "measurements",
+        "usl",
+        "lsl"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "cp": { "type": "number" },
-        "cpk": { "type": "number" },
-        "pp": { "type": "number" },
-        "ppk": { "type": "number" },
-        "sigmaLevel": { "type": "number" },
-        "ppmDefects": { "type": "number" },
-        "status": { "type": "string", "enum": ["capable", "marginal", "not_capable"] }
+        "cp": {
+          "type": "number"
+        },
+        "cpk": {
+          "type": "number"
+        },
+        "pp": {
+          "type": "number"
+        },
+        "ppk": {
+          "type": "number"
+        },
+        "sigmaLevel": {
+          "type": "number"
+        },
+        "ppmDefects": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "capable",
+            "marginal",
+            "not_capable"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "capability_index_alert"
   },
   {
     "id": "manage_product_specs",
@@ -2615,23 +5087,64 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "partId": { "type": "string" },
-        "action": { "type": "string", "enum": ["get", "create", "update"] },
-        "characteristics": { "type": "array", "items": { "type": "object" } }
+        "partId": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "get",
+            "create",
+            "update"
+          ]
+        },
+        "characteristics": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
       },
-      "required": ["partId", "action"]
+      "required": [
+        "partId",
+        "action"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "partId": { "type": "string" },
-        "characteristics": { "type": "array", "items": { "type": "object", "properties": {
-          "id": { "type": "string" }, "name": { "type": "string" },
-          "usl": { "type": "number" }, "lsl": { "type": "number" },
-          "nominal": { "type": "number" }, "isCritical": { "type": "boolean" }
-        }}}
+        "partId": {
+          "type": "string"
+        },
+        "characteristics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "usl": {
+                "type": "number"
+              },
+              "lsl": {
+                "type": "number"
+              },
+              "nominal": {
+                "type": "number"
+              },
+              "isCritical": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "product_spec_update"
   },
   {
     "id": "run_msa_analysis",
@@ -2644,23 +5157,65 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "gaugeId": { "type": "string" },
-        "studyType": { "type": "string", "enum": ["gage_rr", "linearity", "bias", "stability"] },
-        "measurements": { "type": "array", "items": { "type": "object" } },
-        "operators": { "type": "array", "items": { "type": "string" } }
+        "gaugeId": {
+          "type": "string"
+        },
+        "studyType": {
+          "type": "string",
+          "enum": [
+            "gage_rr",
+            "linearity",
+            "bias",
+            "stability"
+          ]
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "operators": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["gaugeId", "studyType", "measurements"]
+      "required": [
+        "gaugeId",
+        "studyType",
+        "measurements"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "gageRRPercent": { "type": "number", "description": "% contribution to total variation" },
-        "repeatability": { "type": "number" },
-        "reproducibility": { "type": "number" },
-        "ndc": { "type": "integer", "description": "Number of distinct categories" },
-        "verdict": { "type": "string", "enum": ["acceptable", "marginal", "unacceptable"] }
+        "gageRRPercent": {
+          "type": "number",
+          "description": "% contribution to total variation"
+        },
+        "repeatability": {
+          "type": "number"
+        },
+        "reproducibility": {
+          "type": "number"
+        },
+        "ndc": {
+          "type": "integer",
+          "description": "Number of distinct categories"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "acceptable",
+            "marginal",
+            "unacceptable"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "msa_analysis_result"
   },
   {
     "id": "collect_quality_measurements",
@@ -2673,27 +5228,71 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "partId": { "type": "string" },
-        "inspectionPlanId": { "type": "string" },
-        "source": { "type": "string", "enum": ["manual_entry", "cmm", "gauge_interface", "vision_system"] },
-        "operatorId": { "type": "string" }
+        "partId": {
+          "type": "string"
+        },
+        "inspectionPlanId": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "manual_entry",
+            "cmm",
+            "gauge_interface",
+            "vision_system"
+          ]
+        },
+        "operatorId": {
+          "type": "string"
+        }
       },
-      "required": ["partId", "inspectionPlanId"]
+      "required": [
+        "partId",
+        "inspectionPlanId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "partId": { "type": "string" },
-        "measurements": { "type": "array", "items": { "type": "object", "properties": {
-          "characteristicId": { "type": "string" }, "value": { "type": "number" },
-          "withinSpec": { "type": "boolean" }, "timestamp": { "type": "string" }
-        }}},
-        "passFailResult": { "type": "string", "enum": ["pass", "fail", "conditional"] },
-        "defectsFound": { "type": "integer" }
+        "partId": {
+          "type": "string"
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "characteristicId": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "withinSpec": {
+                "type": "boolean"
+              },
+              "timestamp": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "passFailResult": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "conditional"
+          ]
+        },
+        "defectsFound": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "quality_measurement_data"
   },
-
   {
     "id": "monitor_energy_meters",
     "name": "monitor_energy_meters",
@@ -2705,24 +5304,67 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "meterIds": { "type": "array", "items": { "type": "string" } },
-        "energyType": { "type": "string", "enum": ["electricity", "gas", "steam", "water", "compressed_air"] },
-        "resolutionMinutes": { "type": "integer", "default": 15 }
+        "meterIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "energyType": {
+          "type": "string",
+          "enum": [
+            "electricity",
+            "gas",
+            "steam",
+            "water",
+            "compressed_air"
+          ]
+        },
+        "resolutionMinutes": {
+          "type": "integer",
+          "default": 15
+        }
       },
-      "required": ["meterIds", "energyType"]
+      "required": [
+        "meterIds",
+        "energyType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "readings": { "type": "array", "items": { "type": "object", "properties": {
-          "meterId": { "type": "string" }, "value": { "type": "number" },
-          "unit": { "type": "string" }, "timestamp": { "type": "string" }
-        }}},
-        "totalConsumption": { "type": "number" },
-        "peakDemand": { "type": "number" },
-        "powerFactor": { "type": "number" }
+        "readings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "meterId": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "timestamp": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "totalConsumption": {
+          "type": "number"
+        },
+        "peakDemand": {
+          "type": "number"
+        },
+        "powerFactor": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "energy_meter_reading"
   },
   {
     "id": "calculate_energy_kpis",
@@ -2735,24 +5377,55 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 30 },
-        "productionUnits": { "type": "number" },
-        "baselineYear": { "type": "integer" }
+        "plantId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 30
+        },
+        "productionUnits": {
+          "type": "number"
+        },
+        "baselineYear": {
+          "type": "integer"
+        }
       },
-      "required": ["plantId", "productionUnits"]
+      "required": [
+        "plantId",
+        "productionUnits"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "totalEnergyKWh": { "type": "number" },
-        "energyIntensity": { "type": "number", "description": "kWh per production unit" },
-        "vsBaselinePercent": { "type": "number" },
-        "energySavingsKWh": { "type": "number" },
-        "costSavings": { "type": "number" },
-        "enpiTrend": { "type": "string", "enum": ["improving", "stable", "degrading"] }
+        "totalEnergyKWh": {
+          "type": "number"
+        },
+        "energyIntensity": {
+          "type": "number",
+          "description": "kWh per production unit"
+        },
+        "vsBaselinePercent": {
+          "type": "number"
+        },
+        "energySavingsKWh": {
+          "type": "number"
+        },
+        "costSavings": {
+          "type": "number"
+        },
+        "enpiTrend": {
+          "type": "string",
+          "enum": [
+            "improving",
+            "stable",
+            "degrading"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "energy_kpi_report"
   },
   {
     "id": "detect_energy_waste",
@@ -2765,24 +5438,60 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "analysisWindow": { "type": "string", "enum": ["day", "week", "month"] },
-        "productionCalendar": { "type": "object" }
+        "plantId": {
+          "type": "string"
+        },
+        "analysisWindow": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month"
+          ]
+        },
+        "productionCalendar": {
+          "type": "object"
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "wasteOpportunities": { "type": "array", "items": { "type": "object", "properties": {
-          "type": { "type": "string" }, "meterId": { "type": "string" },
-          "estimatedWasteKWh": { "type": "number" }, "estimatedCostSavings": { "type": "number" },
-          "recommendation": { "type": "string" }
-        }}},
-        "totalWasteKWh": { "type": "number" },
-        "totalSavingsOpportunity": { "type": "number" }
+        "wasteOpportunities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "meterId": {
+                "type": "string"
+              },
+              "estimatedWasteKWh": {
+                "type": "number"
+              },
+              "estimatedCostSavings": {
+                "type": "number"
+              },
+              "recommendation": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "totalWasteKWh": {
+          "type": "number"
+        },
+        "totalSavingsOpportunity": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "energy_waste_detected"
   },
   {
     "id": "optimize_energy_loads",
@@ -2795,22 +5504,50 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "flexibleLoads": { "type": "array", "items": { "type": "object" } },
-        "tariffSchedule": { "type": "object" },
-        "productionConstraints": { "type": "object" }
+        "plantId": {
+          "type": "string"
+        },
+        "flexibleLoads": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "tariffSchedule": {
+          "type": "object"
+        },
+        "productionConstraints": {
+          "type": "object"
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "loadSchedule": { "type": "array", "items": { "type": "object" } },
-        "projectedPeakReductionKW": { "type": "number" },
-        "projectedCostSavings": { "type": "number" },
-        "implementationActions": { "type": "array", "items": { "type": "string" } }
+        "loadSchedule": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "projectedPeakReductionKW": {
+          "type": "number"
+        },
+        "projectedCostSavings": {
+          "type": "number"
+        },
+        "implementationActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "energy_load_optimization"
   },
   {
     "id": "calculate_carbon_footprint",
@@ -2823,24 +5560,55 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 365 },
-        "includeScope3": { "type": "boolean", "default": false },
-        "emissionFactorSource": { "type": "string", "enum": ["cfe_mexico", "iea", "custom"] }
+        "plantId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 365
+        },
+        "includeScope3": {
+          "type": "boolean",
+          "default": false
+        },
+        "emissionFactorSource": {
+          "type": "string",
+          "enum": [
+            "cfe_mexico",
+            "iea",
+            "custom"
+          ]
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "scope1tCO2e": { "type": "number" },
-        "scope2tCO2e": { "type": "number" },
-        "scope3tCO2e": { "type": "number" },
-        "totalTco2e": { "type": "number" },
-        "vsLastYearPercent": { "type": "number" },
-        "carbonIntensity": { "type": "number", "description": "tCO2e per production unit" }
+        "scope1tCO2e": {
+          "type": "number"
+        },
+        "scope2tCO2e": {
+          "type": "number"
+        },
+        "scope3tCO2e": {
+          "type": "number"
+        },
+        "totalTco2e": {
+          "type": "number"
+        },
+        "vsLastYearPercent": {
+          "type": "number"
+        },
+        "carbonIntensity": {
+          "type": "number",
+          "description": "tCO2e per production unit"
+        }
       }
-    }
+    },
+    "isoEvent": "carbon_footprint_report"
   },
   {
     "id": "generate_iso50001_report",
@@ -2853,22 +5621,54 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "reportPeriod": { "type": "string" },
-        "includeActionPlan": { "type": "boolean", "default": true }
+        "plantId": {
+          "type": "string"
+        },
+        "reportPeriod": {
+          "type": "string"
+        },
+        "includeActionPlan": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["plantId", "reportPeriod"]
+      "required": [
+        "plantId",
+        "reportPeriod"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "reportId": { "type": "string" },
-        "complianceStatus": { "type": "string", "enum": ["compliant", "minor_gaps", "major_gaps"] },
-        "objectives": { "type": "array", "items": { "type": "string" } },
-        "actionPlan": { "type": "array", "items": { "type": "object" } },
-        "pdfUrl": { "type": "string" }
+        "reportId": {
+          "type": "string"
+        },
+        "complianceStatus": {
+          "type": "string",
+          "enum": [
+            "compliant",
+            "minor_gaps",
+            "major_gaps"
+          ]
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actionPlan": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "pdfUrl": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "iso50001_audit_report"
   },
   {
     "id": "benchmark_energy_performance",
@@ -2881,23 +5681,59 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "sector": { "type": "string", "enum": ["automotive", "food_beverage", "chemical", "cement", "steel", "textile", "pharma"] },
-        "companySize": { "type": "string", "enum": ["small", "medium", "large"] }
+        "plantId": {
+          "type": "string"
+        },
+        "sector": {
+          "type": "string",
+          "enum": [
+            "automotive",
+            "food_beverage",
+            "chemical",
+            "cement",
+            "steel",
+            "textile",
+            "pharma"
+          ]
+        },
+        "companySize": {
+          "type": "string",
+          "enum": [
+            "small",
+            "medium",
+            "large"
+          ]
+        }
       },
-      "required": ["plantId", "sector"]
+      "required": [
+        "plantId",
+        "sector"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "plantEnPI": { "type": "number" },
-        "sectorMedianEnPI": { "type": "number" },
-        "sectorBestPracticeEnPI": { "type": "number" },
-        "gapToMedianPercent": { "type": "number" },
-        "gapToBestPercent": { "type": "number" },
-        "improvementPotentialKWh": { "type": "number" }
+        "plantEnPI": {
+          "type": "number"
+        },
+        "sectorMedianEnPI": {
+          "type": "number"
+        },
+        "sectorBestPracticeEnPI": {
+          "type": "number"
+        },
+        "gapToMedianPercent": {
+          "type": "number"
+        },
+        "gapToBestPercent": {
+          "type": "number"
+        },
+        "improvementPotentialKWh": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "energy_benchmark_result"
   },
   {
     "id": "schedule_energy_audit",
@@ -2910,25 +5746,59 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "auditType": { "type": "string", "enum": ["internal", "external", "certification"] },
-        "targetDate": { "type": "string", "format": "date" },
-        "scope": { "type": "array", "items": { "type": "string" } }
+        "plantId": {
+          "type": "string"
+        },
+        "auditType": {
+          "type": "string",
+          "enum": [
+            "internal",
+            "external",
+            "certification"
+          ]
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["plantId", "auditType"]
+      "required": [
+        "plantId",
+        "auditType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "auditId": { "type": "string" },
-        "scheduledDate": { "type": "string", "format": "date" },
-        "assignedAuditors": { "type": "array", "items": { "type": "string" } },
-        "checklistItems": { "type": "integer" },
-        "estimatedDurationDays": { "type": "integer" }
+        "auditId": {
+          "type": "string"
+        },
+        "scheduledDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "assignedAuditors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checklistItems": {
+          "type": "integer"
+        },
+        "estimatedDurationDays": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "energy_audit_scheduled"
   },
-
   {
     "id": "monitor_gas_sensors",
     "name": "monitor_gas_sensors",
@@ -2940,25 +5810,85 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "sensorIds": { "type": "array", "items": { "type": "string" } },
-        "gasType": { "type": "string", "enum": ["H2S", "CO", "LEL", "O2_deficiency", "NH3", "Cl2", "SO2"] },
-        "alarmThresholds": { "type": "object", "properties": {
-          "warning": { "type": "number" }, "alarm": { "type": "number" }, "evacuation": { "type": "number" }
-        }}
+        "sensorIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gasType": {
+          "type": "string",
+          "enum": [
+            "H2S",
+            "CO",
+            "LEL",
+            "O2_deficiency",
+            "NH3",
+            "Cl2",
+            "SO2"
+          ]
+        },
+        "alarmThresholds": {
+          "type": "object",
+          "properties": {
+            "warning": {
+              "type": "number"
+            },
+            "alarm": {
+              "type": "number"
+            },
+            "evacuation": {
+              "type": "number"
+            }
+          }
+        }
       },
-      "required": ["sensorIds", "gasType"]
+      "required": [
+        "sensorIds",
+        "gasType"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "readings": { "type": "array", "items": { "type": "object", "properties": {
-          "sensorId": { "type": "string" }, "value": { "type": "number" },
-          "unit": { "type": "string" }, "status": { "type": "string", "enum": ["normal", "warning", "alarm", "evacuation"] }
-        }}},
-        "emergencyActionTriggered": { "type": "boolean" },
-        "evacuationZones": { "type": "array", "items": { "type": "string" } }
+        "readings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sensorId": {
+                "type": "string"
+              },
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "normal",
+                  "warning",
+                  "alarm",
+                  "evacuation"
+                ]
+              }
+            }
+          }
+        },
+        "emergencyActionTriggered": {
+          "type": "boolean"
+        },
+        "evacuationZones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "gas_sensor_alert"
   },
   {
     "id": "report_safety_incident",
@@ -2971,24 +5901,70 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "incidentType": { "type": "string", "enum": ["accident", "near_miss", "unsafe_condition", "environmental", "property_damage"] },
-        "severity": { "type": "string", "enum": ["first_aid", "medical_treatment", "lost_time", "fatality", "property_damage"] },
-        "location": { "type": "string" },
-        "description": { "type": "string" },
-        "reportedBy": { "type": "string" }
+        "incidentType": {
+          "type": "string",
+          "enum": [
+            "accident",
+            "near_miss",
+            "unsafe_condition",
+            "environmental",
+            "property_damage"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "first_aid",
+            "medical_treatment",
+            "lost_time",
+            "fatality",
+            "property_damage"
+          ]
+        },
+        "location": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "reportedBy": {
+          "type": "string"
+        }
       },
-      "required": ["incidentType", "severity", "description", "reportedBy"]
+      "required": [
+        "incidentType",
+        "severity",
+        "description",
+        "reportedBy"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "incidentId": { "type": "string" },
-        "classification": { "type": "string" },
-        "notificationsSent": { "type": "array", "items": { "type": "string" } },
-        "immediateActions": { "type": "array", "items": { "type": "string" } },
-        "investigationRequired": { "type": "boolean" }
+        "incidentId": {
+          "type": "string"
+        },
+        "classification": {
+          "type": "string"
+        },
+        "notificationsSent": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "immediateActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "investigationRequired": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "safety_incident_report"
   },
   {
     "id": "investigate_root_cause_hse",
@@ -3001,22 +5977,68 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "incidentId": { "type": "string" },
-        "methodology": { "type": "string", "enum": ["5_whys", "cause_tree", "bow_tie", "taproot"] },
-        "teamMembers": { "type": "array", "items": { "type": "string" } }
+        "incidentId": {
+          "type": "string"
+        },
+        "methodology": {
+          "type": "string",
+          "enum": [
+            "5_whys",
+            "cause_tree",
+            "bow_tie",
+            "taproot"
+          ]
+        },
+        "teamMembers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["incidentId", "methodology"]
+      "required": [
+        "incidentId",
+        "methodology"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "immediatesCauses": { "type": "array", "items": { "type": "string" } },
-        "basicCauses": { "type": "array", "items": { "type": "string" } },
-        "rootCauses": { "type": "array", "items": { "type": "string" } },
-        "correctiveActions": { "type": "array", "items": { "type": "object" } },
-        "similarIncidentRisk": { "type": "string", "enum": ["low", "medium", "high"] }
+        "immediatesCauses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "basicCauses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rootCauses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "correctiveActions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "similarIncidentRisk": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
       }
-    }
+    },
+    "isoEvent": "hse_root_cause_finding"
   },
   {
     "id": "run_hazop_analysis",
@@ -3029,25 +6051,81 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "processNodeId": { "type": "string" },
-        "guideWords": { "type": "array", "items": { "type": "string" }, "default": ["no", "more", "less", "as_well_as", "part_of", "reverse", "other_than"] },
-        "parameters": { "type": "array", "items": { "type": "string" } }
+        "processNodeId": {
+          "type": "string"
+        },
+        "guideWords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "no",
+            "more",
+            "less",
+            "as_well_as",
+            "part_of",
+            "reverse",
+            "other_than"
+          ]
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["processNodeId"]
+      "required": [
+        "processNodeId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "deviations": { "type": "array", "items": { "type": "object", "properties": {
-          "guideWord": { "type": "string" }, "parameter": { "type": "string" },
-          "cause": { "type": "string" }, "consequence": { "type": "string" },
-          "safeguards": { "type": "array", "items": { "type": "string" } },
-          "riskRating": { "type": "string", "enum": ["acceptable", "ALARP", "unacceptable"] }
-        }}},
-        "totalDeviations": { "type": "integer" },
-        "unacceptableRisks": { "type": "integer" }
+        "deviations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "guideWord": {
+                "type": "string"
+              },
+              "parameter": {
+                "type": "string"
+              },
+              "cause": {
+                "type": "string"
+              },
+              "consequence": {
+                "type": "string"
+              },
+              "safeguards": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "riskRating": {
+                "type": "string",
+                "enum": [
+                  "acceptable",
+                  "ALARP",
+                  "unacceptable"
+                ]
+              }
+            }
+          }
+        },
+        "totalDeviations": {
+          "type": "integer"
+        },
+        "unacceptableRisks": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "hazop_analysis_result"
   },
   {
     "id": "calculate_sil_level",
@@ -3060,23 +6138,55 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "hazardId": { "type": "string" },
-        "frequencyOfHazard": { "type": "number", "description": "events per year" },
-        "probabilityOfHarm": { "type": "number", "description": "0-1" },
-        "targetRiskFrequency": { "type": "number" }
+        "hazardId": {
+          "type": "string"
+        },
+        "frequencyOfHazard": {
+          "type": "number",
+          "description": "events per year"
+        },
+        "probabilityOfHarm": {
+          "type": "number",
+          "description": "0-1"
+        },
+        "targetRiskFrequency": {
+          "type": "number"
+        }
       },
-      "required": ["hazardId", "frequencyOfHazard", "probabilityOfHarm"]
+      "required": [
+        "hazardId",
+        "frequencyOfHazard",
+        "probabilityOfHarm"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "silLevel": { "type": "integer", "enum": [1, 2, 3, 4] },
-        "riskReductionFactor": { "type": "number" },
-        "pfdAvg": { "type": "number", "description": "Probability of Failure on Demand avg" },
-        "requiresRedundancy": { "type": "boolean" },
-        "architectureRecommendation": { "type": "string" }
+        "silLevel": {
+          "type": "integer",
+          "enum": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "riskReductionFactor": {
+          "type": "number"
+        },
+        "pfdAvg": {
+          "type": "number",
+          "description": "Probability of Failure on Demand avg"
+        },
+        "requiresRedundancy": {
+          "type": "boolean"
+        },
+        "architectureRecommendation": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "sil_assessment_result"
   },
   {
     "id": "manage_work_permits",
@@ -3089,23 +6199,71 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "permitType": { "type": "string", "enum": ["hot_work", "confined_space", "loto", "working_at_height", "electrical"] },
-        "action": { "type": "string", "enum": ["request", "approve", "execute", "close", "cancel"] },
-        "location": { "type": "string" },
-        "requestedBy": { "type": "string" }
+        "permitType": {
+          "type": "string",
+          "enum": [
+            "hot_work",
+            "confined_space",
+            "loto",
+            "working_at_height",
+            "electrical"
+          ]
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "request",
+            "approve",
+            "execute",
+            "close",
+            "cancel"
+          ]
+        },
+        "location": {
+          "type": "string"
+        },
+        "requestedBy": {
+          "type": "string"
+        }
       },
-      "required": ["permitType", "action", "location"]
+      "required": [
+        "permitType",
+        "action",
+        "location"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "permitId": { "type": "string" },
-        "status": { "type": "string", "enum": ["pending", "approved", "active", "closed", "cancelled"] },
-        "approvedBy": { "type": "string" },
-        "validUntil": { "type": "string", "format": "date-time" },
-        "precautions": { "type": "array", "items": { "type": "string" } }
+        "permitId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "approved",
+            "active",
+            "closed",
+            "cancelled"
+          ]
+        },
+        "approvedBy": {
+          "type": "string"
+        },
+        "validUntil": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "precautions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "work_permit_event"
   },
   {
     "id": "track_safety_kpis",
@@ -3118,23 +6276,48 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 30 },
-        "includeLeadingIndicators": { "type": "boolean", "default": true }
+        "plantId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 30
+        },
+        "includeLeadingIndicators": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "daysWithoutAccident": { "type": "integer" },
-        "trir": { "type": "number", "description": "Total Recordable Incident Rate" },
-        "ltir": { "type": "number", "description": "Lost Time Incident Rate" },
-        "openCorrectiveActions": { "type": "integer" },
-        "safetyObservationsCount": { "type": "integer" },
-        "nearMissReportingRate": { "type": "number" }
+        "daysWithoutAccident": {
+          "type": "integer"
+        },
+        "trir": {
+          "type": "number",
+          "description": "Total Recordable Incident Rate"
+        },
+        "ltir": {
+          "type": "number",
+          "description": "Lost Time Incident Rate"
+        },
+        "openCorrectiveActions": {
+          "type": "integer"
+        },
+        "safetyObservationsCount": {
+          "type": "integer"
+        },
+        "nearMissReportingRate": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "safety_kpi_report"
   },
   {
     "id": "schedule_safety_drills",
@@ -3147,25 +6330,59 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "drillType": { "type": "string", "enum": ["evacuation", "fire", "chemical_spill", "medical_emergency", "earthquake"] },
-        "scheduledDate": { "type": "string", "format": "date" },
-        "isAnnounced": { "type": "boolean", "default": false }
+        "plantId": {
+          "type": "string"
+        },
+        "drillType": {
+          "type": "string",
+          "enum": [
+            "evacuation",
+            "fire",
+            "chemical_spill",
+            "medical_emergency",
+            "earthquake"
+          ]
+        },
+        "scheduledDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "isAnnounced": {
+          "type": "boolean",
+          "default": false
+        }
       },
-      "required": ["plantId", "drillType", "scheduledDate"]
+      "required": [
+        "plantId",
+        "drillType",
+        "scheduledDate"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "drillId": { "type": "string" },
-        "scheduledDate": { "type": "string" },
-        "participantsRequired": { "type": "integer" },
-        "evaluationCriteria": { "type": "array", "items": { "type": "string" } },
-        "regulatoryComplianceCheck": { "type": "boolean" }
+        "drillId": {
+          "type": "string"
+        },
+        "scheduledDate": {
+          "type": "string"
+        },
+        "participantsRequired": {
+          "type": "integer"
+        },
+        "evaluationCriteria": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "regulatoryComplianceCheck": {
+          "type": "boolean"
+        }
       }
-    }
+    },
+    "isoEvent": "safety_drill_scheduled"
   },
-
   {
     "id": "track_shipments",
     "name": "track_shipments",
@@ -3177,22 +6394,65 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "shipmentIds": { "type": "array", "items": { "type": "string" } },
-        "transportMode": { "type": "string", "enum": ["land", "air", "sea", "intermodal"] },
-        "includeETA": { "type": "boolean", "default": true }
+        "shipmentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "transportMode": {
+          "type": "string",
+          "enum": [
+            "land",
+            "air",
+            "sea",
+            "intermodal"
+          ]
+        },
+        "includeETA": {
+          "type": "boolean",
+          "default": true
+        }
       },
-      "required": ["shipmentIds"]
+      "required": [
+        "shipmentIds"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "shipments": { "type": "array", "items": { "type": "object", "properties": {
-          "shipmentId": { "type": "string" }, "status": { "type": "string" },
-          "currentLocation": { "type": "string" }, "etaDate": { "type": "string" },
-          "delayDays": { "type": "number" }, "alerts": { "type": "array", "items": { "type": "string" } }
-        }}}
+        "shipments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "shipmentId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "currentLocation": {
+                "type": "string"
+              },
+              "etaDate": {
+                "type": "string"
+              },
+              "delayDays": {
+                "type": "number"
+              },
+              "alerts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "shipment_tracking_update"
   },
   {
     "id": "optimize_delivery_routes",
@@ -3205,23 +6465,56 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "depotId": { "type": "string" },
-        "deliveryPoints": { "type": "array", "items": { "type": "object" } },
-        "fleetConfig": { "type": "object" },
-        "optimizationObjective": { "type": "string", "enum": ["minimize_cost", "minimize_time", "minimize_emissions"] }
+        "depotId": {
+          "type": "string"
+        },
+        "deliveryPoints": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "fleetConfig": {
+          "type": "object"
+        },
+        "optimizationObjective": {
+          "type": "string",
+          "enum": [
+            "minimize_cost",
+            "minimize_time",
+            "minimize_emissions"
+          ]
+        }
       },
-      "required": ["depotId", "deliveryPoints"]
+      "required": [
+        "depotId",
+        "deliveryPoints"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "routes": { "type": "array", "items": { "type": "object" } },
-        "totalDistanceKm": { "type": "number" },
-        "totalCost": { "type": "number" },
-        "estimatedDurationHours": { "type": "number" },
-        "co2Savings": { "type": "number" }
+        "routes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "totalDistanceKm": {
+          "type": "number"
+        },
+        "totalCost": {
+          "type": "number"
+        },
+        "estimatedDurationHours": {
+          "type": "number"
+        },
+        "co2Savings": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "route_optimization_result"
   },
   {
     "id": "predict_supply_disruptions",
@@ -3234,22 +6527,60 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "supplierId": { "type": "string" },
-        "materialIds": { "type": "array", "items": { "type": "string" } },
-        "horizonDays": { "type": "integer", "default": 30 }
+        "supplierId": {
+          "type": "string"
+        },
+        "materialIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "horizonDays": {
+          "type": "integer",
+          "default": 30
+        }
       },
-      "required": ["supplierId"]
+      "required": [
+        "supplierId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "disruptionRisk": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
-        "riskFactors": { "type": "array", "items": { "type": "string" } },
-        "estimatedImpactDays": { "type": "number" },
-        "contingencyRecommendations": { "type": "array", "items": { "type": "string" } },
-        "alternativeSuppliers": { "type": "array", "items": { "type": "string" } }
+        "disruptionRisk": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
+        },
+        "riskFactors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "estimatedImpactDays": {
+          "type": "number"
+        },
+        "contingencyRecommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "alternativeSuppliers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "supply_disruption_alert"
   },
   {
     "id": "manage_warehouse_wms",
@@ -3262,23 +6593,64 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "warehouseId": { "type": "string" },
-        "operation": { "type": "string", "enum": ["receive", "putaway", "pick", "pack", "ship", "inventory_count"] },
-        "items": { "type": "array", "items": { "type": "object" } },
-        "priority": { "type": "string", "enum": ["normal", "urgent", "express"] }
+        "warehouseId": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "receive",
+            "putaway",
+            "pick",
+            "pack",
+            "ship",
+            "inventory_count"
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "urgent",
+            "express"
+          ]
+        }
       },
-      "required": ["warehouseId", "operation"]
+      "required": [
+        "warehouseId",
+        "operation"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "operationId": { "type": "string" },
-        "status": { "type": "string" },
-        "locationAssignments": { "type": "array", "items": { "type": "object" } },
-        "utilizationPercent": { "type": "number" },
-        "processedItems": { "type": "integer" }
+        "operationId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "locationAssignments": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "utilizationPercent": {
+          "type": "number"
+        },
+        "processedItems": {
+          "type": "integer"
+        }
       }
-    }
+    },
+    "isoEvent": "wms_management_event"
   },
   {
     "id": "calculate_scm_kpis",
@@ -3291,23 +6663,51 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 30 },
-        "framework": { "type": "string", "enum": ["scor", "custom"], "default": "scor" }
+        "plantId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 30
+        },
+        "framework": {
+          "type": "string",
+          "enum": [
+            "scor",
+            "custom"
+          ],
+          "default": "scor"
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "otifPercent": { "type": "number", "description": "On-Time In-Full" },
-        "fillRatePercent": { "type": "number" },
-        "inventoryDays": { "type": "number" },
-        "inventoryTurnover": { "type": "number" },
-        "avgLeadTimeDays": { "type": "number" },
-        "logisticsCostPercent": { "type": "number" }
+        "otifPercent": {
+          "type": "number",
+          "description": "On-Time In-Full"
+        },
+        "fillRatePercent": {
+          "type": "number"
+        },
+        "inventoryDays": {
+          "type": "number"
+        },
+        "inventoryTurnover": {
+          "type": "number"
+        },
+        "avgLeadTimeDays": {
+          "type": "number"
+        },
+        "logisticsCostPercent": {
+          "type": "number"
+        }
       }
-    }
+    },
+    "isoEvent": "scm_kpi_report"
   },
   {
     "id": "manage_supplier_scorecard",
@@ -3320,26 +6720,69 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "supplierId": { "type": "string" },
-        "evaluationPeriodDays": { "type": "integer", "default": 90 },
-        "weights": { "type": "object", "properties": {
-          "quality": { "type": "number" }, "delivery": { "type": "number" },
-          "price": { "type": "number" }, "responsiveness": { "type": "number" }
-        }}
+        "supplierId": {
+          "type": "string"
+        },
+        "evaluationPeriodDays": {
+          "type": "integer",
+          "default": 90
+        },
+        "weights": {
+          "type": "object",
+          "properties": {
+            "quality": {
+              "type": "number"
+            },
+            "delivery": {
+              "type": "number"
+            },
+            "price": {
+              "type": "number"
+            },
+            "responsiveness": {
+              "type": "number"
+            }
+          }
+        }
       },
-      "required": ["supplierId"]
+      "required": [
+        "supplierId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "supplierId": { "type": "string" },
-        "overallScore": { "type": "number", "description": "0-100" },
-        "classification": { "type": "string", "enum": ["preferred", "approved", "conditional", "disqualified"] },
-        "qualityPpm": { "type": "number" },
-        "onTimeDeliveryPercent": { "type": "number" },
-        "developmentActions": { "type": "array", "items": { "type": "string" } }
+        "supplierId": {
+          "type": "string"
+        },
+        "overallScore": {
+          "type": "number",
+          "description": "0-100"
+        },
+        "classification": {
+          "type": "string",
+          "enum": [
+            "preferred",
+            "approved",
+            "conditional",
+            "disqualified"
+          ]
+        },
+        "qualityPpm": {
+          "type": "number"
+        },
+        "onTimeDeliveryPercent": {
+          "type": "number"
+        },
+        "developmentActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
-    }
+    },
+    "isoEvent": "supplier_scorecard_update"
   },
   {
     "id": "generate_delivery_report",
@@ -3352,23 +6795,54 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "plantId": { "type": "string" },
-        "periodDays": { "type": "integer", "default": 30 },
-        "groupBy": { "type": "string", "enum": ["route", "customer", "carrier", "product"] }
+        "plantId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 30
+        },
+        "groupBy": {
+          "type": "string",
+          "enum": [
+            "route",
+            "customer",
+            "carrier",
+            "product"
+          ]
+        }
       },
-      "required": ["plantId"]
+      "required": [
+        "plantId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "reportId": { "type": "string" },
-        "totalDeliveries": { "type": "integer" },
-        "onTimePercent": { "type": "number" },
-        "avgDelayDays": { "type": "number" },
-        "topDelayReasons": { "type": "array", "items": { "type": "string" } },
-        "pdfUrl": { "type": "string" }
+        "reportId": {
+          "type": "string"
+        },
+        "totalDeliveries": {
+          "type": "integer"
+        },
+        "onTimePercent": {
+          "type": "number"
+        },
+        "avgDelayDays": {
+          "type": "number"
+        },
+        "topDelayReasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pdfUrl": {
+          "type": "string"
+        }
       }
-    }
+    },
+    "isoEvent": "delivery_report_generated"
   },
   {
     "id": "scan_incoming_material",
@@ -3381,23 +6855,56 @@
     "inputSchema": {
       "type": "object",
       "properties": {
-        "scannerType": { "type": "string", "enum": ["qr", "barcode", "rfid", "manual"] },
-        "locationId": { "type": "string", "description": "Dock/gate identifier" },
-        "purchaseOrderId": { "type": "string" }
+        "scannerType": {
+          "type": "string",
+          "enum": [
+            "qr",
+            "barcode",
+            "rfid",
+            "manual"
+          ]
+        },
+        "locationId": {
+          "type": "string",
+          "description": "Dock/gate identifier"
+        },
+        "purchaseOrderId": {
+          "type": "string"
+        }
       },
-      "required": ["scannerType", "locationId"]
+      "required": [
+        "scannerType",
+        "locationId"
+      ]
     },
     "outputSchema": {
       "type": "object",
       "properties": {
-        "materialId": { "type": "string" },
-        "lotNumber": { "type": "string" },
-        "supplierId": { "type": "string" },
-        "quantityReceived": { "type": "number" },
-        "expirationDate": { "type": "string", "format": "date" },
-        "qualityHoldRequired": { "type": "boolean" },
-        "receivingTimestamp": { "type": "string", "format": "date-time" }
+        "materialId": {
+          "type": "string"
+        },
+        "lotNumber": {
+          "type": "string"
+        },
+        "supplierId": {
+          "type": "string"
+        },
+        "quantityReceived": {
+          "type": "number"
+        },
+        "expirationDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "qualityHoldRequired": {
+          "type": "boolean"
+        },
+        "receivingTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
-    }
+    },
+    "isoEvent": "incoming_material_scanned"
   }
 ]

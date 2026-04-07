@@ -3,6 +3,7 @@ import {
   getAllTools, getToolById, getRules, getEventStandard, getAgentsByToolId, getRulesForTool
 } from '../services/agentDataService.js';
 import { buildScript, buildToolDemo, deriveToolAlarm } from '../services/agentDemoService.js';
+import { TOOL_ISO_MAPPINGS } from '../services/isoMappingService.js';
 
 // ── View controllers ──────────────────────────────────────────
 
@@ -37,8 +38,10 @@ export function renderToolDetail(req, res, next) {
   const tool = getToolById(req.params.id);
   if (!tool) { const err = new Error('Tool no encontrada'); err.status = 404; return next(err); }
   const usedByAgents = getAgentsByToolId(tool.id);
+  // Use the tool's own isoEvent field; fall back to derived alarm for legacy tools
   const agentAlarm = usedByAgents[0]?.isoAlarms?.[0] || null;
-  const toolIsoAlarm = deriveToolAlarm(tool.id, agentAlarm);
+  const toolIsoAlarm = tool.isoEvent || deriveToolAlarm(tool.id, agentAlarm);
+  const toolIsoClauses = TOOL_ISO_MAPPINGS[toolIsoAlarm] || null;
   res.render('agentes-tool', {
     pageTitle: tool.nameEs,
     currentPage: 'agentes',
@@ -46,6 +49,7 @@ export function renderToolDetail(req, res, next) {
     usedByAgents,
     commRules: getRulesForTool(tool.id),
     toolIsoAlarm,
+    toolIsoClauses,
   });
 }
 

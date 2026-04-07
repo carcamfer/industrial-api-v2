@@ -2,6 +2,468 @@
 // Keys are isoAlarm names (from agents.json isoAlarms[]).
 // Old category keys kept as aliases for backward-compatibility.
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Per-tool ISO event mappings — each tool's isoEvent → specific clauses
+// ─────────────────────────────────────────────────────────────────────────────
+export const TOOL_ISO_MAPPINGS = {
+
+  // ── ERP & Gestión Empresarial ─────────────────────────────────────────────
+  inventory_status_report: [
+    { standard: 'ISO 9001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Control del estado de inventario como parte de las operaciones de suministro.' },
+  ],
+  demand_prediction_alert: [
+    { standard: 'ISO 9001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Predicción de demanda para planificar la producción y compras.' },
+  ],
+  stock_optimization_result: [
+    { standard: 'ISO 9001:2015', clause: '8.4', title: 'Control de procesos, productos y servicios externos', description: 'Optimización de niveles de stock para asegurar disponibilidad de materiales.' },
+  ],
+  purchase_order_recommendation: [
+    { standard: 'ISO 9001:2015', clause: '8.4', title: 'Control de procesos, productos y servicios externos', description: 'Recomendación de órdenes de compra basada en criterios de proveedor aprobado.' },
+  ],
+  purchase_order_generated: [
+    { standard: 'ISO 9001:2015', clause: '8.4', title: 'Control de procesos, productos y servicios externos', description: 'Generación de órdenes de compra con trazabilidad a requerimientos aprobados.' },
+  ],
+  supplier_evaluation_result: [
+    { standard: 'ISO 9001:2015', clause: '8.4', title: 'Control de procesos, productos y servicios externos', description: 'Evaluación periódica de proveedores según criterios de desempeño definidos.' },
+  ],
+  lead_time_analysis: [
+    { standard: 'ISO 28000:2022', clause: '8.1', title: 'Planificación y control operacional de la cadena de suministro', description: 'Análisis de tiempos de entrega para gestión de riesgo logístico.' },
+    { standard: 'ISO 9001:2015', clause: '8.4', title: 'Control de procesos, productos y servicios externos', description: 'Evaluación de lead times de proveedores como criterio de selección.' },
+  ],
+  production_variance_report: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Comparación entre producción planificada y real para identificar desviaciones.' },
+  ],
+  production_deviation_alert: [
+    { standard: 'ISO 9001:2015', clause: '9.1.3', title: 'Análisis y evaluación', description: 'Detección de desviaciones de producción con respecto a lo planificado.' },
+    { standard: 'ISO 9001:2015', clause: '8.7', title: 'Control de las salidas no conformes', description: 'Tratamiento de desviaciones que puedan resultar en producto no conforme.' },
+  ],
+  production_delay_forecast: [
+    { standard: 'ISO 9001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Predicción de retrasos de producción para acción preventiva.' },
+  ],
+  schedule_optimization_result: [
+    { standard: 'ISO 9001:2015', clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Optimización del programa de producción para cumplimiento de requisitos del cliente.' },
+  ],
+  project_progress_update: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Seguimiento del avance de proyectos contra los hitos planificados.' },
+  ],
+  project_cost_estimate: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Estimación y seguimiento de costos de proyecto.' },
+  ],
+  budget_overrun_alert: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Detección de sobrepasos presupuestarios como indicador de desempeño operacional.' },
+  ],
+  expense_categorization: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Categorización de gastos para análisis de eficiencia operacional.' },
+  ],
+  cost_optimization_result: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Resultados de optimización de costos operacionales.' },
+    { standard: 'ISO 9001:2015', clause: '10.3', title: 'Mejora continua', description: 'Reducción de costos como parte del proceso de mejora continua.' },
+  ],
+  kpi_report_generated: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Generación de KPIs de negocio para monitoreo del desempeño organizacional.' },
+  ],
+  revenue_forecast_alert: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Pronóstico de ingresos como indicador de desempeño de negocio.' },
+  ],
+  business_anomaly_detected: [
+    { standard: 'ISO 9001:2015', clause: '9.1.3', title: 'Análisis y evaluación', description: 'Detección de anomalías en indicadores de negocio mediante modelos ML.' },
+    { standard: 'ISO 9001:2015', clause: '10.2', title: 'No conformidad y acción correctiva', description: 'Activación de acciones correctivas ante anomalías de negocio detectadas.' },
+  ],
+  lead_scoring_result: [
+    { standard: 'ISO 9001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Calificación de leads para priorización de oportunidades de venta.' },
+  ],
+  sales_prediction_alert: [
+    { standard: 'ISO 9001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Predicción de ventas para planificación de producción y recursos.' },
+  ],
+  followup_automation_event: [
+    { standard: 'ISO 9001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Automatización de seguimientos comerciales como parte del proceso de ventas.' },
+  ],
+  erp_sync_event: [
+    { standard: 'ISO 9001:2015', clause: '7.5', title: 'Información documentada', description: 'Sincronización de datos ERP local garantizando integridad de información documentada.' },
+  ],
+  erp_order_pushed: [
+    { standard: 'ISO 9001:2015', clause: '8.4', title: 'Control de procesos, productos y servicios externos', description: 'Envío de órdenes al ERP local con trazabilidad completa.' },
+  ],
+
+  // ── Ciberseguridad Industrial ─────────────────────────────────────────────
+  net_risk_assessment: [
+    { standard: 'IEC 62443-2-1:2010', clause: '4.2.3.1', title: 'Evaluación de riesgo de seguridad IACS', description: 'Identificación y evaluación de riesgos en la red industrial OT/IT.' },
+    { standard: 'ISO 27001:2022', clause: 'A.5.19', title: 'Seguridad de la información con proveedores', description: 'Evaluación de riesgos en la cadena de suministro digital.' },
+  ],
+  anomaly_pattern_alert: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 6.2', title: 'Monitoreo continuo de red OT', description: 'Detección continua de patrones de anomalía en la red industrial.' },
+    { standard: 'ISO 27001:2022', clause: 'A.12.4', title: 'Registro y monitoreo', description: 'Análisis de logs y detección de comportamientos anómalos en sistemas industriales.' },
+  ],
+  attack_simulation_report: [
+    { standard: 'IEC 62443-2-4:2015', clause: '5', title: 'Requerimientos de seguridad para proveedores de servicios IACS', description: 'Simulación de escenarios de ataque para validar controles de seguridad.' },
+    { standard: 'ISO 27001:2022', clause: 'A.8.8', title: 'Gestión de vulnerabilidades técnicas', description: 'Pruebas de penetración y simulación de ataques para identificar vulnerabilidades.' },
+  ],
+  security_strategy_update: [
+    { standard: 'IEC 62443-2-1:2010', clause: '4.3', title: 'Desarrollo del programa de gestión de seguridad IACS', description: 'Actualización de la estrategia de seguridad basada en análisis de amenazas.' },
+    { standard: 'ISO 27001:2022', clause: 'A.5.1', title: 'Políticas de seguridad de la información', description: 'Actualización de políticas y estrategias de seguridad.' },
+  ],
+  local_network_anomaly: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 6.1', title: 'Auditoría de eventos de seguridad', description: 'Detección y registro local de anomalías de red sin dependencia de conectividad cloud.' },
+  ],
+  ip_block_action: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 5.1', title: 'Segmentación de red', description: 'Bloqueo de IPs maliciosas para proteger la integridad de la red OT.' },
+    { standard: 'ISO 27001:2022', clause: 'A.16.1', title: 'Gestión de incidentes de seguridad', description: 'Respuesta activa ante incidentes de ciberseguridad mediante bloqueo de acceso.' },
+  ],
+  network_segmentation_event: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 5.2', title: 'Protección del perímetro de zona', description: 'Segmentación de red OT en zonas de seguridad aisladas.' },
+    { standard: 'IEC 62443-2-1:2010', clause: '4.3.4', title: 'Gestión del riesgo en zonas de seguridad', description: 'Aplicación de zonas y conductos de seguridad según modelo de zonas IEC 62443.' },
+  ],
+  segmentation_applied: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 5.2', title: 'Protección del perímetro de zona', description: 'Aplicación efectiva de segmentación de red en el entorno OT.' },
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 5.1', title: 'Segmentación de red', description: 'Confirmación de que la segmentación aplicada cumple con los requisitos de separación OT/IT.' },
+  ],
+  ot_network_monitor_alert: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 6.2', title: 'Monitoreo continuo de red OT', description: 'Vigilancia continua del tráfico en la red de tecnología operacional.' },
+    { standard: 'IEC 62443-2-1:2010', clause: '4.3.3', title: 'Gestión del sistema de control industrial', description: 'Monitoreo del estado de salud de la red de control industrial.' },
+  ],
+  device_isolation_action: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 5.1', title: 'Segmentación de red', description: 'Aislamiento de dispositivos comprometidos para contener la propagación de amenazas.' },
+    { standard: 'ISO 27001:2022', clause: 'A.16.1', title: 'Gestión de incidentes de seguridad', description: 'Contención de incidentes mediante aislamiento de dispositivos afectados.' },
+  ],
+  gateway_traffic_inspection: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 5.3', title: 'Restricción de comunicaciones a través de interfaces diagnósticas', description: 'Inspección del tráfico en gateways OT/IT para detectar comunicaciones no autorizadas.' },
+    { standard: 'ISO 27001:2022', clause: 'A.13.1', title: 'Gestión de seguridad en redes', description: 'Control del tráfico de red a través de puntos de acceso y gateways.' },
+  ],
+
+  // ── Visión Artificial Industrial ──────────────────────────────────────────
+  product_quality_inspection: [
+    { standard: 'ISO 9001:2015', clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Inspección visual automatizada en línea para asegurar calidad de producto.' },
+    { standard: 'ISO 9001:2015', clause: '8.7', title: 'Control de las salidas no conformes', description: 'Detección y segregación de productos defectuosos mediante visión artificial.' },
+    { standard: 'IATF 16949:2016', clause: '8.5.1', title: 'Plan de control de manufactura', description: 'Inspección automatizada como parte del plan de control del proceso.' },
+  ],
+  conveyor_count_event: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Conteo automatizado de unidades en línea para control de producción.' },
+  ],
+  safety_violation_detected: [
+    { standard: 'ISO 45001:2018', clause: '8.1', title: 'Planificación y control operacional', description: 'Detección automática de violaciones a las normas de seguridad en planta.' },
+    { standard: 'ISO 45001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación del desempeño SST', description: 'Monitoreo continuo de condiciones de seguridad mediante visión artificial.' },
+  ],
+  worker_posture_alert: [
+    { standard: 'ISO 45001:2018', clause: '8.1', title: 'Planificación y control operacional', description: 'Monitoreo de postura de trabajadores para prevención de lesiones ergonómicas.' },
+    { standard: 'ISO 45001:2018', clause: '6.1', title: 'Acciones para abordar riesgos y oportunidades SST', description: 'Identificación de riesgos ergonómicos mediante análisis de postura.' },
+  ],
+  video_stream_capture: [
+    { standard: 'ISO 9001:2015', clause: '7.5', title: 'Información documentada', description: 'Captura y almacenamiento de video como evidencia de inspección y trazabilidad.' },
+  ],
+  vision_model_trained: [
+    { standard: 'ISO 9001:2015', clause: '7.2', title: 'Competencia', description: 'Entrenamiento de modelos de visión como competencia tecnológica del sistema de calidad.' },
+    { standard: 'IATF 16949:2016', clause: '8.5.1', title: 'Plan de control de manufactura', description: 'Actualización del modelo de inspección visual para el plan de control.' },
+  ],
+  detection_model_improved: [
+    { standard: 'ISO 9001:2015', clause: '10.3', title: 'Mejora continua', description: 'Mejora iterativa del modelo de detección como parte del ciclo de mejora continua.' },
+    { standard: 'IATF 16949:2016', clause: '8.5.1', title: 'Plan de control de manufactura', description: 'Mejora de la detección de defectos en el plan de control.' },
+  ],
+  visual_pattern_analysis: [
+    { standard: 'ISO 9001:2015', clause: '9.1.3', title: 'Análisis y evaluación', description: 'Análisis de patrones visuales históricos para identificar tendencias de calidad.' },
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Análisis visual de activos para mantenimiento predictivo.' },
+  ],
+
+  // ── AI & ML Industrial ────────────────────────────────────────────────────
+  demand_forecast_alert: [
+    { standard: 'ISO 9001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Pronóstico de demanda industrial para planificación de producción y capacidad.' },
+  ],
+  sequence_optimization_result: [
+    { standard: 'ISO 9001:2015', clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Optimización de secuencia de producción mediante modelos de ML.' },
+  ],
+  process_deviation_detected: [
+    { standard: 'ISO 9001:2015', clause: '9.1.3', title: 'Análisis y evaluación', description: 'Detección automática de desviaciones de proceso usando modelos predictivos.' },
+    { standard: 'ISO 9001:2015', clause: '10.2', title: 'No conformidad y acción correctiva', description: 'Inicio de acción correctiva ante desviación detectada por ML.' },
+  ],
+  machine_failure_prediction: [
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Predicción de fallas de máquinas para programar mantenimiento predictivo.' },
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Evaluación del estado de activos mediante modelos de predicción de fallas.' },
+  ],
+  vibration_pattern_alert: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Análisis de patrones de vibración para detectar degradación de activos.' },
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Acción preventiva basada en análisis de vibración.' },
+  ],
+  energy_usage_optimized: [
+    { standard: 'ISO 50001:2018', clause: '6.6', title: 'Planificación energética', description: 'Optimización del uso de energía mediante modelos ML para reducir consumo.' },
+    { standard: 'ISO 50001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Evaluación del desempeño energético post-optimización.' },
+  ],
+  bottleneck_identified: [
+    { standard: 'ISO 9001:2015', clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Identificación de cuellos de botella para mejora del flujo productivo.' },
+    { standard: 'ISO 9001:2015', clause: '10.3', title: 'Mejora continua', description: 'Eliminación de cuellos de botella como acción de mejora continua.' },
+  ],
+  twin_model_generated: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Generación de modelo de gemelo digital para evaluación de activos.' },
+  ],
+  vibration_data_collected: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Recolección de datos de vibración en el edge para análisis predictivo.' },
+  ],
+  process_signal_collected: [
+    { standard: 'ISO 9001:2015', clause: '7.5', title: 'Información documentada', description: 'Recolección de señales de proceso como información documentada del sistema de calidad.' },
+  ],
+  local_inference_result: [
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Inferencia local ML en el edge para decisiones de mantenimiento en tiempo real.' },
+  ],
+  realtime_anomaly_detected: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 6.2', title: 'Monitoreo continuo de red OT', description: 'Detección en tiempo real de anomalías de proceso o red en el edge.' },
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Monitoreo continuo de activos con detección de anomalías en tiempo real.' },
+  ],
+
+  // ── Infraestructura & Edge ────────────────────────────────────────────────
+  edge_orchestration_event: [
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Orquestación de nodos edge como control operacional de la infraestructura.' },
+    { standard: 'IEC 62443-2-1:2010', clause: '4.3.3', title: 'Gestión del sistema de control industrial', description: 'Gestión centralizada de nodos edge en la infraestructura de control.' },
+  ],
+  edge_device_management: [
+    { standard: 'IEC 62443-2-1:2010', clause: '4.3.3', title: 'Gestión del sistema de control industrial', description: 'Administración de dispositivos edge con control de inventario y configuración.' },
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Gestión del ciclo de vida de dispositivos edge como activos físicos.' },
+  ],
+  sensor_data_collected: [
+    { standard: 'ISO 9001:2015', clause: '7.1', title: 'Recursos', description: 'Recolección de datos de sensores como recurso para el monitoreo del proceso.' },
+  ],
+  analog_digitization_event: [
+    { standard: 'ISO 9001:2015', clause: '7.1', title: 'Recursos', description: 'Digitalización de señales analógicas para integrar equipos legacy al sistema de monitoreo.' },
+  ],
+  energy_consumption_monitored: [
+    { standard: 'ISO 50001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Monitoreo de consumo energético en tiempo real desde el edge.' },
+  ],
+  local_control_action: [
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 2.1', title: 'Autorización de acceso a sistemas de control', description: 'Ejecución de acciones de control local en PLCs con autorización verificada.' },
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Acción de control operacional sobre activos físicos en planta.' },
+  ],
+  edge_config_deployed: [
+    { standard: 'IEC 62443-2-1:2010', clause: '4.3.3', title: 'Gestión del sistema de control industrial', description: 'Despliegue de configuración en nodos edge con verificación de integridad.' },
+  ],
+  edge_agent_updated: [
+    { standard: 'IEC 62443-2-1:2010', clause: '4.3.3', title: 'Gestión del sistema de control industrial', description: 'Actualización de agentes edge con control de versión y verificación.' },
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Mantenimiento de software de nodos edge como activos de infraestructura.' },
+  ],
+  edge_health_status: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Evaluación del estado de salud de la flota de nodos edge.' },
+    { standard: 'IEC 62443-2-1:2010', clause: '4.3.3', title: 'Gestión del sistema de control industrial', description: 'Monitoreo de disponibilidad y salud de infraestructura de control.' },
+  ],
+  device_registry_update: [
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Actualización del registro de dispositivos como inventario de activos físicos.' },
+  ],
+
+  // ── Producción Avanzada ───────────────────────────────────────────────────
+  bottleneck_simulation: [
+    { standard: 'ISO 9001:2015', clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Simulación de cuellos de botella para planificación de capacidad productiva.' },
+  ],
+  production_flow_optimized: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Resultado de optimización del flujo productivo medido contra KPIs de OEE.' },
+    { standard: 'ISO 9001:2015', clause: '10.3', title: 'Mejora continua', description: 'Mejora del flujo de producción como resultado del ciclo de mejora continua.' },
+  ],
+  production_plan_generated: [
+    { standard: 'ISO 9001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Generación automática de plan de producción con restricciones de capacidad.' },
+  ],
+  idle_time_pattern_alert: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Identificación de patrones de tiempo muerto para mejora de eficiencia.' },
+  ],
+  production_data_collected: [
+    { standard: 'ISO 9001:2015', clause: '7.5', title: 'Información documentada', description: 'Recolección de datos de producción como información documentada.' },
+  ],
+  machine_state_change: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Seguimiento del estado de máquinas como indicador de disponibilidad de activos.' },
+  ],
+  idle_time_detected: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Detección de tiempo muerto en tiempo real para acción correctiva inmediata.' },
+  ],
+  production_adjustment_applied: [
+    { standard: 'ISO 9001:2015', clause: '8.5', title: 'Control de producción y de la provisión del servicio', description: 'Aplicación de ajuste de producción para mantener parámetros dentro de especificación.' },
+  ],
+
+  // ── Digital Twin ──────────────────────────────────────────────────────────
+  digital_twin_created: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Creación de gemelo digital para evaluación virtual del desempeño de activos.' },
+  ],
+  twin_simulation_result: [
+    { standard: 'ISO 9001:2015', clause: '10.3', title: 'Mejora continua', description: 'Resultado de simulación what-if en gemelo digital para identificar mejoras.' },
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Evaluación virtual de escenarios operacionales en el gemelo digital.' },
+  ],
+  system_performance_optimized: [
+    { standard: 'ISO 9001:2015', clause: '10.3', title: 'Mejora continua', description: 'Optimización del sistema aplicando hallazgos del gemelo digital.' },
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Mejora de desempeño de activos basada en análisis del gemelo digital.' },
+  ],
+  twin_data_feed_event: [
+    { standard: 'ISO 9001:2015', clause: '7.5', title: 'Información documentada', description: 'Alimentación continua del gemelo digital con datos reales del piso de planta.' },
+  ],
+
+  // ── Mantenimiento & CMMS ──────────────────────────────────────────────────
+  work_order_event: [
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Gestión de órdenes de trabajo de mantenimiento correctivo y preventivo.' },
+  ],
+  preventive_maint_scheduled: [
+    { standard: 'ISO 55001:2014', clause: '6.2', title: 'Objetivos de gestión de activos y planificación', description: 'Programación de mantenimiento preventivo optimizado según objetivos del activo.' },
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Control operacional de actividades de mantenimiento preventivo.' },
+  ],
+  reliability_metrics_alert: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Seguimiento de indicadores MTBF/MTTR para evaluar desempeño de activos.' },
+  ],
+  fmea_analysis_result: [
+    { standard: 'ISO 55001:2014', clause: '6.2', title: 'Objetivos de gestión de activos y planificación', description: 'Análisis de modos de falla (FMEA/RCM) para optimizar la estrategia de mantenimiento.' },
+    { standard: 'ISO 31000:2018', clause: '6.4', title: 'Evaluación del riesgo', description: 'Evaluación de riesgos de falla mediante análisis FMEA.' },
+  ],
+  spare_parts_status: [
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Control de inventario de repuestos para soporte del plan de mantenimiento.' },
+  ],
+  asset_lifecycle_event: [
+    { standard: 'ISO 55001:2014', clause: '8.1', title: 'Planificación y control operacional', description: 'Seguimiento del ciclo de vida completo de activos físicos.' },
+  ],
+  condition_monitoring_alert: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Monitoreo de condición en tiempo real de activos críticos.' },
+  ],
+  maintenance_kpi_report: [
+    { standard: 'ISO 55001:2014', clause: '9.1', title: 'Monitoreo, medición, análisis y evaluación', description: 'Reporte de KPIs de mantenimiento para evaluación del sistema de gestión de activos.' },
+  ],
+
+  // ── Control & SCADA ───────────────────────────────────────────────────────
+  scada_tag_alarm: [
+    { standard: 'IEC 61511:2016', clause: '16', title: 'Operación y mantenimiento del SIS', description: 'Monitoreo de tags SCADA para detección de condiciones fuera de límites operacionales.' },
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 6.2', title: 'Monitoreo continuo', description: 'Monitoreo continuo del sistema SCADA para detección de condiciones anómalas.' },
+  ],
+  pid_control_action: [
+    { standard: 'IEC 61511:2016', clause: '11', title: 'Diseño e ingeniería del SIS', description: 'Ejecución de lazo PID como parte del sistema de control del proceso.' },
+  ],
+  setpoint_change_event: [
+    { standard: 'IEC 61511:2016', clause: '11', title: 'Diseño e ingeniería del SIS', description: 'Cambio de setpoint con auditoría de quién, cuándo y por qué.' },
+    { standard: 'IEC 62443-3-3:2013', clause: 'SR 6.1', title: 'Auditoría de eventos de seguridad', description: 'Registro auditado de cambios de setpoint para trazabilidad.' },
+  ],
+  process_alarm_triggered: [
+    { standard: 'IEC 61511:2016', clause: '16', title: 'Operación y mantenimiento del SIS', description: 'Disparo de alarma de proceso conforme a la gestión de alarmas ISA-18.2.' },
+  ],
+  historian_log_entry: [
+    { standard: 'IEC 61511:2016', clause: '16', title: 'Operación y mantenimiento del SIS', description: 'Registro de datos de proceso en el historiador para trazabilidad y auditoría.' },
+    { standard: 'ISO 9001:2015', clause: '7.5', title: 'Información documentada', description: 'Datos del proceso como información documentada requerida por el sistema de calidad.' },
+  ],
+  batch_sequence_event: [
+    { standard: 'IEC 61511:2016', clause: '11', title: 'Diseño e ingeniería del SIS', description: 'Ejecución de secuencia de producción por lotes conforme a ISA-88.' },
+  ],
+  alarm_acknowledged: [
+    { standard: 'IEC 61511:2016', clause: '16', title: 'Operación y mantenimiento del SIS', description: 'Reconocimiento de alarma con registro del operador y tiempo de respuesta.' },
+  ],
+  control_loop_analysis: [
+    { standard: 'IEC 61511:2016', clause: '5.2', title: 'Gestión de seguridad funcional', description: 'Análisis del desempeño de lazos de control para verificar cumplimiento del SIL.' },
+  ],
+
+  // ── Calidad & SPC ─────────────────────────────────────────────────────────
+  control_chart_generated: [
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Generación de cartas de control Xbar-R para monitoreo estadístico del proceso.' },
+    { standard: 'IATF 16949:2016', clause: '8.5.1', title: 'Plan de control de manufactura', description: 'SPC como técnica estadística en el plan de control de manufactura.' },
+  ],
+  out_of_control_signal: [
+    { standard: 'IATF 16949:2016', clause: '8.5.1', title: 'Plan de control de manufactura', description: 'Detección de señal fuera de control con reglas de Nelson.' },
+    { standard: 'ISO 9001:2015', clause: '9.1.3', title: 'Análisis y evaluación', description: 'Análisis de señales fuera de control para identificar causas especiales.' },
+  ],
+  nonconformance_registered: [
+    { standard: 'ISO 9001:2015', clause: '8.7', title: 'Control de las salidas no conformes', description: 'Registro y disposición de producto o proceso no conforme.' },
+    { standard: 'IATF 16949:2016', clause: '8.7.1', title: 'Control de producto no conforme — requerimientos específicos', description: 'Gestión de no conformidades incluyendo cuarentena y notificación al cliente.' },
+  ],
+  '8d_report_issued': [
+    { standard: 'IATF 16949:2016', clause: '8.7.1', title: 'Control de producto no conforme — requerimientos específicos', description: 'Reporte 8D para resolución estructurada de no conformidades en la industria automotriz.' },
+    { standard: 'ISO 9001:2015', clause: '10.2', title: 'No conformidad y acción correctiva', description: 'Acción correctiva documentada mediante metodología 8D.' },
+  ],
+  capability_index_alert: [
+    { standard: 'IATF 16949:2016', clause: '8.5.1', title: 'Plan de control de manufactura', description: 'Monitoreo de índices de capacidad Cpk/Ppk para validación de proceso.' },
+    { standard: 'ISO 9001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Evaluación de la capacidad del proceso para cumplir especificaciones.' },
+  ],
+  product_spec_update: [
+    { standard: 'ISO 9001:2015', clause: '8.5.2', title: 'Identificación y trazabilidad', description: 'Actualización de especificaciones de producto con control de versiones.' },
+  ],
+  msa_analysis_result: [
+    { standard: 'IATF 16949:2016', clause: '7.1.5.1', title: 'Análisis del sistema de medición (MSA)', description: 'Análisis Gage R&R para validar la confiabilidad del sistema de medición.' },
+    { standard: 'ISO 9001:2015', clause: '7.1.5', title: 'Recursos de seguimiento y medición', description: 'Validación de equipos de medición mediante análisis de sistema de medición.' },
+  ],
+  quality_measurement_data: [
+    { standard: 'ISO 9001:2015', clause: '9.1.1', title: 'Generalidades — seguimiento y medición', description: 'Recolección de mediciones de calidad en punto de proceso para SPC.' },
+  ],
+
+  // ── Energía & Sustentabilidad ─────────────────────────────────────────────
+  energy_meter_reading: [
+    { standard: 'ISO 50001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Lectura de medidores de energía para seguimiento del desempeño energético.' },
+  ],
+  energy_kpi_report: [
+    { standard: 'ISO 50001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Cálculo de indicadores de desempeño energético (EnPI) para auditoría ISO 50001.' },
+  ],
+  energy_waste_detected: [
+    { standard: 'ISO 50001:2018', clause: '6.6', title: 'Planificación energética', description: 'Detección de usos significativos de energía y desperdicios para acción correctiva.' },
+    { standard: 'ISO 50001:2018', clause: '10.2', title: 'No conformidad y acción correctiva', description: 'Tratamiento de desperdicio energético como no conformidad del SGEn.' },
+  ],
+  energy_load_optimization: [
+    { standard: 'ISO 50001:2018', clause: '6.6', title: 'Planificación energética', description: 'Optimización del despacho de cargas para reducir demanda máxima y costo energético.' },
+  ],
+  carbon_footprint_report: [
+    { standard: 'ISO 14001:2015', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Cálculo de huella de carbono como indicador ambiental clave.' },
+    { standard: 'ISO 14001:2015', clause: '8.1', title: 'Planificación y control operacional', description: 'Control de emisiones de CO₂ como aspecto ambiental significativo.' },
+  ],
+  iso50001_audit_report: [
+    { standard: 'ISO 50001:2018', clause: '9.1.2', title: 'Revisión por la dirección', description: 'Generación automática del reporte de auditoría de cumplimiento ISO 50001.' },
+  ],
+  energy_benchmark_result: [
+    { standard: 'ISO 50001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación', description: 'Comparación del desempeño energético contra benchmarks sectoriales.' },
+  ],
+  energy_audit_scheduled: [
+    { standard: 'ISO 50001:2018', clause: '9.2', title: 'Auditoría interna', description: 'Programación de auditoría energética interna del sistema de gestión de energía.' },
+  ],
+
+  // ── Seguridad HSE ─────────────────────────────────────────────────────────
+  gas_sensor_alert: [
+    { standard: 'ISO 45001:2018', clause: '8.1', title: 'Planificación y control operacional', description: 'Monitoreo de sensores de gas para control operacional de riesgos de SST.' },
+    { standard: 'IEC 61511:2016', clause: '16', title: 'Operación y mantenimiento del SIS', description: 'Sensor de gas como parte del sistema instrumentado de seguridad en operación.' },
+  ],
+  safety_incident_report: [
+    { standard: 'ISO 45001:2018', clause: '10.2', title: 'No conformidad y acción correctiva', description: 'Reporte de incidente de seguridad como no conformidad de SST.' },
+    { standard: 'ISO 45001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación del desempeño SST', description: 'Registro de incidentes como indicador de desempeño de seguridad.' },
+  ],
+  hse_root_cause_finding: [
+    { standard: 'ISO 45001:2018', clause: '10.2', title: 'No conformidad y acción correctiva', description: 'Investigación de causa raíz de incidentes HSE para acción correctiva.' },
+  ],
+  hazop_analysis_result: [
+    { standard: 'IEC 61511:2016', clause: '9', title: 'Especificación de requerimientos de seguridad (SRS)', description: 'Análisis HAZOP para identificar desviaciones de proceso y definir funciones SIS.' },
+    { standard: 'ISO 45001:2018', clause: '6.1', title: 'Acciones para abordar riesgos y oportunidades SST', description: 'Identificación de riesgos operacionales mediante análisis HAZOP.' },
+  ],
+  sil_assessment_result: [
+    { standard: 'IEC 61511:2016', clause: '9', title: 'Especificación de requerimientos de seguridad (SRS)', description: 'Determinación del nivel de integridad de seguridad (SIL) requerido para funciones SIS.' },
+    { standard: 'IEC 61508-1:2010', clause: '7', title: 'Gestión del ciclo de vida de seguridad', description: 'Evaluación de SIL conforme al ciclo de vida de seguridad funcional.' },
+  ],
+  work_permit_event: [
+    { standard: 'ISO 45001:2018', clause: '8.1', title: 'Planificación y control operacional', description: 'Gestión de permisos de trabajo como control operacional para trabajos de riesgo.' },
+  ],
+  safety_kpi_report: [
+    { standard: 'ISO 45001:2018', clause: '9.1', title: 'Seguimiento, medición, análisis y evaluación del desempeño SST', description: 'Seguimiento de KPIs de seguridad para evaluación del desempeño del SGSST.' },
+  ],
+  safety_drill_scheduled: [
+    { standard: 'ISO 45001:2018', clause: '8.2', title: 'Preparación y respuesta ante emergencias', description: 'Programación de simulacros de emergencia para validar planes de respuesta.' },
+  ],
+
+  // ── Cadena de Suministro ──────────────────────────────────────────────────
+  shipment_tracking_update: [
+    { standard: 'ISO 28000:2022', clause: '8.1', title: 'Planificación y control operacional de la cadena de suministro', description: 'Rastreo en tiempo real de envíos para visibilidad de la cadena de suministro.' },
+  ],
+  route_optimization_result: [
+    { standard: 'ISO 28000:2022', clause: '8.1', title: 'Planificación y control operacional de la cadena de suministro', description: 'Optimización de rutas de entrega para eficiencia logística.' },
+  ],
+  supply_disruption_alert: [
+    { standard: 'ISO 28000:2022', clause: '6.1', title: 'Acciones para abordar riesgos y oportunidades de la cadena de suministro', description: 'Predicción y alerta de disrupciones en la cadena de suministro.' },
+    { standard: 'ISO 22301:2019', clause: '8.4', title: 'Procedimientos de continuidad de negocio', description: 'Activación de planes de continuidad ante disrupción de suministro.' },
+  ],
+  wms_management_event: [
+    { standard: 'ISO 28000:2022', clause: '8.1', title: 'Planificación y control operacional de la cadena de suministro', description: 'Gestión de operaciones de almacén con slotting dinámico.' },
+  ],
+  scm_kpi_report: [
+    { standard: 'ISO 28000:2022', clause: '8.1', title: 'Planificación y control operacional de la cadena de suministro', description: 'Reporte de KPIs de cadena de suministro para evaluación del desempeño.' },
+  ],
+  supplier_scorecard_update: [
+    { standard: 'ISO 9001:2015', clause: '8.4', title: 'Control de procesos, productos y servicios externos', description: 'Actualización del scorecard de proveedores como evaluación periódica de desempeño.' },
+    { standard: 'ISO 28000:2022', clause: '6.1', title: 'Acciones para abordar riesgos y oportunidades', description: 'Evaluación de riesgos de proveedores mediante scorecard.' },
+  ],
+  delivery_report_generated: [
+    { standard: 'ISO 28000:2022', clause: '8.1', title: 'Planificación y control operacional de la cadena de suministro', description: 'Generación de reporte de entregas para trazabilidad y cumplimiento.' },
+  ],
+  incoming_material_scanned: [
+    { standard: 'ISO 28000:2022', clause: '8.1', title: 'Planificación y control operacional de la cadena de suministro', description: 'Escaneo de material entrante con QR/RFID para trazabilidad lote a lote.' },
+    { standard: 'ISO 9001:2015', clause: '8.4', title: 'Control de procesos, productos y servicios externos', description: 'Verificación de material entrante de proveedor como control de calidad en recepción.' },
+  ],
+};
+
 const ISO_MAPPINGS = {
 
   // ── Calidad & SPC ──────────────────────────────────────────
@@ -209,6 +671,10 @@ export function getClientMappings () {
   for (const [alias, primary] of Object.entries(aliasMap)) {
     clientMappings[alias] = ISO_MAPPINGS[primary];
   }
+  // Include all per-tool event mappings
+  for (const [key, val] of Object.entries(TOOL_ISO_MAPPINGS)) {
+    clientMappings[key] = val;
+  }
 
   const recKeys = [
     'quality_score_evaluator', 'vision_defect_inspector', 'predictive_maintenance_scan',
@@ -264,7 +730,8 @@ export function mapEventToISO (event) {
     control: 'scada_pid_loop_monitor', supply_chain: 'supply_chain_risk_tracker',
   };
   const key = aliasMap[module_id] || module_id;
-  const baseClauses = ISO_MAPPINGS[key] ?? [];
+  // Prefer per-tool mapping, fall back to agent-level mapping
+  const baseClauses = TOOL_ISO_MAPPINGS[key] ?? ISO_MAPPINGS[key] ?? [];
   const clauseStatus = getClauseStatus(severity, event_type);
 
   const isoStandards = baseClauses.map(c => ({ ...c, status: clauseStatus }));
