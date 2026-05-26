@@ -44,7 +44,7 @@ DO $$
 BEGIN
    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'industrial_reader') THEN
       CREATE ROLE industrial_reader LOGIN PASSWORD 'industrial_reader';
-      GRANT CONNECT ON DATABASE industrial_events TO industrial_reader;
+      EXECUTE format('GRANT CONNECT ON DATABASE %I TO industrial_reader', current_database());
       GRANT USAGE ON SCHEMA public TO industrial_reader;
       GRANT SELECT ON industrial_events TO industrial_reader;
    END IF;
