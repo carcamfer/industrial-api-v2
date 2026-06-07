@@ -3,6 +3,7 @@ import express from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { ensureSchema } from './db/migrate.js';
 import eventsRouter from './routes/eventsRoutes.js';
 import dashboardRouter from './routes/dashboardRoutes.js';
 import auditRouter from './routes/auditRoutes.js';
@@ -55,8 +56,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Expo Programador · Plataforma Industrial running on http://localhost:${PORT}`);
+// Verifica el esquema (columnas de cadena causal) y arranca. La migración es
+// no fatal: si falla, la API arranca igual para no tumbar el sitio.
+ensureSchema().finally(() => {
+  app.listen(PORT, () => {
+    console.log(`Expo Programador · Plataforma Industrial running on http://localhost:${PORT}`);
+  });
 });
 
 export default app;

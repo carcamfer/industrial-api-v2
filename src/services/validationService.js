@@ -48,7 +48,9 @@ const eventSchema = {
       additionalProperties: false
     },
     data: { type: 'object' },
-    metadata: { type: 'object' }
+    metadata: { type: 'object' },
+    correlation_id: { type: 'string', nullable: true },
+    causation_id: { type: 'string', nullable: true }
   },
   additionalProperties: false
 };
