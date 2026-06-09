@@ -57,10 +57,19 @@
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "skuId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "inventory_status_report"
+    "isoEvent": "inventory_status_report",
+    "produces": [
+      "INVENTORY_STATUS_READY"
+    ],
+    "consumes": [
+      "ERP_DATA_SYNCED"
+    ]
   },
   {
     "id": "predict_demand",
@@ -114,7 +123,13 @@
         }
       }
     },
-    "isoEvent": "demand_prediction_alert"
+    "isoEvent": "demand_prediction_alert",
+    "produces": [
+      "DEMAND_FORECAST_READY"
+    ],
+    "consumes": [
+      "INVENTORY_STATUS_READY"
+    ]
   },
   {
     "id": "optimize_stock_levels",
@@ -155,10 +170,19 @@
         },
         "economicOrderQty": {
           "type": "number"
+        },
+        "warehouseId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "stock_optimization_result"
+    "isoEvent": "stock_optimization_result",
+    "produces": [
+      "STOCK_OPTIMIZATION_COMPLETE"
+    ],
+    "consumes": [
+      "DEMAND_FORECAST_READY"
+    ]
   },
   {
     "id": "recommend_purchase_orders",
@@ -207,10 +231,28 @@
         },
         "totalCost": {
           "type": "number"
+        },
+        "supplierId": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "autoApprove": {
+          "type": "boolean"
         }
       }
     },
-    "isoEvent": "purchase_order_recommendation"
+    "isoEvent": "purchase_order_recommendation",
+    "produces": [
+      "ORDER_RECOMMENDED"
+    ],
+    "consumes": [
+      "STOCK_OPTIMIZATION_COMPLETE"
+    ]
   },
   {
     "id": "generate_purchase_order",
@@ -258,10 +300,25 @@
         },
         "totalAmount": {
           "type": "number"
+        },
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "erpType": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "purchase_order_generated"
+    "isoEvent": "purchase_order_generated",
+    "produces": [
+      "ORDER_CREATED"
+    ],
+    "consumes": [
+      "ORDER_RECOMMENDED"
+    ]
   },
   {
     "id": "evaluate_suppliers",
@@ -319,7 +376,9 @@
         }
       }
     },
-    "isoEvent": "supplier_evaluation_result"
+    "isoEvent": "supplier_evaluation_result",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "analyze_lead_times",
@@ -369,7 +428,9 @@
         }
       }
     },
-    "isoEvent": "lead_time_analysis"
+    "isoEvent": "lead_time_analysis",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "compare_planned_vs_actual",
@@ -424,10 +485,31 @@
           "items": {
             "type": "object"
           }
+        },
+        "plantId": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly"
+          ]
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
-    "isoEvent": "production_variance_report"
+    "isoEvent": "production_variance_report",
+    "produces": [
+      "PRODUCTION_VARIANCE_DETECTED"
+    ],
+    "consumes": []
   },
   {
     "id": "detect_production_deviation",
@@ -474,7 +556,9 @@
         }
       }
     },
-    "isoEvent": "production_deviation_alert"
+    "isoEvent": "production_deviation_alert",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "predict_production_delays",
@@ -518,7 +602,9 @@
         }
       }
     },
-    "isoEvent": "production_delay_forecast"
+    "isoEvent": "production_delay_forecast",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "optimize_production_schedule",
@@ -564,7 +650,9 @@
         }
       }
     },
-    "isoEvent": "schedule_optimization_result"
+    "isoEvent": "schedule_optimization_result",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "track_project_progress",
@@ -607,10 +695,30 @@
             "at_risk",
             "delayed"
           ]
+        },
+        "targetType": {
+          "type": "string",
+          "enum": [
+            "lead",
+            "supplier",
+            "order"
+          ]
+        },
+        "targetIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
-    "isoEvent": "project_progress_update"
+    "isoEvent": "project_progress_update",
+    "produces": [
+      "PROJECT_AT_RISK"
+    ],
+    "consumes": [
+      "KPI_REPORT_GENERATED"
+    ]
   },
   {
     "id": "estimate_project_costs",
@@ -654,7 +762,9 @@
         }
       }
     },
-    "isoEvent": "project_cost_estimate"
+    "isoEvent": "project_cost_estimate",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "detect_budget_overrun",
@@ -697,7 +807,9 @@
         }
       }
     },
-    "isoEvent": "budget_overrun_alert"
+    "isoEvent": "budget_overrun_alert",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "categorize_expenses",
@@ -743,7 +855,9 @@
         }
       }
     },
-    "isoEvent": "expense_categorization"
+    "isoEvent": "expense_categorization",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "optimize_operational_costs",
@@ -782,7 +896,9 @@
         }
       }
     },
-    "isoEvent": "cost_optimization_result"
+    "isoEvent": "cost_optimization_result",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "generate_kpis",
@@ -834,10 +950,20 @@
               }
             }
           }
+        },
+        "projectId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "kpi_report_generated"
+    "isoEvent": "kpi_report_generated",
+    "produces": [
+      "KPI_REPORT_GENERATED"
+    ],
+    "consumes": [
+      "PRODUCTION_VARIANCE_DETECTED",
+      "BUSINESS_ANOMALY_DETECTED"
+    ]
   },
   {
     "id": "forecast_revenue",
@@ -876,10 +1002,20 @@
           "items": {
             "type": "object"
           }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
-    "isoEvent": "revenue_forecast_alert"
+    "isoEvent": "revenue_forecast_alert",
+    "produces": [
+      "FORECAST_READY"
+    ],
+    "consumes": []
   },
   {
     "id": "detect_business_anomalies",
@@ -923,10 +1059,28 @@
         },
         "criticalCount": {
           "type": "integer"
+        },
+        "plantId": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly"
+          ]
         }
       }
     },
-    "isoEvent": "business_anomaly_detected"
+    "isoEvent": "business_anomaly_detected",
+    "produces": [
+      "BUSINESS_ANOMALY_DETECTED"
+    ],
+    "consumes": [
+      "FORECAST_READY",
+      "PRODUCTION_VARIANCE_DETECTED"
+    ]
   },
   {
     "id": "score_leads",
@@ -972,10 +1126,20 @@
               }
             }
           }
+        },
+        "productId": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "lead_scoring_result"
+    "isoEvent": "lead_scoring_result",
+    "produces": [
+      "LEADS_SCORED"
+    ],
+    "consumes": []
   },
   {
     "id": "predict_sales",
@@ -1014,10 +1178,33 @@
         },
         "accuracy": {
           "type": "number"
+        },
+        "targetType": {
+          "type": "string",
+          "enum": [
+            "lead",
+            "supplier",
+            "order"
+          ]
+        },
+        "targetIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "closeProbability": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "sales_prediction_alert"
+    "isoEvent": "sales_prediction_alert",
+    "produces": [
+      "SALES_PREDICTED"
+    ],
+    "consumes": [
+      "LEADS_SCORED"
+    ]
   },
   {
     "id": "automate_followups",
@@ -1067,7 +1254,15 @@
         }
       }
     },
-    "isoEvent": "followup_automation_event"
+    "isoEvent": "followup_automation_event",
+    "produces": [
+      "FOLLOWUP_SCHEDULED"
+    ],
+    "consumes": [
+      "SALES_PREDICTED",
+      "8D_REPORT_ISSUED",
+      "PROJECT_AT_RISK"
+    ]
   },
   {
     "id": "sync_erp_data_local",
@@ -1116,10 +1311,17 @@
         },
         "errors": {
           "type": "integer"
+        },
+        "warehouseId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "erp_sync_event"
+    "isoEvent": "erp_sync_event",
+    "produces": [
+      "ERP_DATA_SYNCED"
+    ],
+    "consumes": []
   },
   {
     "id": "push_orders_to_erp",
@@ -1164,7 +1366,11 @@
         }
       }
     },
-    "isoEvent": "erp_order_pushed"
+    "isoEvent": "erp_order_pushed",
+    "produces": [],
+    "consumes": [
+      "ORDER_CREATED"
+    ]
   },
   {
     "id": "analyze_network_risk",
@@ -1211,10 +1417,19 @@
           "items": {
             "type": "object"
           }
+        },
+        "riskProfile": {
+          "type": "object"
         }
       }
     },
-    "isoEvent": "net_risk_assessment"
+    "isoEvent": "net_risk_assessment",
+    "produces": [
+      "RISK_ANALYZED"
+    ],
+    "consumes": [
+      "PATTERNS_FOUND"
+    ]
   },
   {
     "id": "detect_anomaly_patterns",
@@ -1260,10 +1475,19 @@
         },
         "confidence": {
           "type": "number"
+        },
+        "networkId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "anomaly_pattern_alert"
+    "isoEvent": "anomaly_pattern_alert",
+    "produces": [
+      "PATTERNS_FOUND"
+    ],
+    "consumes": [
+      "PACKETS_INSPECTED"
+    ]
   },
   {
     "id": "simulate_attack_scenarios",
@@ -1307,10 +1531,25 @@
         },
         "riskReduction": {
           "type": "number"
+        },
+        "targetZone": {
+          "type": "string"
+        },
+        "segmentationPolicy": {
+          "type": "string",
+          "enum": [
+            "isolate",
+            "restrict",
+            "monitor"
+          ]
         }
       }
     },
-    "isoEvent": "attack_simulation_report"
+    "isoEvent": "attack_simulation_report",
+    "produces": [
+      "VULNERABILITIES_FOUND"
+    ],
+    "consumes": []
   },
   {
     "id": "generate_security_strategy",
@@ -1359,10 +1598,25 @@
           "items": {
             "type": "string"
           }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "deviceId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "security_strategy_update"
+    "isoEvent": "security_strategy_update",
+    "produces": [
+      "STRATEGY_GENERATED"
+    ],
+    "consumes": [
+      "RISK_ANALYZED"
+    ]
   },
   {
     "id": "detect_network_anomalies_local",
@@ -1412,10 +1666,23 @@
             "HIGH",
             "CRITICAL"
           ]
+        },
+        "ipAddress": {
+          "type": "string"
+        },
+        "deviceId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "local_network_anomaly"
+    "isoEvent": "local_network_anomaly",
+    "produces": [
+      "ANOMALY_DETECTED",
+      "DEVICE_COMPROMISE_SUSPECTED"
+    ],
+    "consumes": [
+      "TRAFFIC_CAPTURED"
+    ]
   },
   {
     "id": "block_ip",
@@ -1458,7 +1725,11 @@
         }
       }
     },
-    "isoEvent": "ip_block_action"
+    "isoEvent": "ip_block_action",
+    "produces": [],
+    "consumes": [
+      "ANOMALY_DETECTED"
+    ]
   },
   {
     "id": "segment_network",
@@ -1502,7 +1773,11 @@
         }
       }
     },
-    "isoEvent": "network_segmentation_event"
+    "isoEvent": "network_segmentation_event",
+    "produces": [],
+    "consumes": [
+      "VULNERABILITIES_FOUND"
+    ]
   },
   {
     "id": "apply_segmentation",
@@ -1544,7 +1819,11 @@
         }
       }
     },
-    "isoEvent": "segmentation_applied"
+    "isoEvent": "segmentation_applied",
+    "produces": [],
+    "consumes": [
+      "STRATEGY_GENERATED"
+    ]
   },
   {
     "id": "monitor_ot_network",
@@ -1584,10 +1863,17 @@
         },
         "newDevicesDetected": {
           "type": "integer"
+        },
+        "interfaceId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "ot_network_monitor_alert"
+    "isoEvent": "ot_network_monitor_alert",
+    "produces": [
+      "TRAFFIC_CAPTURED"
+    ],
+    "consumes": []
   },
   {
     "id": "isolate_device",
@@ -1634,7 +1920,11 @@
         }
       }
     },
-    "isoEvent": "device_isolation_action"
+    "isoEvent": "device_isolation_action",
+    "produces": [],
+    "consumes": [
+      "DEVICE_COMPROMISE_SUSPECTED"
+    ]
   },
   {
     "id": "inspect_gateway_traffic",
@@ -1674,10 +1964,20 @@
         },
         "blockedConnections": {
           "type": "integer"
+        },
+        "trafficLogs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     },
-    "isoEvent": "gateway_traffic_inspection"
+    "isoEvent": "gateway_traffic_inspection",
+    "produces": [
+      "PACKETS_INSPECTED"
+    ],
+    "consumes": []
   },
   {
     "id": "inspect_product_quality",
@@ -1731,10 +2031,28 @@
         },
         "boundingBox": {
           "type": "object"
+        },
+        "productType": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "create",
+            "update",
+            "close",
+            "list"
+          ]
         }
       }
     },
-    "isoEvent": "product_quality_inspection"
+    "isoEvent": "product_quality_inspection",
+    "produces": [
+      "DEFECT_FOUND"
+    ],
+    "consumes": [
+      "FRAME_CAPTURED"
+    ]
   },
   {
     "id": "count_items_on_conveyor",
@@ -1774,7 +2092,11 @@
         }
       }
     },
-    "isoEvent": "conveyor_count_event"
+    "isoEvent": "conveyor_count_event",
+    "produces": [],
+    "consumes": [
+      "CONVEYOR_FRAME"
+    ]
   },
   {
     "id": "detect_safety_violations",
@@ -1825,7 +2147,11 @@
         }
       }
     },
-    "isoEvent": "safety_violation_detected"
+    "isoEvent": "safety_violation_detected",
+    "produces": [],
+    "consumes": [
+      "FRAME_CAPTURED"
+    ]
   },
   {
     "id": "monitor_worker_posture",
@@ -1873,7 +2199,9 @@
         }
       }
     },
-    "isoEvent": "worker_posture_alert"
+    "isoEvent": "worker_posture_alert",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "capture_video_stream",
@@ -1925,10 +2253,24 @@
         },
         "sizeKb": {
           "type": "number"
+        },
+        "cameraId": {
+          "type": "string"
+        },
+        "productType": {
+          "type": "string"
+        },
+        "zone": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "video_stream_capture"
+    "isoEvent": "video_stream_capture",
+    "produces": [
+      "FRAME_CAPTURED",
+      "CONVEYOR_FRAME"
+    ],
+    "consumes": []
   },
   {
     "id": "train_vision_model",
@@ -1973,7 +2315,13 @@
         }
       }
     },
-    "isoEvent": "vision_model_trained"
+    "isoEvent": "vision_model_trained",
+    "produces": [
+      "MODEL_TRAINED"
+    ],
+    "consumes": [
+      "PATTERN_ANALYSIS_COMPLETE"
+    ]
   },
   {
     "id": "improve_detection_model",
@@ -2011,7 +2359,11 @@
         }
       }
     },
-    "isoEvent": "detection_model_improved"
+    "isoEvent": "detection_model_improved",
+    "produces": [],
+    "consumes": [
+      "MODEL_TRAINED"
+    ]
   },
   {
     "id": "analyze_visual_patterns",
@@ -2058,10 +2410,19 @@
           "items": {
             "type": "string"
           }
+        },
+        "datasetId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "visual_pattern_analysis"
+    "isoEvent": "visual_pattern_analysis",
+    "produces": [
+      "PATTERN_ANALYSIS_COMPLETE"
+    ],
+    "consumes": [
+      "DEFECT_FOUND"
+    ]
   },
   {
     "id": "predict_demand_industrial",
@@ -2100,7 +2461,9 @@
         }
       }
     },
-    "isoEvent": "demand_forecast_alert"
+    "isoEvent": "demand_forecast_alert",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "optimize_production_sequence",
@@ -2145,7 +2508,11 @@
         }
       }
     },
-    "isoEvent": "sequence_optimization_result"
+    "isoEvent": "sequence_optimization_result",
+    "produces": [],
+    "consumes": [
+      "DEVIATION_DETECTED"
+    ]
   },
   {
     "id": "detect_process_deviation",
@@ -2186,10 +2553,28 @@
         },
         "cpkValue": {
           "type": "number"
+        },
+        "jobs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "machines": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     },
-    "isoEvent": "process_deviation_detected"
+    "isoEvent": "process_deviation_detected",
+    "produces": [
+      "DEVIATION_DETECTED"
+    ],
+    "consumes": [
+      "ANOMALY_CONFIRMED"
+    ]
   },
   {
     "id": "predict_machine_failure",
@@ -2245,10 +2630,19 @@
         },
         "recommendedAction": {
           "type": "string"
+        },
+        "assetId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "machine_failure_prediction"
+    "isoEvent": "machine_failure_prediction",
+    "produces": [
+      "FAILURE_PREDICTED"
+    ],
+    "consumes": [
+      "VIBRATION_PATTERN_ANALYZED"
+    ]
   },
   {
     "id": "analyze_vibration_patterns",
@@ -2300,10 +2694,25 @@
             "alert",
             "danger"
           ]
+        },
+        "assetId": {
+          "type": "string"
+        },
+        "sensorReadings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     },
-    "isoEvent": "vibration_pattern_alert"
+    "isoEvent": "vibration_pattern_alert",
+    "produces": [
+      "VIBRATION_PATTERN_ANALYZED"
+    ],
+    "consumes": [
+      "VIBRATION_SAMPLES_READY"
+    ]
   },
   {
     "id": "optimize_energy_usage",
@@ -2347,7 +2756,9 @@
         }
       }
     },
-    "isoEvent": "energy_usage_optimized"
+    "isoEvent": "energy_usage_optimized",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "identify_bottlenecks",
@@ -2401,7 +2812,9 @@
         }
       }
     },
-    "isoEvent": "bottleneck_identified"
+    "isoEvent": "bottleneck_identified",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "generate_digital_twin_model",
@@ -2442,7 +2855,11 @@
         }
       }
     },
-    "isoEvent": "twin_model_generated"
+    "isoEvent": "twin_model_generated",
+    "produces": [],
+    "consumes": [
+      "FAILURE_PREDICTED"
+    ]
   },
   {
     "id": "collect_vibration_data",
@@ -2489,10 +2906,35 @@
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "assetId": {
+          "type": "string"
+        },
+        "vibrationData": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "modelId": {
+          "type": "string"
+        },
+        "inputTensor": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "cloudUnavailable": {
+          "type": "boolean"
         }
       }
     },
-    "isoEvent": "vibration_data_collected"
+    "isoEvent": "vibration_data_collected",
+    "produces": [
+      "VIBRATION_SAMPLES_READY"
+    ],
+    "consumes": []
   },
   {
     "id": "collect_process_signals",
@@ -2552,10 +2994,20 @@
               }
             }
           }
+        },
+        "signalId": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "process_signal_collected"
+    "isoEvent": "process_signal_collected",
+    "produces": [
+      "SIGNALS_READY"
+    ],
+    "consumes": []
   },
   {
     "id": "run_local_inference",
@@ -2608,7 +3060,11 @@
         }
       }
     },
-    "isoEvent": "local_inference_result"
+    "isoEvent": "local_inference_result",
+    "produces": [],
+    "consumes": [
+      "VIBRATION_SAMPLES_READY"
+    ]
   },
   {
     "id": "detect_real_time_anomalies",
@@ -2657,10 +3113,19 @@
             "HIGH",
             "CRITICAL"
           ]
+        },
+        "processId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "realtime_anomaly_detected"
+    "isoEvent": "realtime_anomaly_detected",
+    "produces": [
+      "ANOMALY_CONFIRMED"
+    ],
+    "consumes": [
+      "SIGNALS_READY"
+    ]
   },
   {
     "id": "orchestrate_edge_nodes",
@@ -2703,10 +3168,20 @@
             "degraded",
             "critical"
           ]
+        },
+        "fleetId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "edge_orchestration_event"
+    "isoEvent": "edge_orchestration_event",
+    "produces": [
+      "NODE_STATUS_REPORT"
+    ],
+    "consumes": [
+      "SIGNAL_DIGITIZED",
+      "DEVICE_STATE_CHANGED"
+    ]
   },
   {
     "id": "manage_edge_devices",
@@ -2751,10 +3226,20 @@
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "clusterName": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "edge_device_management"
+    "isoEvent": "edge_device_management",
+    "produces": [
+      "DEVICE_STATE_CHANGED"
+    ],
+    "consumes": []
   },
   {
     "id": "collect_sensor_data",
@@ -2797,10 +3282,39 @@
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "channelId": {
+          "type": "string"
+        },
+        "signalType": {
+          "type": "string",
+          "enum": [
+            "4-20mA",
+            "0-10V",
+            "0-5V",
+            "thermocouple"
+          ]
+        },
+        "twinId": {
+          "type": "string"
+        },
+        "sensorReadings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "twinEnabled": {
+          "type": "boolean"
         }
       }
     },
-    "isoEvent": "sensor_data_collected"
+    "isoEvent": "sensor_data_collected",
+    "produces": [
+      "ANALOG_DATA_BUFFERED",
+      "SENSOR_DATA_READY"
+    ],
+    "consumes": []
   },
   {
     "id": "digitize_analog_signals",
@@ -2855,10 +3369,19 @@
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "clusterName": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "analog_digitization_event"
+    "isoEvent": "analog_digitization_event",
+    "produces": [
+      "SIGNAL_DIGITIZED"
+    ],
+    "consumes": [
+      "ANALOG_DATA_BUFFERED"
+    ]
   },
   {
     "id": "monitor_energy_consumption",
@@ -2904,10 +3427,32 @@
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "deviceId": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "value": {},
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "opc-ua",
+            "modbus-tcp",
+            "modbus-rtu"
+          ]
+        },
+        "peakDemand": {
+          "type": "boolean"
         }
       }
     },
-    "isoEvent": "energy_consumption_monitored"
+    "isoEvent": "energy_consumption_monitored",
+    "produces": [
+      "PEAK_DEMAND_DETECTED"
+    ],
+    "consumes": []
   },
   {
     "id": "execute_local_control_action",
@@ -2962,7 +3507,11 @@
         }
       }
     },
-    "isoEvent": "local_control_action"
+    "isoEvent": "local_control_action",
+    "produces": [],
+    "consumes": [
+      "PEAK_DEMAND_DETECTED"
+    ]
   },
   {
     "id": "deploy_edge_configuration",
@@ -3009,10 +3558,25 @@
         },
         "rollbackAvailable": {
           "type": "boolean"
+        },
+        "agentId": {
+          "type": "string"
+        },
+        "targetVersion": {
+          "type": "string"
+        },
+        "agentUpdateRequired": {
+          "type": "boolean"
         }
       }
     },
-    "isoEvent": "edge_config_deployed"
+    "isoEvent": "edge_config_deployed",
+    "produces": [
+      "CONFIG_DEPLOYED"
+    ],
+    "consumes": [
+      "NEW_DEVICE_REGISTERED"
+    ]
   },
   {
     "id": "update_edge_agents",
@@ -3054,7 +3618,11 @@
         }
       }
     },
-    "isoEvent": "edge_agent_updated"
+    "isoEvent": "edge_agent_updated",
+    "produces": [],
+    "consumes": [
+      "CONFIG_DEPLOYED"
+    ]
   },
   {
     "id": "monitor_edge_health",
@@ -3096,10 +3664,25 @@
           "items": {
             "type": "object"
           }
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "list",
+            "register",
+            "update",
+            "deregister"
+          ]
         }
       }
     },
-    "isoEvent": "edge_health_status"
+    "isoEvent": "edge_health_status",
+    "produces": [
+      "HEALTH_REPORT_READY"
+    ],
+    "consumes": [
+      "NODE_STATUS_REPORT"
+    ]
   },
   {
     "id": "manage_device_registry",
@@ -3143,10 +3726,46 @@
         },
         "operationResult": {
           "type": "string"
+        },
+        "configId": {
+          "type": "string"
+        },
+        "targetDevices": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "operation": {
+          "type": "string"
+        },
+        "gaugeId": {
+          "type": "string"
+        },
+        "studyType": {
+          "type": "string",
+          "enum": [
+            "gage_rr",
+            "linearity",
+            "bias",
+            "stability"
+          ]
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     },
-    "isoEvent": "device_registry_update"
+    "isoEvent": "device_registry_update",
+    "produces": [
+      "NEW_DEVICE_REGISTERED"
+    ],
+    "consumes": [
+      "HEALTH_REPORT_READY"
+    ]
   },
   {
     "id": "simulate_bottlenecks",
@@ -3185,7 +3804,11 @@
         }
       }
     },
-    "isoEvent": "bottleneck_simulation"
+    "isoEvent": "bottleneck_simulation",
+    "produces": [],
+    "consumes": [
+      "IDLE_PATTERN_DETECTED"
+    ]
   },
   {
     "id": "optimize_production_flow",
@@ -3227,10 +3850,28 @@
         },
         "wipReduction": {
           "type": "number"
+        },
+        "machineId": {
+          "type": "string"
+        },
+        "adjustments": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "oeeDelta": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "production_flow_optimized"
+    "isoEvent": "production_flow_optimized",
+    "produces": [
+      "FLOW_OPTIMIZED"
+    ],
+    "consumes": [
+      "IDLE_TIME_DETECTED"
+    ]
   },
   {
     "id": "plan_production_automatically",
@@ -3283,7 +3924,11 @@
         }
       }
     },
-    "isoEvent": "production_plan_generated"
+    "isoEvent": "production_plan_generated",
+    "produces": [],
+    "consumes": [
+      "PATTERNS_IDENTIFIED"
+    ]
   },
   {
     "id": "identify_idle_time_patterns",
@@ -3325,10 +3970,25 @@
         },
         "totalIdleTimeHours": {
           "type": "number"
+        },
+        "plantId": {
+          "type": "string"
+        },
+        "horizon": {
+          "type": "string",
+          "enum": [
+            "day",
+            "week",
+            "month"
+          ]
         }
       }
     },
-    "isoEvent": "idle_time_pattern_alert"
+    "isoEvent": "idle_time_pattern_alert",
+    "produces": [
+      "PATTERNS_IDENTIFIED"
+    ],
+    "consumes": []
   },
   {
     "id": "collect_production_data",
@@ -3373,10 +4033,17 @@
         },
         "shiftId": {
           "type": "string"
+        },
+        "machineId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "production_data_collected"
+    "isoEvent": "production_data_collected",
+    "produces": [
+      "PRODUCTION_DATA_CAPTURED"
+    ],
+    "consumes": []
   },
   {
     "id": "track_machine_state",
@@ -3422,7 +4089,13 @@
         }
       }
     },
-    "isoEvent": "machine_state_change"
+    "isoEvent": "machine_state_change",
+    "produces": [
+      "MACHINE_STATE_UPDATED"
+    ],
+    "consumes": [
+      "PRODUCTION_DATA_CAPTURED"
+    ]
   },
   {
     "id": "detect_idle_time",
@@ -3465,10 +4138,32 @@
             "planned_stop",
             "unknown"
           ]
+        },
+        "lineId": {
+          "type": "string"
+        },
+        "productionOrders": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "scenario": {
+          "type": "object"
+        },
+        "idleCount": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "idle_time_detected"
+    "isoEvent": "idle_time_detected",
+    "produces": [
+      "IDLE_TIME_DETECTED",
+      "IDLE_PATTERN_DETECTED"
+    ],
+    "consumes": [
+      "MACHINE_STATE_UPDATED"
+    ]
   },
   {
     "id": "execute_production_adjustment",
@@ -3511,7 +4206,11 @@
         }
       }
     },
-    "isoEvent": "production_adjustment_applied"
+    "isoEvent": "production_adjustment_applied",
+    "produces": [],
+    "consumes": [
+      "FLOW_OPTIMIZED"
+    ]
   },
   {
     "id": "generate_digital_twin",
@@ -3558,10 +4257,22 @@
         },
         "fidelityScore": {
           "type": "number"
+        },
+        "scenarios": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     },
-    "isoEvent": "digital_twin_created"
+    "isoEvent": "digital_twin_created",
+    "produces": [
+      "TWIN_READY"
+    ],
+    "consumes": [
+      "TWIN_DATA_UPDATED"
+    ]
   },
   {
     "id": "simulate_operations",
@@ -3607,10 +4318,28 @@
         },
         "projectedImprovement": {
           "type": "number"
+        },
+        "twinId": {
+          "type": "string"
+        },
+        "optimizationObjective": {
+          "type": "string",
+          "enum": [
+            "throughput",
+            "quality",
+            "energy",
+            "cost"
+          ]
         }
       }
     },
-    "isoEvent": "twin_simulation_result"
+    "isoEvent": "twin_simulation_result",
+    "produces": [
+      "SIMULATION_COMPLETE"
+    ],
+    "consumes": [
+      "TWIN_READY"
+    ]
   },
   {
     "id": "optimize_system_performance",
@@ -3658,7 +4387,11 @@
         }
       }
     },
-    "isoEvent": "system_performance_optimized"
+    "isoEvent": "system_performance_optimized",
+    "produces": [],
+    "consumes": [
+      "SIMULATION_COMPLETE"
+    ]
   },
   {
     "id": "feed_real_time_data_to_twin",
@@ -3706,10 +4439,28 @@
             "buffering",
             "error"
           ]
+        },
+        "assetId": {
+          "type": "string"
+        },
+        "assetType": {
+          "type": "string",
+          "enum": [
+            "machine",
+            "line",
+            "plant",
+            "process"
+          ]
         }
       }
     },
-    "isoEvent": "twin_data_feed_event"
+    "isoEvent": "twin_data_feed_event",
+    "produces": [
+      "TWIN_DATA_UPDATED"
+    ],
+    "consumes": [
+      "SENSOR_DATA_READY"
+    ]
   },
   {
     "id": "manage_work_orders",
@@ -3772,10 +4523,28 @@
         },
         "estimatedCompletionHours": {
           "type": "number"
+        },
+        "partId": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "query",
+            "reserve",
+            "consume",
+            "reorder"
+          ]
         }
       }
     },
-    "isoEvent": "work_order_event"
+    "isoEvent": "work_order_event",
+    "produces": [
+      "WORK_ORDER_APPROVED"
+    ],
+    "consumes": [
+      "CONDITION_DEGRADED"
+    ]
   },
   {
     "id": "schedule_preventive_maintenance",
@@ -3836,7 +4605,12 @@
         }
       }
     },
-    "isoEvent": "preventive_maint_scheduled"
+    "isoEvent": "preventive_maint_scheduled",
+    "produces": [],
+    "consumes": [
+      "RELIABILITY_DATA_UPDATED",
+      "FMEA_CRITICAL_FOUND"
+    ]
   },
   {
     "id": "calculate_mtbf_mttr",
@@ -3887,10 +4661,17 @@
             "stable",
             "degrading"
           ]
+        },
+        "assetId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "reliability_metrics_alert"
+    "isoEvent": "reliability_metrics_alert",
+    "produces": [
+      "RELIABILITY_DATA_UPDATED"
+    ],
+    "consumes": []
   },
   {
     "id": "analyze_failure_modes",
@@ -3957,10 +4738,26 @@
         },
         "maintenanceStrategy": {
           "type": "string"
+        },
+        "assetId": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "create",
+            "update",
+            "close",
+            "list"
+          ]
         }
       }
     },
-    "isoEvent": "fmea_analysis_result"
+    "isoEvent": "fmea_analysis_result",
+    "produces": [
+      "FMEA_CRITICAL_FOUND"
+    ],
+    "consumes": []
   },
   {
     "id": "manage_spare_parts",
@@ -4017,7 +4814,11 @@
         }
       }
     },
-    "isoEvent": "spare_parts_status"
+    "isoEvent": "spare_parts_status",
+    "produces": [],
+    "consumes": [
+      "WORK_ORDER_APPROVED"
+    ]
   },
   {
     "id": "track_asset_lifecycle",
@@ -4076,7 +4877,11 @@
         }
       }
     },
-    "isoEvent": "asset_lifecycle_event"
+    "isoEvent": "asset_lifecycle_event",
+    "produces": [],
+    "consumes": [
+      "MAINTENANCE_KPIS_READY"
+    ]
   },
   {
     "id": "execute_condition_monitoring",
@@ -4152,10 +4957,23 @@
             "inspect",
             "repair_now"
           ]
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "create",
+            "update",
+            "close",
+            "list"
+          ]
         }
       }
     },
-    "isoEvent": "condition_monitoring_alert"
+    "isoEvent": "condition_monitoring_alert",
+    "produces": [
+      "CONDITION_DEGRADED"
+    ],
+    "consumes": []
   },
   {
     "id": "generate_maintenance_kpis",
@@ -4209,10 +5027,17 @@
           "items": {
             "type": "string"
           }
+        },
+        "assetId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "maintenance_kpi_report"
+    "isoEvent": "maintenance_kpi_report",
+    "produces": [
+      "MAINTENANCE_KPIS_READY"
+    ],
+    "consumes": []
   },
   {
     "id": "monitor_scada_tags",
@@ -4279,10 +5104,41 @@
               }
             }
           }
+        },
+        "loopId": {
+          "type": "string"
+        },
+        "setpoint": {
+          "type": "number"
+        },
+        "quality": {
+          "type": "string"
+        },
+        "tagId": {
+          "type": "string"
+        },
+        "alarmType": {
+          "type": "string",
+          "enum": [
+            "HIHI",
+            "HI",
+            "LO",
+            "LOLO",
+            "deviation",
+            "rate_of_change"
+          ]
+        },
+        "value": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "scada_tag_alarm"
+    "isoEvent": "scada_tag_alarm",
+    "produces": [
+      "PROCESS_VARIABLE_UPDATED",
+      "TAG_LIMIT_EXCEEDED"
+    ],
+    "consumes": []
   },
   {
     "id": "execute_pid_control",
@@ -4345,10 +5201,22 @@
         },
         "isSteadyState": {
           "type": "boolean"
+        },
+        "tagIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
-    "isoEvent": "pid_control_action"
+    "isoEvent": "pid_control_action",
+    "produces": [
+      "PID_OUTPUT_UPDATED"
+    ],
+    "consumes": [
+      "PROCESS_VARIABLE_UPDATED"
+    ]
   },
   {
     "id": "manage_setpoints",
@@ -4403,7 +5271,9 @@
         }
       }
     },
-    "isoEvent": "setpoint_change_event"
+    "isoEvent": "setpoint_change_event",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "trigger_process_alarm",
@@ -4467,10 +5337,28 @@
         },
         "notificationSent": {
           "type": "boolean"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "acknowledge",
+            "shelve",
+            "suppress",
+            "unshelve"
+          ]
+        },
+        "operatorId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "process_alarm_triggered"
+    "isoEvent": "process_alarm_triggered",
+    "produces": [
+      "ALARM_ACTIVATED"
+    ],
+    "consumes": [
+      "TAG_LIMIT_EXCEEDED"
+    ]
   },
   {
     "id": "log_process_historian",
@@ -4521,10 +5409,19 @@
         "oldestRecordTimestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "loopId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "historian_log_entry"
+    "isoEvent": "historian_log_entry",
+    "produces": [
+      "HISTORIAN_BATCH_READY"
+    ],
+    "consumes": [
+      "PID_OUTPUT_UPDATED"
+    ]
   },
   {
     "id": "run_batch_sequence",
@@ -4585,7 +5482,9 @@
         }
       }
     },
-    "isoEvent": "batch_sequence_event"
+    "isoEvent": "batch_sequence_event",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "acknowledge_alarm",
@@ -4644,7 +5543,11 @@
         }
       }
     },
-    "isoEvent": "alarm_acknowledged"
+    "isoEvent": "alarm_acknowledged",
+    "produces": [],
+    "consumes": [
+      "ALARM_ACTIVATED"
+    ]
   },
   {
     "id": "analyze_control_loop_performance",
@@ -4711,7 +5614,11 @@
         }
       }
     },
-    "isoEvent": "control_loop_analysis"
+    "isoEvent": "control_loop_analysis",
+    "produces": [],
+    "consumes": [
+      "HISTORIAN_BATCH_READY"
+    ]
   },
   {
     "id": "calculate_control_charts",
@@ -4782,10 +5689,20 @@
         },
         "inControl": {
           "type": "boolean"
+        },
+        "chartId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "control_chart_generated"
+    "isoEvent": "control_chart_generated",
+    "produces": [
+      "CHART_POINTS_UPDATED"
+    ],
+    "consumes": [
+      "MEASUREMENTS_CAPTURED",
+      "MSA_VALIDATED"
+    ]
   },
   {
     "id": "detect_out_of_control_signals",
@@ -4859,10 +5776,25 @@
               }
             }
           }
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "create",
+            "update",
+            "close",
+            "list"
+          ]
         }
       }
     },
-    "isoEvent": "out_of_control_signal"
+    "isoEvent": "out_of_control_signal",
+    "produces": [
+      "OUT_OF_CONTROL_DETECTED"
+    ],
+    "consumes": [
+      "CHART_POINTS_UPDATED"
+    ]
   },
   {
     "id": "manage_nonconformances",
@@ -4937,10 +5869,21 @@
         },
         "estimatedCost": {
           "type": "number"
+        },
+        "severity": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "nonconformance_registered"
+    "isoEvent": "nonconformance_registered",
+    "produces": [
+      "NC_REQUIRES_8D"
+    ],
+    "consumes": [
+      "OUT_OF_CONTROL_DETECTED",
+      "DEFECT_FOUND",
+      "FMEA_CRITICAL_FOUND"
+    ]
   },
   {
     "id": "generate_8d_report",
@@ -5004,10 +5947,30 @@
         },
         "pdfUrl": {
           "type": "string"
+        },
+        "targetType": {
+          "type": "string",
+          "enum": [
+            "lead",
+            "supplier",
+            "order"
+          ]
+        },
+        "targetIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
-    "isoEvent": "8d_report_issued"
+    "isoEvent": "8d_report_issued",
+    "produces": [
+      "8D_REPORT_ISSUED"
+    ],
+    "consumes": [
+      "NC_REQUIRES_8D"
+    ]
   },
   {
     "id": "calculate_cpk_ppk",
@@ -5071,10 +6034,27 @@
             "marginal",
             "not_capable"
           ]
+        },
+        "partId": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "get",
+            "create",
+            "update"
+          ]
         }
       }
     },
-    "isoEvent": "capability_index_alert"
+    "isoEvent": "capability_index_alert",
+    "produces": [
+      "CAPABILITY_BELOW_TARGET"
+    ],
+    "consumes": [
+      "MEASUREMENTS_CAPTURED"
+    ]
   },
   {
     "id": "manage_product_specs",
@@ -5141,10 +6121,19 @@
               }
             }
           }
+        },
+        "inspectionPlanId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "product_spec_update"
+    "isoEvent": "product_spec_update",
+    "produces": [
+      "PRODUCT_SPEC_UPDATED"
+    ],
+    "consumes": [
+      "CAPABILITY_BELOW_TARGET"
+    ]
   },
   {
     "id": "run_msa_analysis",
@@ -5212,10 +6201,37 @@
             "marginal",
             "unacceptable"
           ]
+        },
+        "characteristicId": {
+          "type": "string"
+        },
+        "chartType": {
+          "type": "string",
+          "enum": [
+            "xbar_r",
+            "xbar_s",
+            "imr",
+            "p",
+            "np",
+            "c",
+            "u"
+          ]
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
         }
       }
     },
-    "isoEvent": "msa_analysis_result"
+    "isoEvent": "msa_analysis_result",
+    "produces": [
+      "MSA_VALIDATED"
+    ],
+    "consumes": [
+      "NEW_DEVICE_REGISTERED"
+    ]
   },
   {
     "id": "collect_quality_measurements",
@@ -5261,21 +6277,7 @@
         "measurements": {
           "type": "array",
           "items": {
-            "type": "object",
-            "properties": {
-              "characteristicId": {
-                "type": "string"
-              },
-              "value": {
-                "type": "number"
-              },
-              "withinSpec": {
-                "type": "boolean"
-              },
-              "timestamp": {
-                "type": "string"
-              }
-            }
+            "type": "number"
           }
         },
         "passFailResult": {
@@ -5288,10 +6290,37 @@
         },
         "defectsFound": {
           "type": "integer"
+        },
+        "characteristicId": {
+          "type": "string"
+        },
+        "chartType": {
+          "type": "string",
+          "enum": [
+            "xbar_r",
+            "xbar_s",
+            "imr",
+            "p",
+            "np",
+            "c",
+            "u"
+          ]
+        },
+        "usl": {
+          "type": "number"
+        },
+        "lsl": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "quality_measurement_data"
+    "isoEvent": "quality_measurement_data",
+    "produces": [
+      "MEASUREMENTS_CAPTURED"
+    ],
+    "consumes": [
+      "PRODUCT_SPEC_UPDATED"
+    ]
   },
   {
     "id": "monitor_energy_meters",
@@ -5361,10 +6390,20 @@
         },
         "powerFactor": {
           "type": "number"
+        },
+        "plantId": {
+          "type": "string"
+        },
+        "productionUnits": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "energy_meter_reading"
+    "isoEvent": "energy_meter_reading",
+    "produces": [
+      "ENERGY_READING_AVAILABLE"
+    ],
+    "consumes": []
   },
   {
     "id": "calculate_energy_kpis",
@@ -5422,10 +6461,28 @@
             "stable",
             "degrading"
           ]
+        },
+        "plantId": {
+          "type": "string"
+        },
+        "periodDays": {
+          "type": "integer",
+          "default": 365
+        },
+        "reportPeriod": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "energy_kpi_report"
+    "isoEvent": "energy_kpi_report",
+    "produces": [
+      "ENPI_CALCULATED",
+      "CONSUMPTION_DATA_READY",
+      "ENPI_PERIOD_CLOSED"
+    ],
+    "consumes": [
+      "ENERGY_READING_AVAILABLE"
+    ]
   },
   {
     "id": "detect_energy_waste",
@@ -5488,10 +6545,19 @@
         },
         "totalSavingsOpportunity": {
           "type": "number"
+        },
+        "plantId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "energy_waste_detected"
+    "isoEvent": "energy_waste_detected",
+    "produces": [
+      "ENERGY_WASTE_FOUND"
+    ],
+    "consumes": [
+      "ENPI_CALCULATED"
+    ]
   },
   {
     "id": "optimize_energy_loads",
@@ -5547,7 +6613,11 @@
         }
       }
     },
-    "isoEvent": "energy_load_optimization"
+    "isoEvent": "energy_load_optimization",
+    "produces": [],
+    "consumes": [
+      "ENERGY_WASTE_FOUND"
+    ]
   },
   {
     "id": "calculate_carbon_footprint",
@@ -5608,7 +6678,11 @@
         }
       }
     },
-    "isoEvent": "carbon_footprint_report"
+    "isoEvent": "carbon_footprint_report",
+    "produces": [],
+    "consumes": [
+      "CONSUMPTION_DATA_READY"
+    ]
   },
   {
     "id": "generate_iso50001_report",
@@ -5668,7 +6742,11 @@
         }
       }
     },
-    "isoEvent": "iso50001_audit_report"
+    "isoEvent": "iso50001_audit_report",
+    "produces": [],
+    "consumes": [
+      "ENPI_PERIOD_CLOSED"
+    ]
   },
   {
     "id": "benchmark_energy_performance",
@@ -5733,7 +6811,9 @@
         }
       }
     },
-    "isoEvent": "energy_benchmark_result"
+    "isoEvent": "energy_benchmark_result",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "schedule_energy_audit",
@@ -5797,7 +6877,9 @@
         }
       }
     },
-    "isoEvent": "energy_audit_scheduled"
+    "isoEvent": "energy_audit_scheduled",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "monitor_gas_sensors",
@@ -5885,10 +6967,43 @@
           "items": {
             "type": "string"
           }
+        },
+        "incidentType": {
+          "type": "string",
+          "enum": [
+            "accident",
+            "near_miss",
+            "unsafe_condition",
+            "environmental",
+            "property_damage"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "first_aid",
+            "medical_treatment",
+            "lost_time",
+            "fatality",
+            "property_damage"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "reportedBy": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "gas_sensor_alert"
+    "isoEvent": "gas_sensor_alert",
+    "produces": [
+      "GAS_ALARM_TRIGGERED"
+    ],
+    "consumes": []
   },
   {
     "id": "report_safety_incident",
@@ -5961,10 +7076,25 @@
         },
         "investigationRequired": {
           "type": "boolean"
+        },
+        "methodology": {
+          "type": "string",
+          "enum": [
+            "5_whys",
+            "cause_tree",
+            "bow_tie",
+            "taproot"
+          ]
         }
       }
     },
-    "isoEvent": "safety_incident_report"
+    "isoEvent": "safety_incident_report",
+    "produces": [
+      "INCIDENT_REPORTED"
+    ],
+    "consumes": [
+      "GAS_ALARM_TRIGGERED"
+    ]
   },
   {
     "id": "investigate_root_cause_hse",
@@ -6035,10 +7165,19 @@
             "medium",
             "high"
           ]
+        },
+        "processNodeId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "hse_root_cause_finding"
+    "isoEvent": "hse_root_cause_finding",
+    "produces": [
+      "ROOT_CAUSE_SYSTEMIC"
+    ],
+    "consumes": [
+      "INCIDENT_REPORTED"
+    ]
   },
   {
     "id": "run_hazop_analysis",
@@ -6122,10 +7261,27 @@
         },
         "unacceptableRisks": {
           "type": "integer"
+        },
+        "hazardId": {
+          "type": "string"
+        },
+        "frequencyOfHazard": {
+          "type": "number",
+          "description": "events per year"
+        },
+        "probabilityOfHarm": {
+          "type": "number",
+          "description": "0-1"
         }
       }
     },
-    "isoEvent": "hazop_analysis_result"
+    "isoEvent": "hazop_analysis_result",
+    "produces": [
+      "HAZOP_UNACCEPTABLE_RISK"
+    ],
+    "consumes": [
+      "ROOT_CAUSE_SYSTEMIC"
+    ]
   },
   {
     "id": "calculate_sil_level",
@@ -6186,7 +7342,11 @@
         }
       }
     },
-    "isoEvent": "sil_assessment_result"
+    "isoEvent": "sil_assessment_result",
+    "produces": [],
+    "consumes": [
+      "HAZOP_UNACCEPTABLE_RISK"
+    ]
   },
   {
     "id": "manage_work_permits",
@@ -6260,10 +7420,17 @@
           "items": {
             "type": "string"
           }
+        },
+        "plantId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "work_permit_event"
+    "isoEvent": "work_permit_event",
+    "produces": [
+      "PERMIT_CLOSED"
+    ],
+    "consumes": []
   },
   {
     "id": "track_safety_kpis",
@@ -6317,7 +7484,11 @@
         }
       }
     },
-    "isoEvent": "safety_kpi_report"
+    "isoEvent": "safety_kpi_report",
+    "produces": [],
+    "consumes": [
+      "PERMIT_CLOSED"
+    ]
   },
   {
     "id": "schedule_safety_drills",
@@ -6381,7 +7552,9 @@
         }
       }
     },
-    "isoEvent": "safety_drill_scheduled"
+    "isoEvent": "safety_drill_scheduled",
+    "produces": [],
+    "consumes": []
   },
   {
     "id": "track_shipments",
@@ -6449,10 +7622,20 @@
               }
             }
           }
+        },
+        "supplierId": {
+          "type": "string"
+        },
+        "delayDays": {
+          "type": "number"
         }
       }
     },
-    "isoEvent": "shipment_tracking_update"
+    "isoEvent": "shipment_tracking_update",
+    "produces": [
+      "SHIPMENT_DELAYED"
+    ],
+    "consumes": []
   },
   {
     "id": "optimize_delivery_routes",
@@ -6514,7 +7697,11 @@
         }
       }
     },
-    "isoEvent": "route_optimization_result"
+    "isoEvent": "route_optimization_result",
+    "produces": [],
+    "consumes": [
+      "DISRUPTION_RISK_HIGH"
+    ]
   },
   {
     "id": "predict_supply_disruptions",
@@ -6577,10 +7764,25 @@
           "items": {
             "type": "string"
           }
+        },
+        "depotId": {
+          "type": "string"
+        },
+        "deliveryPoints": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     },
-    "isoEvent": "supply_disruption_alert"
+    "isoEvent": "supply_disruption_alert",
+    "produces": [
+      "DISRUPTION_RISK_HIGH"
+    ],
+    "consumes": [
+      "SHIPMENT_DELAYED"
+    ]
   },
   {
     "id": "manage_warehouse_wms",
@@ -6647,10 +7849,22 @@
         },
         "processedItems": {
           "type": "integer"
+        },
+        "plantId": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "wms_management_event"
+    "isoEvent": "wms_management_event",
+    "produces": [
+      "WMS_OPERATION_COMPLETE"
+    ],
+    "consumes": [
+      "MATERIAL_RECEIVED"
+    ]
   },
   {
     "id": "calculate_scm_kpis",
@@ -6707,7 +7921,11 @@
         }
       }
     },
-    "isoEvent": "scm_kpi_report"
+    "isoEvent": "scm_kpi_report",
+    "produces": [],
+    "consumes": [
+      "WMS_OPERATION_COMPLETE"
+    ]
   },
   {
     "id": "manage_supplier_scorecard",
@@ -6779,10 +7997,17 @@
           "items": {
             "type": "string"
           }
+        },
+        "plantId": {
+          "type": "string"
         }
       }
     },
-    "isoEvent": "supplier_scorecard_update"
+    "isoEvent": "supplier_scorecard_update",
+    "produces": [
+      "SCORECARD_UPDATED"
+    ],
+    "consumes": []
   },
   {
     "id": "generate_delivery_report",
@@ -6842,7 +8067,11 @@
         }
       }
     },
-    "isoEvent": "delivery_report_generated"
+    "isoEvent": "delivery_report_generated",
+    "produces": [],
+    "consumes": [
+      "SCORECARD_UPDATED"
+    ]
   },
   {
     "id": "scan_incoming_material",
@@ -6902,9 +8131,27 @@
         "receivingTimestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "warehouseId": {
+          "type": "string"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "receive",
+            "putaway",
+            "pick",
+            "pack",
+            "ship",
+            "inventory_count"
+          ]
         }
       }
     },
-    "isoEvent": "incoming_material_scanned"
+    "isoEvent": "incoming_material_scanned",
+    "produces": [
+      "MATERIAL_RECEIVED"
+    ],
+    "consumes": []
   }
 ]

@@ -153,51 +153,49 @@ Estas son **las reglas duras** que evitan que el sistema se vuelva ingobernable.
 
 ### 4.1 `event.type`
 
-Formato: `<dominio>.<sujeto>.<acción>` en `snake_case` con puntos como separadores de nivel. Verbo siempre en **pasado**.
+Formato: **`SCREAMING_SNAKE_CASE`** — todo en MAYÚSCULAS con guion bajo. El nombre describe **qué pasó**, con el resultado en pasado: `..._CAPTURED`, `..._DETECTED`, `..._UPDATED`, `..._ISSUED`, `..._GENERATED`.
 
-Dominios válidos hoy:
+> ⚠️ **Importante (corrige versiones previas de esta guía):** el `event.type` **NO** lleva dominio ni puntos, y **NO** es minúsculas. Es un nombre plano en MAYÚSCULAS, único en todo el sistema. El "dominio" de la tool vive aparte, en su campo **`category`** (`quality`, `productivity`, `energy`, …), no dentro del `event.type`.
+>
+> **Regla de oro:** el `event.type` que tu tool **produce** debe coincidir **carácter por carácter** con el campo `event` de la regla en `communication-rules.json` y con el `consumes` de la tool que reacciona. Si difiere en una sola letra, tu tool **nunca se dispara**.
 
-| Dominio | Para qué |
+Ejemplos correctos (son los que el bus realmente enruta hoy):
+
+```
+MEASUREMENTS_CAPTURED
+CHART_POINTS_UPDATED
+OUT_OF_CONTROL_DETECTED
+NC_REQUIRES_8D
+8D_REPORT_ISSUED
+FOLLOWUP_SCHEDULED
+DEFECT_FOUND
+PRODUCTION_VARIANCE_DETECTED
+```
+
+Categorías válidas (campo `category` de la tool, **no** parte del `event.type`):
+
+| Categoría | Para qué |
 |---|---|
-| `sensor` | Lectura cruda de un sensor físico |
-| `iso` | Eventos de cumplimiento ISO (10816, 14224, etc.) |
-| `quality` | Defectos, no conformidades, inspecciones |
-| `maint` | Mantenimiento (ordenes, predicciones, ejecuciones) |
+| `quality` | Defectos, no conformidades, inspecciones, SPC, MSA |
+| `productivity` | OEE, desviaciones de producción, KPIs, proyectos |
+| `maintenance` | Mantenimiento (órdenes, predicciones, FMEA) |
 | `energy` | Consumo, picos, anomalías energéticas |
-| `safety` | Incidentes, zonas, EPP, near-miss |
-| `production` | OEE, desviaciones, optimización |
-| `supply` | Cadena de suministro, proveedores, inventario |
+| `safety` | Incidentes, zonas, HAZOP, SIL |
+| `supply_chain` | Cadena de suministro, proveedores, inventario |
 | `erp` | KPIs de negocio, ventas, finanzas |
 | `aiml` | Predicciones, anomalías ML, scoring |
 | `edge` | Salud de equipos edge, conectividad |
-| `cybersec` | Amenazas, eventos de seguridad TI |
-| `ops` | Turnos, scheduling, eventos operacionales |
-| `audit` | Reportes, hallazgos de auditoría |
-
-Ejemplos correctos:
-
-```
-sensor.vibration.measured
-iso.10816.alarm.triggered
-quality.defect.detected
-maint.workorder.created
-maint.workorder.closed
-production.deviation.alerted
-energy.consumption.exceeded
-safety.zone.violation.detected
-audit.report.generated
-```
+| `cybersecurity` | Amenazas, eventos de seguridad OT/IT |
 
 Ejemplos **incorrectos** (no hagas esto):
 
 | Mal | Por qué |
 |---|---|
-| `DefectDetected` | Usa snake_case + puntos, no CamelCase. |
-| `defect_detected` | Falta dominio. |
-| `quality.detect_defect` | Verbo debe ir en pasado. |
-| `quality.defect.detect.event` | Sobra `event`. Todo es un evento. |
-| `ALARM_TRIGGERED` | No mayúsculas; un solo formato para todo. |
-| `iso10816AlarmTriggered` | No CamelCase y falta separación de niveles. |
+| `DefectFound` | CamelCase. Usa `DEFECT_FOUND`. |
+| `defect_found` | Minúsculas. Va en MAYÚSCULAS. |
+| `quality.defect.found` | Sin puntos ni dominio en el nombre; el dominio va en `category`. |
+| `MEASUREMENTS CAPTURED` | Sin espacios. Usa guion bajo. |
+| `getChartPoints` | El `event.type` nombra un hecho ocurrido, no una acción a ejecutar. |
 
 ### 4.2 `asset_id`
 
@@ -283,8 +281,8 @@ export const meta = {
   id:          'detect_production_deviation',
   name:        'Detect Production Deviation',
   version:     '1.0.0',
-  consumes:    ['production.metrics.snapshot'],
-  produces:    ['production.deviation.alerted'],
+  consumes:    ['PRODUCTION_METRICS_SNAPSHOT'],
+  produces:    ['PRODUCTION_DEVIATION_DETECTED'],
   category:    'productivity',
   description: 'Compara producción planificada vs real y emite alerta si la desviación supera 5%.',
 };
@@ -299,7 +297,7 @@ export async function handler(inputEvent) {
 
   return {
     event: {
-      type:     'production.deviation.alerted',
+      type:     'PRODUCTION_DEVIATION_DETECTED',
       category: 'productivity',
       severity: Math.abs(deviationPct) > 15 ? 'high' : 'medium',
     },
@@ -320,7 +318,7 @@ export async function handler(inputEvent) {
 3. **Lo que NO devuelves**: `event_id`, `timestamp`, `module`, `platform_version`, `correlation_id`, `causation_id`. El bus los rellena automático.
 4. **Sin efectos secundarios externos**: no llames a otras tools, no escribas en la DB, no hagas HTTP saliente. Tu único output es el `return`.
 5. **Síncrono respecto a I/O propio**: si necesitas leer un archivo de catálogo o calcular algo, hazlo. Pero no toques recursos compartidos.
-6. **Errores**: lanza `throw new Error('mensaje')`. El bus lo captura y manda el evento a `events_dlq` con la traza. No silencies excepciones.
+6. **Errores**: lanza `throw new Error('mensaje')`. El bus lo captura, corta esa rama de la cadena y registra la falla como una entrada `{ tool, error, triggered_by }` en el `chain` de la respuesta (el resto de la cadena sigue). No silencies excepciones.
 7. **Idempotente**: si te llaman dos veces con el mismo input, debes producir el mismo output.
 
 ### 5.3 Casos válidos de retorno
@@ -350,8 +348,10 @@ return null;
 | `produces` | Sí | Array de `event.type` que puede emitir. |
 | `category` | Sí | Una de las 7 categorías del enum. |
 | `description` | Sí | Una línea. Para el dashboard de tools. |
-| `inputSchema` | Recomendado | JSON Schema de `data` que espera. Validado en runtime. |
+| `inputSchema` | Recomendado | JSON Schema de `data` que espera. |
 | `outputSchema` | Recomendado | JSON Schema de `data` que produce. |
+
+> **Dónde vive cada cosa:** el `meta` del handler (`src/tools/<id>.js`) lleva `id`, `name`, `version`, `category`, `consumes`, `produces`, `description`. El **contrato de datos** —`inputSchema` / `outputSchema`, además de `produces` / `consumes` e `isoEvent`— vive en la entrada de tu tool en **`src/data/agents/tools.json`** (es el catálogo que consume el dashboard y la validación). Mantén ambos consistentes: `meta.consumes/produces` del handler deben coincidir con los de `tools.json` y con las reglas.
 
 ---
 
@@ -399,7 +399,7 @@ Para que tu tool se ejecute automáticamente cuando entra cierto tipo de evento,
   "id":               "rule-prod-014",
   "sourceToolId":     "production_metrics_collector",
   "targetToolId":     "detect_production_deviation",
-  "event":            "production.metrics.snapshot",
+  "event":            "PRODUCTION_METRICS_SNAPSHOT",
   "protocol":         "internal",
   "topic":            "tool/detect_production_deviation",
   "triggerCondition": "always",
@@ -486,8 +486,8 @@ export const meta = {
   id:       'forecast_production_delays',
   name:     'Forecast Production Delays',
   version:  '0.1.0-placeholder',
-  consumes: ['production.metrics.snapshot'],
-  produces: ['production.delay.forecasted'],
+  consumes: ['PRODUCTION_METRICS_SNAPSHOT'],
+  produces: ['PRODUCTION_DELAY_FORECASTED'],
   category: 'productivity',
   description: '[PLACEHOLDER] Pronostica retrasos de producción.',
 };
@@ -495,7 +495,7 @@ export const meta = {
 export async function handler(inputEvent) {
   return {
     event: {
-      type:     'production.delay.forecasted',
+      type:     'PRODUCTION_DELAY_FORECASTED',
       category: 'productivity',
       severity: 'medium',
     },
@@ -550,7 +550,7 @@ const inputEvent = {
     area_id:    'assembly',
     line_id:    'line_2',
   },
-  event:     { type: 'production.metrics.snapshot', category: 'productivity', severity: 'low' },
+  event:     { type: 'PRODUCTION_METRICS_SNAPSHOT', category: 'productivity', severity: 'low' },
   data:      { planned: 100, actual: 82 },
 };
 
@@ -569,13 +569,20 @@ curl -X POST http://localhost:3000/api/v1/events \
   -d @sample-event.json
 ```
 
-Luego consulta:
+**La respuesta del POST ya trae la cadena** en el campo `chain`: cada elemento es una tool que el bus disparó, con `tool`, el `event` que produjo, `triggered_by` (la regla) y `data` (la salida de su handler). Ahí ves directo si tu tool corrió y qué emitió:
 
-```bash
-curl "http://localhost:3000/api/v1/events?since_id=0" -H "x-api-key: <tu-key>"
+```json
+{
+  "status": "accepted",
+  "triggered": 1,
+  "chain": [
+    { "tool": "detect_production_deviation", "event": "PRODUCTION_DEVIATION_DETECTED",
+      "triggered_by": "rule-prod-014", "data": { "deviation_pct": -18 } }
+  ]
+}
 ```
 
-Deberías ver el evento original **y** el evento que tu tool produjo en respuesta. Con el mismo `correlation_id`.
+Si `triggered: 0` y `chain: []`, tu tool **no** se disparó → revisa que (a) el `event.type` que mandaste coincide con el `event` de tu regla y (b) el `triggerCondition` se cumple con tus `data`.
 
 ### 9.4 Ver la cadena causal
 
@@ -619,7 +626,8 @@ Antes de abrir el PR, recorre esta lista. Si algo está en rojo, no se mergea.
 
 ### Datos
 
-- [ ] `tools.json` actualizado con la entry de tu tool (id, name, category, description, inputSchema, outputSchema).
+- [ ] `tools.json` actualizado con la entry de tu tool (id, name, category, descriptionEs/En, inputSchema, outputSchema, **`produces`**, **`consumes`**, **`isoEvent`**).
+- [ ] El `outputSchema` de tu tool incluye **todos los campos** que la(s) tool(s) downstream marcan como `required` (y los que lee su `triggerCondition`), para que tu salida **encaje** con la entrada de la siguiente. Verifícalo con `node scripts/align_tools_schemas.js` (dry-run): debe reportar `Huecos restantes: 0`.
 - [ ] `communication-rules.json` tiene al menos una regla con tu tool como `targetToolId` (a menos que sea una tool de entrada manual).
 - [ ] Si tu tool produce un `event.type` nuevo, está documentado en `event-standard.json`.
 - [ ] Si tu tool aplica a un estándar ISO, está mapeada en `src/services/isoMappingService.js`.
@@ -653,7 +661,7 @@ Antes de abrir el PR, recorre esta lista. Si algo está en rojo, no se mergea.
 | `asset.plant_id` | string | snake_case | productor | `plant_01` |
 | `asset.area_id` | string | snake_case | productor | `assembly` |
 | `asset.line_id` | string | snake_case | productor | `line_2` |
-| `event.type` | string | `dominio.sujeto.accion` | productor | `production.deviation.alerted` |
+| `event.type` | string | `SCREAMING_SNAKE_CASE` | productor | `PRODUCTION_DEVIATION_DETECTED` |
 | `event.category` | string | enum (7 valores) | productor | `productivity` |
 | `event.severity` | string | enum (4 valores) | productor | `high` |
 | `data` | object | flexible, snake_case | productor | `{ deviation_pct: 12.5 }` |

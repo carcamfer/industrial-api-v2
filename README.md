@@ -9,6 +9,16 @@ Ambiente modular listo para los módulos del hackatón CTRLHACK 2.0. Incluye:
 - Docker Compose con perfiles (`api`, `dashboard`, `seed`)
 - Workflow de CI (GitHub Actions) con lint + build Docker
 
+## 📖 Para desarrolladores de tools (empieza aquí)
+
+Si vas a crear o probar una tool, lee estas guías en `docs/`:
+
+- **[`docs/GUIA_TOOLS.md`](docs/GUIA_TOOLS.md)** — cómo crear una tool: anatomía del evento y del handler, reglas de nombrado (`event.type` en `SCREAMING_SNAKE_CASE`), reglas de comunicación, pruebas locales y checklist antes de mergear.
+- **[`docs/SIMULACION_PASO_A_PASO.md`](docs/SIMULACION_PASO_A_PASO.md)** — cómo levantar el ambiente (Docker) y disparar una cadena de tools con Postman, el script o curl, y leer el `chain` de la respuesta.
+- **[`docs/postman/Paquete-ISO9001.postman_collection.json`](docs/postman/Paquete-ISO9001.postman_collection.json)** — colección de Postman lista para importar.
+
+> Las pruebas de tools **en desarrollo** se hacen en **localhost** (tu código, tu Postgres local vía Docker). Railway corre solo el código ya desplegado en `main`.
+
 ## Estructura
 
 ```
